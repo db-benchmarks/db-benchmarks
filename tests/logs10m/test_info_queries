@@ -1,0 +1,4 @@
+{
+  "count": "select count(*) from logs10m",
+  "doc": "select * from logs10m limit 1"
+}
