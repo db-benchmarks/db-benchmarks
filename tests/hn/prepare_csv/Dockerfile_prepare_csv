@@ -1,0 +1,9 @@
+#FROM python:2.7-alpine as csv
+FROM python:3.8.5-buster
+RUN pip install --upgrade pip setuptools csvkit
+#RUN apk update && apk upgrade && apk add bash
+RUN mkdir /data
+VOLUME /data
+ADD entrypoint.sh /
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
+#CMD ["sleep", "1000"]

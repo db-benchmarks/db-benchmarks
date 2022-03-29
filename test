@@ -1,0 +1,623 @@
+#!/usr/bin/php
+<?php
+
+abstract class engine {
+
+    public static $mode; // work mode: test, save or dump
+    protected static $startTime; // test start timestamp to be used as a sub-directory when saving results
+    protected static $cwd; // the initial working dir the script was run in
+    public static $commandLineArguments;
+    protected $type; // engine type (e.g. columnar_plain_ps)
+    private static $queries = false; // queries to process
+    private static $formatVersion = 1; // output files/db record format version
+
+    // fetches and returns info about engine
+    // should return non-empty array including element "version"
+    abstract protected function getInfo();
+
+    // runs before query, supposed to be used for preparing for a query, so the time spent on that is not count towards the actual query
+    abstract protected function beforeQuery();
+
+    // runs after engine is started to make sure we can connect to it before we make any actual query
+    abstract protected function canConnect();
+
+    // runs one query against engine
+    abstract protected function testOnce($query);
+
+    // parses query result and returns it in the format that should be common across all engines
+    abstract protected function parseResult($result);
+
+    // sends a command to engine to drop its caches
+    abstract protected function dropEngineCache();
+
+    // modifies $query for the case when it's defined in simple form in queries file, i.e. common for all the engines
+    protected abstract function prepareQuery($query);
+
+    // creates instance of engine of different type (defined by the inheritant class) and subtype (defined in $type)
+    // not the engine class itself is abstract, therefore should not be instantiated
+    // it's just that the constructor can be common for all the inheritants, that's why it's implemented in the abstract class
+    public function __construct($type) {
+        $this->type = $type;
+    }
+
+    // $modifyMode=true means we deal with a log line which is already processed, we just need to modify the tabs after time and:
+    // * insert tabs between date and message, not in the beginning of each line
+    // * do not apply any colors
+    protected static function log($message, $depth, $color = false, $noTime = false, $modifyMode = false) {
+        $depth--;
+        $colors = ['black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'white' => 37, 'bright_black' => 90];
+        $lines = preg_split('/\r\n|\n\r|\r|\n/', trim($message));
+        foreach ($lines as $line) if (trim($line) != "") {
+            $prepend = "";
+            if (!$noTime) {
+                if (stream_isatty(STDOUT)) $prepend .= "\033[01;".$colors['white']."m".date('r')."\033[0m ";
+                else $prepend .= date('r')." ";
+            }
+            if ($depth > 0) $tabs = str_repeat("   ", $depth); else $tabs = "";
+            if (!$modifyMode) $prepend .= $tabs;
+            $lineColor = false;
+            if (preg_match('/error/i', $line) and !$modifyMode) $lineColor = 'red';
+            else if (preg_match('/warning/i', $line) and !$modifyMode) $lineColor = 'yellow';
+            if ($color and !$modifyMode) $lineColor = $color;
+
+            if (!stream_isatty(STDOUT)) $lineColor = false; // disable spec. characters in case there's no TTY at stdout
+
+            if (isset($colors[$lineColor])) $prepend .= "\033[01;".$colors[$lineColor]."m";
+            if ($modifyMode) echo preg_replace('/(\d\d\d\d \d\d:\d\d:\d\d \+\d\d\d\d\\033\[0m )\s*/', '$1'.$tabs, $prepend.$line);
+            else echo $prepend.$line;
+            if ($lineColor and isset($colors[$lineColor]) and !$modifyMode) echo "\033[0m";
+            echo "\n";
+        }
+    }
+
+    protected static function die($message, $depth, $color = false, $noTime = false) {
+        self::log($message, $depth, $color, $noTime);
+        exit(1);
+    }
+
+
+    public static function saveResultsFromPath($path) {
+        $dir_iterator = new RecursiveDirectoryIterator($path);
+        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $file) {
+            if (is_file($file)) {
+                self::log("Saving from file $file", 1, 'yellow');
+                $results = @unserialize(file_get_contents($file));
+                if (!$results) self::die("ERROR: can't read from the file");
+                self::saveToDB($results);
+            }
+        }
+        return true;
+    }
+
+
+    private static function mres($value) {
+        $search = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
+        $replace = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
+        return str_replace($search, $replace, $value);
+    }
+
+    private static function saveToDB($results) {
+        self::log("Saving results for {$results['engine']}", 2);
+        if (@$results['formatVersion'] != self::$formatVersion) self::die("ERROR: can't save to db (unsupported format)", 3);
+        $queries = $results['queries'];
+        unset($results['queries']);
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, "https://".self::$commandLineArguments['host'].":".self::$commandLineArguments['port']."/sql?mode=raw");
+        curl_setopt($curl, CURLOPT_USERPWD, self::$commandLineArguments['username'].":".self::$commandLineArguments['password']);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        $query = "create table if not exists results(test_time timestamp, server_id string, server_info string stored, format_version int, engine_name string, type string, info json, avg float, cv float, avg_fastest float, cv_avg_fastest float, cold bigint, fastest bigint, slowest bigint, times json, times_count int, original_query text indexed attribute, modified_query text indexed attribute, result string, checksum int, warmup_time bigint) min_word_len = '1' min_infix_len = '2' engine='columnar'";
+
+        curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
+        $curlResult = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($httpCode != 200) self::die("ERROR: can't create or verify table to save results: http code: $httpCode", 3);
+
+        foreach ($queries as $query) {
+            $fields = ['id', 'test_time', 'server_id', 'server_info', 'format_version', 'engine_name', 'type', 'info', 'avg', 'cv', 'avg_fastest', 'cv_avg_fastest', 'cold', 'fastest', 'slowest', 'times', 'times_count', 'original_query', 'modified_query', 'result', 'checksum', 'warmup_time' ];
+            $id = unpack('q', sha1("{$results['testTime']}_{$results['engine']}_{$results['type']}_{$query['originalQuery']}_".implode(',', $query['times']), true));
+            $id = abs($id[1]);
+            $values = [$id, $results['testTime'], "'".$results['serverId']."'", "'".self::mres(json_encode($results['serverInfo'], JSON_PRETTY_PRINT))."'", self::$formatVersion,  "'{$results['engine']}'", "'{$results['type']}'", "'".self::mres(json_encode($results['info']))."'", $query['avg'], $query['cv'], $query['avgFastest'], $query['cvAvgFastest'], $query['cold'], $query['fastest'], $query['slowest'], "'".json_encode($query['times'])."'", count($query['times']), "'".self::mres($query['originalQuery'])."'", "'".self::mres($query['modifiedQuery'])."'", "'".self::mres(json_encode($query['result'], JSON_PRETTY_PRINT))."'", $query['checksum'], $query['warmupTime']];
+            $query = "replace into results (".implode(',', $fields).") values (".implode(',', $values).")";
+
+            curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
+            $curlResult = curl_exec($curl);
+            $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($curlResult = @json_decode($curlResult));
+            $errorMessage = "ERROR: can't save results to db: http code: $httpCode";
+            if (isset($curlResult->error)) $errorMessage .= "; error: ".$curlResult->error;
+            if ($httpCode != 200) self::die($errorMessage, 3);
+        }
+    }
+
+
+    public static function save() {
+        // TODO        
+    }
+
+    // runs test based on config for all engines
+    public static function test($cwd) {
+        chdir(dirname(__FILE__));
+
+        $enginesInfo = [];
+
+        self::prepareEnvironmentForTest(); // stop all that can be running
+
+        self::log("Getting general server info", 1, 'cyan');
+
+        $commands = [
+            'serverId' => 'cat /etc/machine-id',
+            'cpuInfo' => 'cat /proc/cpuinfo',
+            'free' => 'free',
+            'ps' => 'ps aux',
+            'DMIInfo' => 'dmidecode',
+            'df' => 'df -h',
+            'hostname' => 'hostname'
+        ];
+
+        $serverInfo = [];
+        foreach ($commands as $k=>$v) {
+            self::log("running \"$v\" to get $k", 2);
+            exec($v, $o, $r);
+            if (!$o or $r) self::die("ERROR: cannot get server info (\"$v\" failed)", 3);
+            $serverInfo[$k] = implode("\n", $o);
+        }
+        $serverId = $serverInfo['serverId']; // we'll store serverId separately from ther other server info
+        unset($serverInfo['serverId']);
+
+        // let's first start all engines one by one with no constraint even if they were set just to figure out their info
+        self::log("Getting info about engines", 1, 'cyan');
+        foreach (self::$commandLineArguments['engines'] as $engine) {
+            $engineOptions = self::parseEngineName($engine);
+            $engine = new $engineOptions['engine']($engineOptions['type']);
+            $engine->start(false, false, false); // no memory constraint, no CPU constraint, no IO waiting
+            $t = microtime(true);
+            self::log("Getting info about {$engineOptions['engine']}".($engineOptions['type']?" (type {$engineOptions['type']})":""), 2);
+            do {
+                ob_start();
+                $info = $engine->getInfo();
+                self::log(ob_get_clean(), 3);
+                if (is_array($info) and !empty($info)) {
+                    $enginesInfo[$engineOptions['engine']][$engineOptions['type']] = $info;
+                    $file = realpath(__DIR__.'/tests/'.self::$commandLineArguments['test'].'/test_info_queries');
+                    if (!file_exists($file)) self::die("ERROR: cannot get engine info, $file is not accessible", 3);
+                    $json = @json_decode(file_get_contents($file), true);
+                    if (!$json) self::die("ERROR: cannot get engine info, $file is not JSON", 3);
+                    if (!isset($json['count']) or !isset($json['doc'])) self::die("ERROR: cannot get engine info, $file doesn't have elements \"count\" or \"doc\"", 3);
+
+                    $engine = new $engineOptions['engine']($engineOptions['type']);
+
+                    $queries = ['count', 'doc'];
+                    $outs = [];
+                    foreach ($queries as $type) {
+                        $query = $json[$type];
+                        if (!is_array($query)) $preparedQuery = $engine->prepareQuery($query);
+                        else $preparedQuery = @$query[$engineOptions['engine']];
+                        if (!$preparedQuery) self::die("ERROR: cannot get engine info, unknown query of type $type", 3);
+                        self::log("Sending informational query \"$preparedQuery\" to {$engineOptions['engine']}". ($engineOptions['type']?" (type {$engineOptions['type']})":""), 3, 'yellow');
+                        $engine->beforeQuery();
+                        $result = $engine->testOnce($preparedQuery);
+                        $outs[$type] = $engine->parseResult($result);
+                    }
+                    $count = array_shift(array_values(array_shift($outs['count'])));
+                    if (!$count) self::die("ERROR: cannot continue since the dataset is empty (COUNT query returned zero)", 3);
+                    $enginesInfo[$engineOptions['engine']][$engineOptions['type']]['datasetCount'] = $count;
+                    $doc = (object)array_shift($outs['doc']);
+                    if (!$doc) self::die("ERROR: cannot continue since we couldn't fetch a sample document", 3);
+                    $enginesInfo[$engineOptions['engine']][$engineOptions['type']]['datasetSampleDocument'] = $doc;
+                    break;
+                }
+                sleep(5);
+            } while (microtime(true) - $t < self::$commandLineArguments['info_timeout']);
+            if (!is_array($info)) self::die("ERROR: couldn't get info about $engine", 1);
+        }
+
+        self::prepareEnvironmentForTest(); // stop all again after getting info about engines
+
+        self::readQueries();
+        if (!self::$queries) self::die("ERROR: empty queries", 1);
+
+        // let's test in all memory modes
+        self::log('Starting testing', 1, 'cyan');
+        foreach (self::$commandLineArguments['memory'] as $mem) {
+            self::log("Memory: {$mem}m", 1);
+            foreach (self::$commandLineArguments['engines'] as $engine) {
+                $engineOptions = self::parseEngineName($engine);
+                self::log("Engine: ".$engineOptions['engine'].", type: ".$engineOptions['type'], 2);
+                $engine = new $engineOptions['engine']($engineOptions['type']);
+                $queryTimes = [];
+                foreach (self::$queries as $query) {
+                    $originalQuery = is_array($query)?current($query):$query;
+                    self::log("Original query: $originalQuery", 3, 'yellow');
+                    if (!is_array($query)) $preparedQuery = $engine->prepareQuery($query);
+                    else $preparedQuery = $query[$engineOptions['engine']];
+                    self::log("Modified query: $preparedQuery", 3, 'yellow');
+
+                    // starting Engine
+                    ob_start(); 
+                    $warmupTime = $engine->start();
+                    if ($warmupTime === true or $warmupTime === false) $warmupTime = -1;
+                    self::log(ob_get_clean(), 4, false, true, true); self::log(ob_get_clean(), 4);
+
+                    // making initial connection to make sure the 1st real query doesn't spend extra time on connection
+                    ob_start();
+                    $t = microtime(true);
+                    while (true) {
+                        $canConnect = $engine->canConnect();
+                        if ($canConnect) break;
+                        if (microtime(true) - $t > self::$commandLineArguments['probe_timeout']) break;
+                    }
+                    self::log(ob_get_clean(), 4);
+                    if (!$canConnect) self::die("ERROR: couldn't connect to engine", 4);
+
+                    self::log("Making queries", 4);
+                    $times = [];
+                    for ($n=0;$n<self::$commandLineArguments['times'];$n++) {
+                        if (!self::checkTempAndWait()) self::die("ERROR: can't check temperature. High risk of inaccuracy!", 4);
+                        $engine->beforeQuery();
+                        $engine->dropEngineCache(); // before we test we need to drop caches inside the engine, otherwise we'll test cache performance which in most cases is wrong
+                        $t = microtime(true);
+                        $result = $engine->testOnce($preparedQuery);
+                        if (is_array($result)) { // means testOnce() returned an error
+                            $s = "WARNING: query failed. Details: ";
+                            $errorDetails = []; foreach ($result as $k=>$v) $errorDetails[] = "$k: $v"; $s .= implode('; ', $errorDetails); 
+                            $s .= ". It doesn't make sense to test this query further.";
+                            self::log($s, 5);
+                            $normalizedResult = ['error' => $result];
+                            break;
+                        }
+                        $times[] = microtime(true) - $t;
+                        self::log(floor((microtime(true) - $t) * 1000000)." us", 5, 'white');
+                        $normalizedResult = $engine->parseResult($result);
+
+                        $tmpTimes = $times; 
+                        sort($tmpTimes); 
+                        if (count($tmpTimes) > self::$commandLineArguments['times'] / 3) {
+                            $cv = self::cv(array_slice($tmpTimes, 0, floor(0.8 * count($tmpTimes))));
+                            if ($cv > 0 and $cv <= 2) { // if the CV of fastest 80% of response times <2% and there were at least 1/3 of attempts made - that's enough
+                                self::log(($n+1)." queries is enough, the quality is sufficient", 5, 'white');
+                                break;
+                            }
+                        }
+                    }
+                    $engine->stop();
+                    self::dropIOCache();
+
+                    $queryTimes[] = ['originalQuery' => $originalQuery, 'modifiedQuery' => $preparedQuery, 'times' => $times, 'result' => $normalizedResult, 'checksum' => self::checksum($normalizedResult), 'warmupTime' => $warmupTime];
+                }
+                $engine->saveToDir($queryTimes, $mem, $engineOptions, $enginesInfo[$engineOptions['engine']][$engineOptions['type']], $serverId, $serverInfo);
+            }
+        }
+    }
+
+    // calculates result's checksum
+    private static function checksum($normalizedResult) {
+        if (!$normalizedResult) return 0;
+        $csPayload = [];
+        foreach ($normalizedResult as $v) {
+            $csPayload = array_merge($csPayload, array_values($v));
+        }
+        return crc32(implode('_', $csPayload));
+    }
+
+    // saves test results
+    protected function saveToDir($queryTimes, $memory, $engineOptions, $info, $serverId, $serverInfo) {
+        self::log("Saving data for engine \"".get_class($this)."\"", 2, 'cyan');
+
+        $engine = get_class($this);
+        if (!isset($info['version'])) {
+            self::log("WARNING: version for $engine is not found, can't save results");
+            return false;
+        }
+
+        $limited = (@self::$commandLineArguments['limited'] or $engineOptions['limited']);
+
+        $fileName = self::$commandLineArguments['test']."_{$engine}_{$this->type}_{$memory}";
+
+        $final = [
+            'testTime' => self::$startTime,
+            'formatVersion' => self::$formatVersion,
+            'engine' => $engine,
+            'type' => $this->type,
+            'info' => $info,
+            'queries' => [],
+            'limited' => (int)$limited,
+            'serverId' => $serverId,
+            'serverInfo' => $serverInfo
+        ];
+
+
+        foreach ($queryTimes as $result) {
+            $out = [];
+            $times = $result['times'];
+            $timesSorted = $times;
+            sort($timesSorted);
+            $out['avgFastest'] = (floor(0.8 * count($timesSorted)) !=0) ? ((int)@floor(array_sum(array_slice($timesSorted, 0, floor(0.8 * count($timesSorted)))) / floor(0.8 * count($timesSorted)) * 1000000)) : -1;
+            $out['cv'] = self::cv($times);
+            if (!$out['cv']) $out['cv'] = -1; // let's save -1 instead of 0 to make it less confusing
+            $out['avg'] = floor(array_sum($times) / count($times) * 1000000);
+            $out['cvAvgFastest'] = self::cv(array_slice($timesSorted, 0, floor(0.8 * count($timesSorted))))??-1;
+            if (!$out['cvAvgFastest']) $out['cvAvgFastest'] = -1; // let's save -1 instead of 0
+            $out['cold'] = round($times[0]*1000000);
+            $out['fastest'] = round($timesSorted[0] * 1000000);
+            $out['slowest'] = round($timesSorted[count($timesSorted) - 1] * 1000000);
+            foreach ($times as $k=>$time) $times[$k] = round($time * 1000000);
+            $out['times'] = $times;
+            $out['originalQuery'] = $result['originalQuery'];
+            $out['modifiedQuery'] = $result['modifiedQuery'];
+            $out['result'] = $result['result'];
+            $out['checksum'] = $result['checksum'];
+            $out['warmupTime'] = $result['warmupTime'];
+            $final['queries'][] = $out;
+        }
+
+        $time = date('ymd_his', self::$startTime);
+        @mkdir(self::$commandLineArguments['dir']."/".$time, 0777, true);
+        $fileName = self::$commandLineArguments['dir']."/".$time."/".$fileName;
+        if (!@file_put_contents($fileName, serialize($final))) self::log("WARNING: couldn't save test result to file $fileName", 2);
+    }
+
+    // parses engine name, e.g. manticoresearch:columnar_plain_ps into parses
+    private static function parseEngineName($engine) {
+        $engine_type = explode(':', $engine);
+        if (!$engine_type) self::die("ERROR: $engine cannot be parsed", 2);
+        $out = [];
+        $out['engine'] = $engine_type[0];
+        $out['type'] = (isset($engine_type[1]))?$engine_type[1]:'';
+        $out['limited'] = strstr($out['type'], 'limited');
+        return $out;
+    }
+
+    // starts one engine
+    // returns warmup time in milliseconds
+    //   or false in case of some issue
+    //   or true in case of  $skipIOCheck = true
+    protected function start($memory = false, $limited = false, $skipIOCheck = false) {
+        $suffix = $this->type?"_".$this->type:""; // suffix defines some volumes in the docker-compose, e.g. ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore
+        if (!$memory) $memory = 1024*1024; // supposed to be in megabytes
+
+        // "limited" can be set as --limited or as a "*limited*" in engine name
+        if ($limited or self::$commandLineArguments['limited']) $limited = 'cpuset=0'; // only one core (perhaps virtual)
+
+        $engine = get_class($this);
+
+        self::log("Starting $engine", 1, 'cyan');
+        $o = []; exec("test=".self::$commandLineArguments['test']." mem=$memory suffix=$suffix $limited docker-compose up -d $engine 2>&1", $o, $r);
+        self::log(implode("\n", $o), 2, 'bright_black');
+        if ($r) self::die("ERROR: couldn't start $engine", 2);
+        self::log("Waiting for $engine to come up", 2);
+        $t = microtime(true);
+        while ($this->checkHealth()) {
+            sleep(1);
+            if (microtime(true) - $t > self::$commandLineArguments['start_timeout']) {
+                self::log("WARNING: $engine starting time exceeded timeout (".self::$commandLineArguments[start_timeout]." seconds)", 2);
+                return false;
+            }
+        }
+        self::log("$engine ".($this->type?"(type: {$this->type}) ":'')."is up and running", 3);
+        if ($skipIOCheck) return true;
+        $t = microtime(true);
+        self::waitForNoIO();
+        return round((microtime(true) - $t)*1000);
+    }
+
+    private static function waitForNoIO() {
+        self::log("Making sure there's no activity on disks", 2);
+        $t = microtime(true);
+        while (true) {
+            $o = []; exec('dstat --noupdate --nocolor -d 3 2|tail -1', $o);
+            if (strpos(trim($o[0]), '0') === 0) break;
+            if (microtime(true) - $t > self::$commandLineArguments['warmup_timeout']) self::die("ERROR: warmup timeout (60 seconds)", 2);
+        }
+        self::log("disks are calm", 2);
+    }
+
+    // stops engine
+    private function stop() {
+        $engine = get_class($this);
+        self::log("Stopping $engine ".($this->type?"(type {$this->type})":""), 1, 'cyan');
+        $suffix = $this->type?"_".$this->type:""; // suffix defines some volumes in the docker-compose, e.g. ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore, it has to be set on stop too
+        exec("test=".self::$commandLineArguments['test']." suffix=$suffix docker-compose rm -fsv $engine > /dev/null 2>&1");
+        self::waitForNoIO();
+
+        self::log("Attempting to kill $engine in case it's still running", 2);
+        exec("test=".self::$commandLineArguments['test']." suffix=$suffix docker-compose kill $engine > /dev/null 2>&1");
+    }
+
+    // drops all global IO caches
+    // some engines require to be stopped before that, otherwise it's not effective
+    private static function dropIOCache() {
+        system('echo 3 > /proc/sys/vm/drop_caches');
+        system('sync');
+    }
+
+    // checks health of engine
+    // returns exit code (0 in case of no problems)
+    protected function checkHealth() {
+        $engine = get_class($this);
+        self::log("Checking health for $engine", 2);
+        exec("docker inspect {$engine}_engine", $o, $r);
+        if ($r) {
+            self::log("ERROR: exit code $r", 3);
+            return $r;
+        }
+        $o = implode("\n", $o);
+        $j = json_decode($o);
+        if (@$j[0]->State->Status == 'exited') {
+            self::log("ERROR: exit code ".$j[0]->State->ExitCode, 3);
+            return $j[0]->State->ExitCode;
+        }
+        self::log("$engine is ok", 3);
+        return 0;
+    }
+
+    // reads queries from disk and prepares them for further processing
+    // sets static $queries property
+    private static function readQueries() {
+        if (!file_exists(self::$commandLineArguments['queries'])) self::die("ERROR: ".self::$commandLineArguments['queries']." is not accessible", 1);
+        $queries = file_get_contents(self::$commandLineArguments['queries']);
+        if (!@json_decode($queries)) {
+            self::log("WARNING: couldn't decode the queries file, probably not a json. JSON error: ".json_last_error_msg(), 1);
+            $queries = explode("\n", trim($queries));
+        } else $queries = json_decode($queries, true);
+        self::$queries = $queries;
+    }
+
+    private static function dieWithUsage() {
+        self::log("To run a particular test with specified engines, memory constraints and number of attempts and save the results locally: 
+\t".__FILE__." 
+\t--test=test_name
+\t--engines={engine1:type,...,engineN}
+\t--times=N 
+\t[--memory=1024,2048,...,1048576]
+\t[--dir=path] - if path is omitted - save to /tmp/dbb/
+\t[--probe_timeout=N]
+\t[--start_timeout=N]
+\t[--warmup_timeout=N]
+\t[--query_timeout=N]
+\t[--info_timeout=N]
+\t[--limited]
+\t[--queries=/path/to/queries] 
+To save to db all results it finds by path
+\t".__FILE__." 
+\t--save=path/to/file/or/dir
+\t--host=HOSTNAME
+\t--port=PORT
+\t--username=USERNAME
+\t--password=PASSWORD
+To dump from db all results or a particular one by id: 
+\t".__FILE__." 
+\t--dump {test id}
+----------------------
+Environment vairables: 
+\tAll the options can be specified as environment variables, but you can't use the same option as an environment variables and an command line argument at the same time.
+", 1, 'white', true);
+        exit(1);
+    }
+
+
+    private static function getopt($short = '', $ar) {
+        $out = [];
+        foreach ($ar as $el) {
+            $el = rtrim($el, ':');
+            if (getenv($el)) $out[$el] = getenv($el);
+        }
+        $opts = getopt($short, $ar);
+        foreach ($opts as $k=>$v) {
+            if (isset($out[$k])) self::die("ERROR: environment variable \"$k\" conflicts with command line argument", 1);
+            $out[$k] = $v;
+        }
+        return $out;
+    }
+
+    public static function parseCommandLineArguments() {
+        self::$commandLineArguments = self::getopt('', ["test:", "memory:", "dir::", "engines:", "times:", "probe_timeout::", "mysql::", "start_timeout::", "warmup_timeout::", "limited::", "queries::", "query_timeout::", "info_timeout::"]);
+        if (@self::$commandLineArguments['test'] and @self::$commandLineArguments['engines'] and @self::$commandLineArguments['times']) {
+            self::$mode = 'test';
+
+            self::$commandLineArguments['engines'] = explode(',', self::$commandLineArguments['engines']);
+
+            if (!isset(self::$commandLineArguments['probe_timeout'])) self::$commandLineArguments['probe_timeout'] = 30;
+            if (!isset(self::$commandLineArguments['query_timeout'])) self::$commandLineArguments['query_timeout'] = 900;
+            if (!isset(self::$commandLineArguments['start_timeout'])) self::$commandLineArguments['start_timeout'] = 120;
+            if (!isset(self::$commandLineArguments['warmup_timeout'])) self::$commandLineArguments['warmup_timeout'] = 60;
+            if (!isset(self::$commandLineArguments['info_timeout'])) self::$commandLineArguments['info_timeout'] = 60;
+            if (!isset(self::$commandLineArguments['queries'])) self::$commandLineArguments['queries'] = 'tests/' . self::$commandLineArguments['test'] . '/test_queries';
+            if (!isset(self::$commandLineArguments['dataset'])) self::$commandLineArguments['dataset'] = self::$commandLineArguments['test'];
+            if (!isset(self::$commandLineArguments['times'])) self::$commandLineArguments['times'] = 5;
+
+            if (!isset(self::$commandLineArguments['dir'])) self::$commandLineArguments['dir'] = '/tmp/benchmarks/';
+            if (self::$commandLineArguments['dir'][0] != "/") self::$commandLineArguments['dir'] = self::$cwd."/".self::$commandLineArguments['dir'];
+            $exists = file_exists(self::$commandLineArguments['dir']);
+            if (!$exists and !@mkdir(self::$commandLineArguments['dir'])) self::die("ERROR: --dir ".self::$commandLineArguments['dir']." doesn't exist or can't be created", 1, 'red', true);
+            if (!$exists) rmdir(self::$commandLineArguments['dir']); // if the dir didn't exist (meaning we've just created it) let's remove it since in this function we are just parsing command line arguments, not creating any dirs
+
+            if (!isset(self::$commandLineArguments['mysql'])) self::$commandLineArguments['mysql'] = false; else self::$commandLineArguments['mysql'] = true;
+            if (!isset(self::$commandLineArguments['limited'])) self::$commandLineArguments['limited'] = false;
+
+            if (isset(self::$commandLineArguments['memory'])) {
+                self::$commandLineArguments['memory'] = explode(',', self::$commandLineArguments['memory']);
+            } else self::die("ERROR: --memory should be specified", 1);
+            return true;
+        }
+        self::$commandLineArguments = self::getopt('', ["save:", "host:", "port:", "username:", "password:"]);
+        if (@self::$commandLineArguments['save']) {
+            self::$mode = 'save';
+            if (self::$commandLineArguments['save'][0] != '/') self::$commandLineArguments['save'] = self::$cwd."/".self::$commandLineArguments['save'];
+            if (!file_exists(self::$commandLineArguments['save'])) self::die("ERROR: path ".self::$commandLineArguments['save']." not found", 1, 'red', true);
+        }
+        if (isset(self::$commandLineArguments['host']) and isset(self::$commandLineArguments['port']) and isset(self::$commandLineArguments['username']) and isset(self::$commandLineArguments['password'])) return true;
+        self::dieWithUsage();
+    }
+
+    // initializes some global things
+    public static function init($cwd) {
+        self::$startTime = time();
+        self::$cwd = $cwd;
+        if ( ! defined('MYSQL_OPT_READ_TIMEOUT')) {
+            define('MYSQL_OPT_READ_TIMEOUT', 30);
+        }
+
+        if ( ! defined('MYSQL_OPT_WRITE_TIMEOUT')) {
+            define('MYSQL_OPT_WRITE_TIMEOUT', 30);
+        }
+
+        ini_set('mysql.connect_timeout','60');
+    }
+
+    // function intended to prepare the environment for proper testing: stop all docker instances, clear global caches etc.
+    public static function prepareEnvironmentForTest() {
+        self::log("Preparing environment for test", 1, 'cyan');
+        system("test=".self::$commandLineArguments['test']." docker-compose down > /dev/null 2>&1");
+        system("test=".self::$commandLineArguments['test']." docker-compose rm > /dev/null 2>&1");
+        system("docker stop $(docker ps -aq) > /dev/null 2>&1");
+        system("docker ps -a|grep _engine|awk '{print $1}'|xargs docker rm > /dev/null 2>&1");
+    }
+
+    static private function checkTempAndWait() {
+        $cool = false;
+        do {
+            $o = []; $r = null;
+            exec('sensors', $o, $r);
+            if ($r) return false;
+            if (!preg_match_all('/Tctl:\s+\+([0-9\.]+)°C/i', implode("\n", $o), $matches)) return false;
+            $max = max($matches[1]);
+            if ($max > 80) {
+                if (!$cool) self::log("WARNING: CPU throttling threat (detected temperature {$max}°C). Waiting until the CPU gets cooler:", 5);
+                $cool = true;
+            }
+            if ($max < 60) $cool = false;
+            if ($cool) {
+                self::log("🧯", 5);
+                sleep(1);
+            }
+        } while ($cool);
+        return true;
+    }
+
+    // function calculates coefficient of variation
+    private static function cv($ar) {
+        $c = count($ar);
+        if (!$c) return null;
+        $variance = 0.0;
+        $average = array_sum($ar)/$c;
+        foreach($ar as $i) $variance += pow(($i - $average), 2);
+        return round(sqrt($variance/$c) / $average * 100, 2);
+    }
+
+}
+
+$cwd = getcwd();
+
+$files = glob(__DIR__ . '/plugins/*.php');
+foreach ($files as $file) require($file);
+
+engine::init($cwd);
+engine::parseCommandLineArguments();
+
+if (engine::$mode == 'save') {
+    $results = engine::saveResultsFromPath(engine::$commandLineArguments['save']);
+} else if (engine::$mode == 'test') engine::test($cwd);

@@ -1,0 +1,74 @@
+version: '2.4'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    container_name: "elasticsearch_engine"
+    mem_limit: ${mem}m # used for testing with limiated capabilities, e.g. RAM capped at 256MB
+    cpuset: "${cpuset}" # used for testing with limited capabilities, e.g. single physical core
+    privileged: true # we give containers all privileges since otherwise (as previous tests showed) in-docker and on-host performances can differe significantly
+    mem_swappiness: 0 # we disable swappiness since it can lower test results quality
+    ulimits:
+      memlock: # as recommended on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping
+        soft: -1
+        hard: -1
+      nproc: 65535 # as recommended on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_increase_ulimits_for_nofile_and_nproc
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "127.0.0.1:9200:9200"
+    environment: 
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true # as said on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping it needs to be done for performance
+    volumes:
+      - ./tests/${test}/es/idx${suffix}:/usr/share/elasticsearch/data
+      - ./tests/${test}/es/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+  clickhouse:
+    image: yandex/clickhouse-server:21.8.11.4
+    container_name: "clickhouse_engine"
+    mem_limit: ${mem}m
+    cpuset: "${cpuset}"
+    privileged: true
+    mem_swappiness: 0
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "127.0.0.1:8123:8123"
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - ./tests/${test}/ch/data${suffix}:/var/lib/clickhouse
+  manticoresearch:
+    container_name: "manticoresearch_engine"
+    mem_limit: ${mem}m
+    cpuset: "${cpuset}"
+    build:
+      context: ./manticoresearch_docker/
+      args: # required for building
+        - columnar_commit
+        - daemon_commit
+        - columnar_token
+        - daemon_token
+    image: manticoresearch:test
+    privileged: true
+    mem_swappiness: 0
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "127.0.0.1:9306:9306"
+      - "127.0.0.1:9308:9308"
+    volumes:
+      - ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore
+      - ./tests/${test}/data:/input
+      - ./tests/${test}/manticore/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf

@@ -1,0 +1,49 @@
+# rt indexes
+for type in rt columnar_rt rt_ps0 columnar_rt_ps0 rt_limited columnar_rt_limited; do
+  [ ! -z "$type" ] && suffix="_$type" || suffix="";
+  if [[ $type =~ "columnar" ]]; then storage=columnar; else storage=rowwise; fi
+  echo -e "Manticore Search (type $type):"
+  docker-compose -f ../../docker-compose.yml stop manticoresearch
+  docker-compose -f ../../docker-compose.yml rm -f manticoresearch
+  . ../../manticoresearch_docker/build
+
+  if [ -f manticore/idx$suffix/$test/$test.meta ]; then
+    echo -e "No need to rebuild"
+  else
+    echo "Stopping previous Manticore Search container"
+    docker-compose -f ../../docker-compose.yml stop manticoresearch
+    echo "Removing previous Manticore Search container"
+    docker-compose -f ../../docker-compose.yml rm -f manticoresearch
+    cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml up -d manticoresearch"
+    echo -e "Starting Manticore ($cmd)"
+    eval "$cmd"
+    echo -e "Waiting for Manticore to come up"
+    while ! nc -z localhost 9306; do sleep 1; done
+    echo -en "Starting loading to Manticore (type $type) at "; date
+    php manticore/load_csv.php data/data.csv 10000 `nproc` $storage
+    echo -en "Finished loading at "; date
+  fi
+done
+
+
+# plain indexes
+for type in columnar_plain plain columnar_plain_ps0 plain_ps0 columnar_plain_limited plain_limited; do
+  [ ! -z "$type" ] && suffix="_$type" || suffix="";
+  echo -e "Manticore Search (type $type):"
+  docker-compose -f ../../docker-compose.yml stop manticoresearch
+  docker-compose -f ../../docker-compose.yml rm -f manticoresearch
+  . ../../manticoresearch_docker/build
+  php manticore/generate_manticore_config.php --test=$test --type=$type > manticore/manticore$suffix.conf
+  if [ -f manticore/idx$suffix/${test}.sph ]; then
+    echo -e "\tNo need to rebuild"
+  else
+    if [[ "$type" != *"_ps0"* ]]; then
+      echo -en "\tStarting loading at "; date
+      suffix=$suffix docker-compose -f ../../docker-compose.yml run manticoresearch indexer --all
+      echo -en "\tFinished loading at "; date
+    else
+      echo -e "\tSkipping indexing"
+    fi
+  fi
+done
+

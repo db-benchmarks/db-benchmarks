@@ -1,0 +1,3 @@
+echo "Building Manticore Search: columnar commit: $columnar_commit; daemon commit: $daemon_commit"
+docker-compose -f ../../docker-compose.yml build --build-arg commit=$columnar_commit --build-arg daemon_commit=$daemon_commit --build-arg columnar_token=$columnar_token --build-arg daemon_token=$daemon_token manticoresearch
+
