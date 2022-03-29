@@ -4,12 +4,12 @@ for type in "" tuned limited; do
   if [ -d es/idx$suffix/nodes/0/indices ]; then
     echo -e "${COLORED}\tNo need to rebuild${NC}"
   else
-    docker-compose -f ../../docker-compose.yml stop elasticsearch
-    docker-compose -f ../../docker-compose.yml rm -f elasticsearch
+    docker-compose -f ../../docker-compose.yml --env-file ../../.env stop elasticsearch
+    docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f elasticsearch
     mkdir -p es/idx$suffix
     chmod -R 777 es/idx$suffix # otherwise elasticsearch in docker won't start
     chmod -R 777 data # otherwise logstash may not be able to read the files
-    cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml up -d elasticsearch"
+    cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d elasticsearch"
     echo -e "\tStarting elasticsearch ($cmd)"
     eval "$cmd"
     echo -e "\tWaiting for elasticsearch to come up"
