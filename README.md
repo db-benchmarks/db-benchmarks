@@ -107,6 +107,7 @@ Make sure you have the following:
 
 ```bash
 git clone git@github.com:db-benchmarks/db-benchmarks.git
+cd db-benchmarks
 ```
 
 # Get started
@@ -115,9 +116,9 @@ git clone git@github.com:db-benchmarks/db-benchmarks.git
 
 First you need to prepare a test:
 
-Go to a particular test's directory (all tests must be in directory `./tests`)
+Go to a particular test's directory (all tests must be in directory `./tests`), for example "hn_small":
 ```bash
-cd db-benchmarks/tests/hn_small
+cd tests/hn_small
 ```
 
 Run the init script:
@@ -198,9 +199,9 @@ Tue, 29 Mar 2022 14:37:30 +0200 Saving from file /home/snikolaev/db-benchmarks/t
 Tue, 29 Mar 2022 14:37:30 +0200    Saving results for clickhouse
 ```
 
-### Pull request
+### Make pull request
 
-If you believe your test results should be added to https://db-benchmarks.com/ feel free to make a pull request of your results to https://github.com/db-benchmarks/repo
+We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com/ feel free to make a pull request of your results to https://github.com/db-benchmarks/repo
 
 We will then:
 * review your results to make sure they follow the testing principles
