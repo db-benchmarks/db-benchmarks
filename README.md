@@ -201,7 +201,7 @@ Tue, 29 Mar 2022 14:37:30 +0200    Saving results for clickhouse
 
 ### Make pull request
 
-We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com/ feel free to make a pull request of your results to https://github.com/db-benchmarks/repo
+We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com feel free to make a pull request of your results to https://github.com/db-benchmarks/repo
 
 We will then:
 * review your results to make sure they follow the testing principles
