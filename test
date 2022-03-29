@@ -105,7 +105,7 @@ abstract class engine {
         unset($results['queries']);
 
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "https://".self::$commandLineArguments['host'].":".self::$commandLineArguments['port']."/sql?mode=raw");
+        curl_setopt($curl, CURLOPT_URL, ((self::$commandLineArguments['port'] == 443)?'https':'http')."://".self::$commandLineArguments['host'].":".self::$commandLineArguments['port']."/sql?mode=raw");
         curl_setopt($curl, CURLOPT_USERPWD, self::$commandLineArguments['username'].":".self::$commandLineArguments['password']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
@@ -182,7 +182,7 @@ abstract class engine {
                 self::log(ob_get_clean(), 3);
                 if (is_array($info) and !empty($info)) {
                     $enginesInfo[$engineOptions['engine']][$engineOptions['type']] = $info;
-                    $file = realpath(__DIR__.'/tests/'.self::$commandLineArguments['test'].'/test_info_queries');
+                    $file = __DIR__.'/tests/'.self::$commandLineArguments['test'].'/test_info_queries';
                     if (!file_exists($file)) self::die("ERROR: cannot get engine info, $file is not accessible", 3);
                     $json = @json_decode(file_get_contents($file), true);
                     if (!$json) self::die("ERROR: cannot get engine info, $file is not JSON", 3);
@@ -471,16 +471,16 @@ abstract class engine {
 \t".__FILE__." 
 \t--test=test_name
 \t--engines={engine1:type,...,engineN}
-\t--times=N 
-\t[--memory=1024,2048,...,1048576]
-\t[--dir=path] - if path is omitted - save to /tmp/dbb/
-\t[--probe_timeout=N]
-\t[--start_timeout=N]
-\t[--warmup_timeout=N]
-\t[--query_timeout=N]
-\t[--info_timeout=N]
-\t[--limited]
-\t[--queries=/path/to/queries] 
+\t--memory=1024,2048,...,1048576 - memory constraints to test with, MB
+\t[--times=N] - max number of times to test each query, 100 by default
+\t[--dir=path] - if path is omitted - save to /tmp/benchmarks/
+\t[--probe_timeout=N] - how long to wait for an initial connection, 30 seconds by default
+\t[--start_timeout=N] - how long to wait for a db/engine to start, 120 seconds by default
+\t[--warmup_timeout=N] - how long to wait for a db/engine to warmup after start, 120 seconds by default
+\t[--query_timeout=N] - max time a query can run, 900 seconds by default
+\t[--info_timeout=N] - how long to wait for getting info from a db/engine
+\t[--limited] - emulate one physical CPU core
+\t[--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
 To save to db all results it finds by path
 \t".__FILE__." 
 \t--save=path/to/file/or/dir
@@ -514,8 +514,8 @@ Environment vairables:
     }
 
     public static function parseCommandLineArguments() {
-        self::$commandLineArguments = self::getopt('', ["test:", "memory:", "dir::", "engines:", "times:", "probe_timeout::", "mysql::", "start_timeout::", "warmup_timeout::", "limited::", "queries::", "query_timeout::", "info_timeout::"]);
-        if (@self::$commandLineArguments['test'] and @self::$commandLineArguments['engines'] and @self::$commandLineArguments['times']) {
+        self::$commandLineArguments = self::getopt('', ["test:", "memory:", "dir::", "engines:", "times::", "probe_timeout::", "mysql::", "start_timeout::", "warmup_timeout::", "limited::", "queries::", "query_timeout::", "info_timeout::"]);
+        if (@self::$commandLineArguments['test'] and @self::$commandLineArguments['engines']) {
             self::$mode = 'test';
 
             self::$commandLineArguments['engines'] = explode(',', self::$commandLineArguments['engines']);
@@ -527,7 +527,7 @@ Environment vairables:
             if (!isset(self::$commandLineArguments['info_timeout'])) self::$commandLineArguments['info_timeout'] = 60;
             if (!isset(self::$commandLineArguments['queries'])) self::$commandLineArguments['queries'] = 'tests/' . self::$commandLineArguments['test'] . '/test_queries';
             if (!isset(self::$commandLineArguments['dataset'])) self::$commandLineArguments['dataset'] = self::$commandLineArguments['test'];
-            if (!isset(self::$commandLineArguments['times'])) self::$commandLineArguments['times'] = 5;
+            if (!isset(self::$commandLineArguments['times'])) self::$commandLineArguments['times'] = 100;
 
             if (!isset(self::$commandLineArguments['dir'])) self::$commandLineArguments['dir'] = '/tmp/benchmarks/';
             if (self::$commandLineArguments['dir'][0] != "/") self::$commandLineArguments['dir'] = self::$cwd."/".self::$commandLineArguments['dir'];
