@@ -111,7 +111,7 @@ git clone git@github.com:db-benchmarks/db-benchmarks.git
 
 # Get started
 
-### prepare test
+### Prepare test
 
 First you need to prepare a test:
 
@@ -130,7 +130,7 @@ to:
 * download the data collection from the internet
 * build tables and indexes
 
-### run test
+### Run test
 
 Then run `../../test` (it's in the project root's folder) to see the options:
 
@@ -186,7 +186,7 @@ drwxr-xr-x 3 root root   4096 Mar 29 14:02 ..
 -rw-r--r-- 1 root root 810241 Mar 29 14:02 hn_small_elasticsearch__16384
 ```
 
-### save to db
+### Save to db
 
 You can now upload the results to db for further visualization:
 
@@ -197,6 +197,15 @@ Tue, 29 Mar 2022 14:37:27 +0200    Saving results for elasticsearch
 Tue, 29 Mar 2022 14:37:30 +0200 Saving from file /home/snikolaev/db-benchmarks/tests/hn_small/./cache/220329_124856/hn_small_clickhouse__16384
 Tue, 29 Mar 2022 14:37:30 +0200    Saving results for clickhouse
 ```
+
+### Pull request
+
+If you believe your test results should be added to https://db-benchmarks.com/ feel free to make a pull request of your results to https://github.com/db-benchmarks/repo
+
+We will then:
+* review your results to make sure they follow the testing principles
+* discuss with you any arising questions 
+* and will merge your pull request
 
 # Roadmap
 
