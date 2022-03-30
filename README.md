@@ -137,12 +137,12 @@ Then run `../../test` (it's in the project root's folder) to see the options:
 
 ```bash
 To run a particular test with specified engines, memory constraints and number of attempts and save the results locally:
-        /home/snikolaev/db-benchmarks/test
+        /perf/test_engines/test
         --test=test_name
         --engines={engine1:type,...,engineN}
+        --memory=1024,2048,...,1048576 - memory constraints to test with, MB
         [--times=N] - max number of times to test each query, 100 by default
-        [--memory=1024,2048,...,1048576]
-        [--dir=path] - if path is omitted - save to /tmp/benchmarks/
+        [--dir=path] - if path is omitted - save to ./results/
         [--probe_timeout=N] - how long to wait for an initial connection, 30 seconds by default
         [--start_timeout=N] - how long to wait for a db/engine to start, 120 seconds by default
         [--warmup_timeout=N] - how long to wait for a db/engine to warmup after start, 120 seconds by default
@@ -151,15 +151,13 @@ To run a particular test with specified engines, memory constraints and number o
         [--limited] - emulate one physical CPU core
         [--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
 To save to db all results it finds by path
-        /home/snikolaev/db-benchmarks/test
-        --save=path/to/file/or/dir
+        /perf/test_engines/test
+        --save=path/to/file/or/dir, all files in the dir recursively will be saved
         --host=HOSTNAME
         --port=PORT
         --username=USERNAME
         --password=PASSWORD
-To dump from db all results or a particular one by id:
-        /home/snikolaev/db-benchmarks/test
-        --dump {test id}
+        --rm - remove after successful saving to database
 ----------------------
 Environment vairables:
         All the options can be specified as environment variables, but you can't use the same option as an environment variables and an command line argument at the same time.
@@ -219,4 +217,4 @@ We will then:
   - CPU consumption
   - IO consumption
 * Measure not only response time, but throughput
-* Make it easy to use the system in CI, so each new commit is tested and if it's slower than previously the test fails
+* Make it easy to use it in CI, so each new commit is tested and if it's slower than previously the test fails
