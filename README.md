@@ -187,7 +187,7 @@ drwxr-xr-x 3 root root   4096 Mar 29 14:02 ..
 -rw-r--r-- 1 root root 810241 Mar 29 14:02 hn_small_elasticsearch__16384
 ```
 
-### Save to db
+### Save to db to visualize
 
 You can now upload the results to db for further visualization:
 
@@ -201,12 +201,16 @@ Tue, 29 Mar 2022 14:37:30 +0200    Saving results for clickhouse
 
 ### Make pull request
 
-We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com feel free to make a pull request of your results to https://github.com/db-benchmarks/repo
+We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com feel free to make a pull request of your results to this repository:
+* Your results should be located in directory `./results`
+* If it's a new test/engine - the other changes should be in the same pull request
+* Just remeber we (and anyone else) should be able to reproduce your test and hopefully get similar results, otherwise we won't be able to accept your pull request
 
 We will then:
-* review your results to make sure they follow the testing principles
-* discuss with you any arising questions 
-* and will merge your pull request
+* Review your results to make sure they follow the testing principles
+* Perhaps reproduce your test on our hardware so they are comparable with the other tests
+* Discuss with you any arising questions 
+* And will merge your pull request
 
 # Roadmap
 
