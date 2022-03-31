@@ -89,7 +89,7 @@ Our belief is that a fair database benchmark should follow some key principles:
 9. Best if you test on a fixed CPU frequency
    > Otherwise if you are using "on-demand" cpu governor (which is normally a default) it can easily turn your 500ms response time into a 1000+ ms.
 10. Best if you test on SSD/NVME rather than HDD
-   > Otherwise depending on where your files are located on HDD you can get up to 2x lower/higher I/O performance (we tested), which can make at least your cold queries results wrong.
+    > Otherwise depending on where your files are located on HDD you can get up to 2x lower/higher I/O performance (we tested), which can make at least your cold queries results wrong.
 
 # Installation
 
