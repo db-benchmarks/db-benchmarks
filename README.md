@@ -137,64 +137,59 @@ Then run `../../test` (it's in the project root's folder) to see the options:
 
 ```bash
 To run a particular test with specified engines, memory constraints and number of attempts and save the results locally:
-        /perf/test_engines/test
-        --test=test_name
-        --engines={engine1:type,...,engineN}
-        --memory=1024,2048,...,1048576 - memory constraints to test with, MB
-        [--times=N] - max number of times to test each query, 100 by default
-        [--dir=path] - if path is omitted - save to ./results/
-        [--probe_timeout=N] - how long to wait for an initial connection, 30 seconds by default
-        [--start_timeout=N] - how long to wait for a db/engine to start, 120 seconds by default
-        [--warmup_timeout=N] - how long to wait for a db/engine to warmup after start, 120 seconds by default
-        [--query_timeout=N] - max time a query can run, 900 seconds by default
-        [--info_timeout=N] - how long to wait for getting info from a db/engine
-        [--limited] - emulate one physical CPU core
-        [--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
+	/perf/test_engines/test
+	--test=test_name
+	--engines={engine1:type,...,engineN}
+	--memory=1024,2048,...,1048576 - memory constraints to test with, MB
+	[--times=N] - max number of times to test each query, 100 by default
+	[--dir=path] - if path is omitted - save to directory 'results' in the same dir where this file is located
+	[--probe_timeout=N] - how long to wait for an initial connection, 30 seconds by default
+	[--start_timeout=N] - how long to wait for a db/engine to start, 120 seconds by default
+	[--warmup_timeout=N] - how long to wait for a db/engine to warmup after start, 300 seconds by default
+	[--query_timeout=N] - max time a query can run, 900 seconds by default
+	[--info_timeout=N] - how long to wait for getting info from a db/engine
+	[--limited] - emulate one physical CPU core
+	[--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
 To save to db all results it finds by path
-        /perf/test_engines/test
-        --save=path/to/file/or/dir, all files in the dir recursively will be saved
-        --host=HOSTNAME
-        --port=PORT
-        --username=USERNAME
-        --password=PASSWORD
-        --rm - remove after successful saving to database
+	/perf/test_engines/test
+	--save=path/to/file/or/dir, all files in the dir recursively will be saved
+	--host=HOSTNAME
+	--port=PORT
+	--username=USERNAME
+	--password=PASSWORD
+	--rm - remove after successful saving to database
 ----------------------
 Environment vairables:
-        All the options can be specified as environment variables, but you can't use the same option as an environment variables and an command line argument at the same time.
+	All the options can be specified as environment variables, but you can't use the same option as an environment variables and an command line argument at the same time.
 ```
 
 And run the test:
 
 ```bash
-root@perf3 /home/snikolaev/db-benchmarks/tests/hn_small # ../../test --test=hn_small --engines=elasticsearch,clickhouse --memory=16384 --dir=cache
-Tue, 29 Mar 2022 12:48:56 +0200 Preparing environment for test
-Tue, 29 Mar 2022 12:48:58 +0200 Getting general server info
-...
-Tue, 29 Mar 2022 14:14:44 +0200    Attempting to kill clickhouse in case it's still running
-Tue, 29 Mar 2022 14:14:45 +0200    Saving data for engine "clickhouse"
+../../test --test=hn_small --engines=elasticsearch,clickhouse --memory=16384
 ```
 
-Now you have test results in `./cache/`, for example:
+Now you have test results in `./results/` (in the root of the repository), for example:
 
 ```bash
-root@perf3 /home/snikolaev/db-benchmarks/tests/hn_small # ls -la cache/220329_124856/
-total 1384
-drwxr-xr-x 2 root root   4096 Mar 29 14:14 .
-drwxr-xr-x 3 root root   4096 Mar 29 14:02 ..
--rw-r--r-- 1 root root 595984 Mar 29 14:14 hn_small_clickhouse__16384
--rw-r--r-- 1 root root 810241 Mar 29 14:02 hn_small_elasticsearch__16384
+# ls results/
+220401_054753
 ```
 
 ### Save to db to visualize
 
-You can now upload the results to db for further visualization:
+You can now upload the results to db for further visualization. The visualization tool which is used on https://db-benchmarks.com/ can be found here https://github.com/db-benchmarks/ui .
+
+Here's how you can save the resuls:
 
 ```bash
-root@perf3 /home/snikolaev/db-benchmarks/tests/hn_small # username=bench password=bench host=manticore.benchmarks.manticoresearch.com port=443 save=./cache ../../test
-Tue, 29 Mar 2022 14:37:27 +0200 Saving from file /home/snikolaev/db-benchmarks/tests/hn_small/./cache/220329_124856/hn_small_elasticsearch__16384
-Tue, 29 Mar 2022 14:37:27 +0200    Saving results for elasticsearch
-Tue, 29 Mar 2022 14:37:30 +0200 Saving from file /home/snikolaev/db-benchmarks/tests/hn_small/./cache/220329_124856/hn_small_clickhouse__16384
-Tue, 29 Mar 2022 14:37:30 +0200    Saving results for clickhouse
+username=login password=pass host=db.db-benchmarks.com port=443 save=./results ./test
+```
+
+or 
+
+```
+./test --username=login --password=pass --host=db.db-benchmarks.com --port=443 --save=./results
 ```
 
 ### Make pull request
