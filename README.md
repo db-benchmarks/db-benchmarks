@@ -11,7 +11,7 @@
   <a href="#test-framework">Features</a> •
   <a href="#testing-principles">Testing principles</a> •
   <a href="#installation">Installation</a> •
-  <a href="https://github.com/db-benchmarks/ui">UI</a>
+  <a href="https://github.com/db-benchmarks/ui/#intro">UI</a>
 </h3>
 
 <p>&nbsp;</p>
