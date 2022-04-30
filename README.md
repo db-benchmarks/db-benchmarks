@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://db-benchmarks.com" target="_blank" rel="noopener">
-    <img src="./logo.svg" width="50%" alt="db-benchmarks logo" style="color: white">
+    <img id="intro" src="./logo.svg" width="50%" alt="db-benchmarks logo" style="color: white">
   </a>
 </p>
 
