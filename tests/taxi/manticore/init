@@ -1,0 +1,18 @@
+#for type in columnar_plain plain; do
+for type in columnar_plain; do
+  proc=32
+  [ ! -z "$type" ] && suffix="_$type" || suffix="";
+  echo -e "Manticore Search (type $type):"
+  docker-compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
+  docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
+  docker-compose -f ../../docker-compose.yml --env-file ../../.env build manticoresearch
+  php manticore/generate_manticore_config.php --test=$test --type=$type > manticore/manticore$suffix.conf
+  if [ -f manticore/idx$suffix/${test}1${type}.*sph ]; then
+    echo -e "\tNo need to rebuild"
+  else
+    mkdir -p manticore/idx$suffix
+    echo -en "\tStarting loading at "; date
+    suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env run -e proc=$proc manticoresearch bash -c 'for n in `seq 1 $proc`; do rm -f /tmp/taxi$n; (indexer --noprogress -c /etc/manticoresearch/manticore.conf taxi$n|tee /tmp/taxi$n) & pids[${n}]=$!; done; for pid in ${pids[*]}; do wait $pid; done';
+    echo -en "\tFinished loading at "; date
+  fi
+done

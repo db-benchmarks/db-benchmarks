@@ -1,0 +1,31 @@
+{
+  "index_patterns": "logs10m",
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 32,
+    "index.queries.cache.enabled": false
+  },
+  "mappings": {
+    "properties": {
+      "remote_addr": {"type": "text"},
+      "remote_user": {"type": "text"},
+      "runtime": {"type": "long"},
+      "time_local": {"type": "long"},
+      "request_type": {"type": "text"},
+      "request_path": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "request_protocol": {"type": "text"},
+      "status": {"type": "long"},
+      "size": {"type": "long"},
+      "referer": {"type": "text"},
+      "usearagent": {"type": "text"}
+    }
+  }
+}
+

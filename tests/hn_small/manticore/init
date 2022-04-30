@@ -1,0 +1,18 @@
+#for type in columnar_plain plain columnar_plain_ps0 plain_ps0 columnar_plain_limited plain_limited; do
+for type in plain; do
+  [ ! -z "$type" ] && suffix="_$type" || suffix="";
+  echo -e "Manticore Search (type $type):"
+  docker-compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
+  docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
+  docker-compose -f ../../docker-compose.yml --env-file ../../.env build manticoresearch
+  php manticore/generate_manticore_config.php --test=$test --type=$type > manticore/manticore$suffix.conf
+  mkdir -p manticore/idx$suffix/data/binlog
+  chmod 777 manticore/idx$suffix/data/binlog
+  if [ -f manticore/idx$suffix/$test.*sph ]; then
+    echo -e "\tNo need to rebuild"
+  else
+    echo -en "\tStarting loading at "; date
+    suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env run manticoresearch indexer --all
+    echo -en "\tFinished loading at "; date
+  fi
+done

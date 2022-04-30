@@ -1,0 +1,4 @@
+{
+  "count": "select count(*) from hn_small",
+  "doc": "select * from hn_small limit 1"
+}

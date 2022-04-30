@@ -1,0 +1,103 @@
+<?php
+
+/* Copyright (C) 2022 Manticore Software Ltd
+ * You may use, distribute and modify this code under the
+ * terms of the AGPLv3 license.
+ *
+ * You can find a copy of the AGPLv3 license here
+ * https://www.gnu.org/licenses/agpl-3.0.txt
+ */
+
+class mysql extends engine {
+
+    private $port = 3306;
+    private $mysql = null; // mysql connection
+    private $user = "root";
+    private $db = "default";
+
+    protected function url() {
+        return "https://mysql.com/";
+    }
+
+    protected function description() {
+        return "MySQL is the world's most popular open source database";
+    }
+    
+    // attempts to fetch info about engine and return it
+    protected function getInfo() {
+        $m = new mysqli();
+        @$m->real_connect('127.0.0.1', $this->user, '', $this->db, $this->port);
+        if ($m->connect_error) return false;
+        $res = $m->query("show variables");
+        if (!$res) return false;
+        $out = [];
+        while ($row = $res->fetch_row()) $out[$row[0]] = $row[1];
+        $ret['variables'] = $out;
+        $ret['version'] = $out['version'];
+        return $ret;
+    }
+
+    protected function appendType($info) {
+        return "";
+    }
+
+    protected function prepareQuery($query) {
+        return $query; // no modifications required
+    }
+
+    // returns true when it's possible to connect to engine and it can run a simple query
+    protected function canConnect() {
+        $m = new mysqli();
+        @$m->real_connect('127.0.0.1', $this->user, '', $this->db, $this->port);
+        if (!@$m->connect_error) {
+            $res = @$m->query("show status");
+            if ($res) return true;
+        }
+        return false;
+    }
+
+    protected function beforeQuery() {
+        $this->mysql = new mysqli();
+        $this->mysql->options(MYSQL_OPT_READ_TIMEOUT, self::$commandLineArguments['query_timeout']);
+        ini_set('mysqlnd.net_read_timeout', self::$commandLineArguments['query_timeout']);
+        @$this->mysql->real_connect('127.0.0.1', $this->user, '', $this->db, $this->port);
+    }
+
+    // runs one query against engine
+    // must respect self::$commandLineArguments['query_timeout']
+    // must return ['timeout' => true] in case of timeout
+    protected function testOnce($query) {
+        $res = $this->mysql->query($query);
+        if ($this->mysql->errno) {
+            $out = ['mysqlError' => $this->mysql->error, 'mysqlErrorCode' => $this->mysql->errno];
+            if ($this->mysql->errno == 2006) $out['timeout'] = true;
+            return $out;
+        }
+        return $res;
+    }
+
+    // parses query result and returns it in the format that should be common across all engines
+    protected function parseResult($result) {
+        $res = [];
+        if ($result and $result->num_rows > 0) {
+            while ($hit = $result->fetch_assoc()) {
+                $ar = [];
+                foreach ($hit as $k=>$v) {
+                    if (is_float($v)) $v = round($v, 4); // this is a workaround against different floating point calculations in different engines
+                    $ar[$k] = $v;
+                }
+                ksort($ar);
+                $res[] = $ar;
+            }
+        }
+        return $res;
+    }
+
+    // sends a command to engine to drop its caches
+    protected function dropEngineCache() {
+        $m = new mysqli();
+        @$m->real_connect('127.0.0.1', $this->user, '', $this->db, $this->port);
+        if ($m->connect_error) return false;
+        $m->query("RESET QUERY CACHE");
+    }
+}

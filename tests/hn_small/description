@@ -1,0 +1,4 @@
+Hacker News comments
+
+Data collection: 1.1M Hacker News curated comments with numeric fields (from https://zenodo.org/record/45901/). 
+Queries: full-text and analytical queries 
