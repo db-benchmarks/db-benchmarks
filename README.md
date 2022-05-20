@@ -336,7 +336,7 @@ To stop - just `CTRL-C`.
 
 ## Notes
 
-* The original test results layout was heavily inspired by Clickhouse Benchmarks - https://clickhouse.com/benchmark/dbms/ . Thank you, Alexey Milovidov and Clickhouse team!
+* The original test results layout of the [UI](https://github.com/db-benchmarks/ui) was heavily inspired by Clickhouse Benchmarks - https://clickhouse.com/benchmark/dbms/ . Thank you, Alexey Milovidov and Clickhouse team!
 
 <!-- roadmap -->
 ## ❤️ Contribute
