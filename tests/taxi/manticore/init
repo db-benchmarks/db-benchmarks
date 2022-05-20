@@ -1,5 +1,5 @@
 #for type in columnar_plain plain; do
-for type in columnar_plain; do
+for type in columnar; do
   proc=32
   [ ! -z "$type" ] && suffix="_$type" || suffix="";
   echo -e "Manticore Search (type $type):"

@@ -51,7 +51,8 @@ class manticoresearch extends engine {
     }
 
     protected function appendType($info) {
-        return "_".date('Ymd', $info['manticoreCommitTime'])."_".$info['manticoreCommit'];
+        return "";
+//        return "_".date('Ymd', $info['manticoreCommitTime'])."_".$info['manticoreCommit'];
     }
 
     protected function prepareQuery($query) {

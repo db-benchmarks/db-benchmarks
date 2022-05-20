@@ -1,4 +1,4 @@
-for type in plain columnar_plain; do
+for type in rowwise columnar; do
   [ ! -z "$type" ] && suffix="_$type" || suffix="";
   echo -e "Manticore Search (type $type):"
   docker-compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
