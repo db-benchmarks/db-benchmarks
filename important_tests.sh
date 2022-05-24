@@ -18,6 +18,12 @@
 ./test --test=hn --engines=manticoresearch:columnar --memory=110000 --dir=results/hn/manticoresearch
 ./test --test=hn --engines=manticoresearch:rowwise --memory=110000 --dir=results/hn/manticoresearch
 
+./test --test=hn --engines=mysql:tuned --memory=1024 --dir=results/hn/mysql
+./test --test=hn --engines=elasticsearch:tuned --memory=1024 --dir=results/hn/elasticsearch
+./test --test=hn --engines=clickhouse --memory=1024 --dir=results/hn/clickhouse
+./test --test=hn --engines=manticoresearch:columnar --memory=1024 --dir=results/hn/manticoresearch
+./test --test=hn --engines=manticoresearch:rowwise --memory=1024 --dir=results/hn/manticoresearch
+
 ./test --test=logs10m --engines=elasticsearch --memory=110000 --dir=results/logs10m/elasticsearch --query_timeout=600
 ./test --test=logs10m --engines=elasticsearch:tuned --memory=110000 --dir=results/logs10m/elasticsearch --query_timeout=600
 ./test --test=logs10m --engines=clickhouse --memory=110000 --dir=results/logs10m/clickhouse --query_timeout=600
