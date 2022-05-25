@@ -68,6 +68,31 @@ services:
       - MYSQL_DATABASE=default
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_ROOT_PASSWORD=
+  mysql_percona:
+    image: percona:8.0.28-19
+    container_name: "mysql_percona_engine"
+    mem_limit: ${mem}m
+    cpuset: "${cpuset}"
+    privileged: true
+    mem_swappiness: 0
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - ./tests/${test}/mysql_percona/data${suffix}:/var/lib/mysql
+      - ./tests/${test}/data:/input
+    command: --secure-file-priv="/input/" --innodb-ft-min-token-size=1
+    environment:
+      - MYSQL_DATABASE=default
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_ROOT_PASSWORD=
   manticoresearch:
     container_name: "manticoresearch_engine"
     mem_limit: ${mem}m

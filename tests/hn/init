@@ -30,3 +30,9 @@ fi
 
 # MySQL
 . mysql/init
+
+# MySQL Percona
+if [[ -d mysql_percona ]]; then 
+  . mysql_percona/init
+fi
+

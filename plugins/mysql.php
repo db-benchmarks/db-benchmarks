@@ -10,10 +10,10 @@
 
 class mysql extends engine {
 
-    private $port = 3306;
-    private $mysql = null; // mysql connection
-    private $user = "root";
-    private $db = "default";
+    protected $port = 3306;
+    protected $mysql = null; // mysql connection
+    protected $user = "root";
+    protected $db = "default";
 
     protected function url() {
         return "https://mysql.com/";
