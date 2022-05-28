@@ -39,7 +39,7 @@ This repository provides a test framework which does the job.
 
 Many database benchmarks are not objective, others jsut don't care about results accuracy and stability which in some cases breaks the whole idea of benchmarks. Few examples:
 
-### Druid vs Clickhouse vs Rockset
+### Druid vs ClickHouse vs Rockset
 
 https://imply.io/blog/druid-nails-cost-efficiency-challenge-against-clickhouse-and-rockset/ :
 
@@ -57,7 +57,7 @@ Mark did a great job making the taxi rides test on so many different databases a
 
 -------
 
-### Clickhouse vs others
+### ClickHouse vs others
 
 https://clickhouse.com/benchmark/dbms/
 
@@ -275,7 +275,7 @@ We will then:
   |-plugins                                 <- plugins directory: if you decide to extend the framework by adding one more database / search engine to test you need to put it into this directory
   |  |-elasticsearch.php                    <- Elasticsearch plugin
   |  |-manticoresearch.php                  <- Manticore Search plugin
-  |  |-clickhouse.php                       <- Clickhouse plugin
+  |  |-clickhouse.php                       <- ClickHouse plugin
   |  |-mysql.php                            <- Mysql plugin
   |-README.md                               <- you are reading this file
   |-tests                                   <- tests directory
@@ -284,12 +284,12 @@ We will then:
   |  |  |-description                       <- Test description which is included into test results and then is to be used when the results are visualized
   |  |  |-manticore                         <- In this dir happens everything related to testing Manticore Search WRT the current test (Hackernews)
   |  |  |  |-init                           <- This is a common script which should be in every <test>/<database> directory which is responsible for generating all for the <database>
-  |  |  |-ch                                <- "Hackernews test -> Clickhouse" directory
-  |  |  |  |-data_limited                   <- This will be mounted to Clickhouse docker if the docker-compose is run with env. var. suffix=_limited 
+  |  |  |-ch                                <- "Hackernews test -> ClickHouse" directory
+  |  |  |  |-data_limited                   <- This will be mounted to ClickHouse docker if the docker-compose is run with env. var. suffix=_limited 
   |  |  |  |-post_load_limited.sh           <- This is a hook which is triggered after the data load, called by ./init in the same directory
                                                Note, there's no post_load.sh (with no suffix), which means that no hook will be called in this case.
-  |  |  |  |-data                           <- This is another Clickhouse directory, no suffix means the docker-compose should be run with suffix= (empty value)
-  |  |  |  |-init                           <- Clickhouse's init script
+  |  |  |  |-data                           <- This is another ClickHouse directory, no suffix means the docker-compose should be run with suffix= (empty value)
+  |  |  |  |-init                           <- ClickHouse's init script
   |  |  |-es                                <- "Hackernews test -> Elasticsearch" directory
   |  |  |  |-logstash_limited               <- Logstash config dir for type "limited", hence suffix "_limited"
   |  |  |  |  |-post_load.sh                
@@ -336,7 +336,7 @@ To stop - just `CTRL-C`.
 
 ## Notes
 
-* The original test results layout of the [UI](https://github.com/db-benchmarks/ui) was heavily inspired by Clickhouse Benchmarks - https://clickhouse.com/benchmark/dbms/ . Thank you, Alexey Milovidov and Clickhouse team!
+* The original test results layout of the [UI](https://github.com/db-benchmarks/ui) was heavily inspired by ClickHouse Benchmarks - https://clickhouse.com/benchmark/dbms/ . Thank you, Alexey Milovidov and ClickHouse team!
 
 <!-- roadmap -->
 ## ❤️ Contribute
