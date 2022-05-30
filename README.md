@@ -31,13 +31,13 @@ https://db-benchmarks.com aims to make database and search engines benchmarks:
 
 ➕ **Extendable** - pluggable architecture allows adding more databases to test
 
-And keep it all **100% open source!**
+And keep it all **100% Open Source!**
 
 This repository provides a test framework which does the job.
 
 ## Why is this important?
 
-Many database benchmarks are not objective, others jsut don't care about results accuracy and stability which in some cases breaks the whole idea of benchmarks. Few examples:
+Many database benchmarks are not objective. Others don't do enough to ensure results accuracy and stability, which in some cases breaks the whole idea of benchmarks. A few examples:
 
 ### Druid vs ClickHouse vs Rockset
 
@@ -45,7 +45,7 @@ https://imply.io/blog/druid-nails-cost-efficiency-challenge-against-clickhouse-a
 
 > We actually wanted to do the benchmark on the same hardware, an m5.8xlarge, but the only pre-baked configuration we have for m5.8xlarge is actually the m5d.8xlarge ... Instead, we run on a c5.9xlarge instance
 
-Bad news, guys: when you run benchmarks on different hardware, at the very least you can't then say that something is "106.76%" and "103.13%" of something else. Even when you test on the same bare-metal server it's quite difficult to get coefficient of variation lower than 5%. 3% difference on different servers can be highly likley ignored. Provided all that, how can one make sure the final conclusion is true?
+Bad news, guys: when you run benchmarks on different hardware, at the very least you can't then say that something is "106.76%" and "103.13%" of something else. Even when you test on the same bare-metal server, it's quite difficult to get a coefficient of variation lower than 5%. 3% difference on different servers can highly likely be ignored. Provided all that, how can one make sure the final conclusion is true?
 
 -------
 
@@ -53,7 +53,7 @@ Bad news, guys: when you run benchmarks on different hardware, at the very least
 
 https://tech.marksblogg.com/benchmarks.html
 
-Mark did a great job making the taxi rides test on so many different databases and search engines. But since the tests are made on different hardware the numbers in the resulting table don't make much sense to compare one with another. You always need to remember about it when you evaluate the results in the table.
+Mark did a great job making the taxi rides test on so many different databases and search engines. But since the tests are made on different hardware, the numbers in the resulting table aren't really comparable. You always need to keep this in mind when you evaluate the results in the table.
 
 -------
 
@@ -61,23 +61,23 @@ Mark did a great job making the taxi rides test on so many different databases a
 
 https://clickhouse.com/benchmark/dbms/
 
-When you run each query just 3 times most likely you'll get very high coefficient of variation for each of them. Which means that if you make the same a minute later you may get some 20% different results. 
-And how does one reproduce it if he wants to test on his own hardware? Unfortunately, I can't find how one can do it.
+When you run each query just 3 times, you'll most likely get very high coefficients of variation for each of them. Which means that if you run the test a minute later, you may get a variation of 20%.
+And how does one reproduce a test on one's own hardware? Unfortunately, I can't find how one can do it.
 
 <!-- principles -->
 ## Testing principles
 
 Our belief is that a fair database benchmark should follow some key principles:
 
-✅ Test different databases on exactly same hardware
+✅ Test different databases on exactly the same hardware
 
-> Otherwise you at least can't appeal to little percents differences in test results.
+> Otherwise, you should acknowledge an error margin when there are small differences.
 
 ✅ Test with full OS cache purged before each test
 
 > Otherwise you can't test cold queries.
 
-✅ Database which is being tested should have all it's internal caches disabled
+✅ Database which is being tested should have all its internal caches disabled
 
 > Otherwise you'll measure cache performance.
 
@@ -95,9 +95,9 @@ Our belief is that a fair database benchmark should follow some key principles:
 
 ✅ You need to wait until the database warms up completely after it's started
 
-> Otherwise you can at least end up competing with db's warmup process for I/O which can spoil your test results severely.
+> Otherwise you may end up competing with db's warmup process for I/O which can spoil your test results severely.
 
-✅ Best if you provide a coefficient of variation, so everyone understands how stable your resutls are and make sure yourself it's low enough
+✅ Best if you provide a coefficient of variation, so everyone understands how stable your results are and make sure yourself it's low enough
 
 > [Coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) is a very good metric which shows how stable your test results are. If it's higher than N% you can't say one database is N% faster than another.
 
@@ -112,10 +112,10 @@ Our belief is that a fair database benchmark should follow some key principles:
 <!-- framework -->
 ## Test framework
 
-The test framework which is used on the backend of https://db-benchmarks.com is fully open source with AGPLv3 license and can be found on https://github.com/db-benchmarks/db-benchmarks . Here's what it does:
+The test framework which is used on the backend of https://db-benchmarks.com is fully Open Source (AGPLv3 license) and can be found at https://github.com/db-benchmarks/db-benchmarks . Here's what it does:
 
 * Automates data loading to the databases / search engines included in the repository
-* Can run database / search engine in docker with particular CPU/RAM constraint
+* Can run database / search engine in Docker with a particular CPU/RAM constraint
 * While testing:
   * Purges OS cache automatically
   * Automates purging database caches before each cold run
@@ -124,7 +124,7 @@ The test framework which is used on the backend of https://db-benchmarks.com is 
   * Looks after coefficient of variation while making queries and can stop as soon as:
     - the CV is low enough
     - and the number of queries made is sufficient
-  * After starting a database / search engine lets it do its warmup stage (preread needed data from disk), stops waiting as soon as:
+  * After starting a database / search engine, lets it do its warmup stage (preread needed data from disk), stops waiting as soon as:
     - there's no IO for a few seconds
     - and it can connect to the database / search engine
   * After stopping a database / search engine waits until it fully stops
@@ -145,13 +145,13 @@ The test framework which is used on the backend of https://db-benchmarks.com is 
       - Slowest query's response time
     - Database / search engine info:
       - `select count(*)` and `select * limit 1` to make sure the data collections are similar in different databases
-      - internal database / search engine data structures status (chunks, shards, segments, partitions, parts etc.) 
+      - internal database / search engine data structures status (chunks, shards, segments, partitions, parts, etc.) 
 * Makes it easy to limit CPU / RAM consumption inside or outside the test (using environment variables `cpuset` and `mem`)
 * Allows to start each database / search engine easily the same way it's started by the framework for manual testing and preparation of test queries
 
 ## Installation
 
-Before you deploy the test framework make sure you have the following:
+Before you deploy the test framework, make sure you have the following:
 * Linux server fully dedicated to testing
 * Fresh CPU thermal paste to make sure your CPUs don't throttle down
 * `PHP 8` and:
@@ -189,7 +189,7 @@ Run the init script:
 
 to:
 
-* download the data collection from the internet
+* download the data collection from the Internet
 * build tables and indexes
 
 ### Run test
@@ -220,8 +220,8 @@ To save to db all results it finds by path
 	--password=PASSWORD
 	--rm - remove after successful saving to database
 ----------------------
-Environment vairables:
-	All the options can be specified as environment variables, but you can't use the same option as an environment variables and an command line argument at the same time.
+Environment variables:
+	All the options can be specified as environment variables, but you can't use the same option as an environment variables and as a command line argument at the same time.
 ```
 
 And run the test:
@@ -239,9 +239,9 @@ Now you have test results in `./results/` (in the root of the repository), for e
 
 ### Save to db to visualize
 
-You can now upload the results to db for further visualization. The visualization tool which is used on https://db-benchmarks.com/ is also opensource and can be found here https://github.com/db-benchmarks/ui .
+You can now upload the results to db for further visualization. The visualization tool which is used on https://db-benchmarks.com/ is also Open Source and can be found here https://github.com/db-benchmarks/ui .
 
-Here's how you can save the resuls:
+Here's how you can save the results:
 
 ```bash
 username=login password=pass host=db.db-benchmarks.com port=443 save=./results ./test
@@ -255,10 +255,10 @@ or
 
 ### Make pull request
 
-We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com feel free to make a pull request of your results to this repository:
+We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com please make a pull request of your results to this repository:
 * Your results should be located in directory `./results`
 * If it's a new test/engine - the other changes should be in the same pull request
-* Just remeber we (and anyone else) should be able to reproduce your test and hopefully get similar results, otherwise we won't be able to accept your pull request
+* Please keep in mind that we (and anyone else) should be able to reproduce your test and hopefully get similar results.
 
 We will then:
 * Review your results to make sure they follow the testing principles
@@ -276,7 +276,7 @@ We will then:
   |  |-elasticsearch.php                    <- Elasticsearch plugin
   |  |-manticoresearch.php                  <- Manticore Search plugin
   |  |-clickhouse.php                       <- ClickHouse plugin
-  |  |-mysql.php                            <- Mysql plugin
+  |  |-mysql.php                            <- MySQL plugin
   |-README.md                               <- you are reading this file
   |-tests                                   <- tests directory
   |  |-hn                                   <- Hackernews test
@@ -285,7 +285,7 @@ We will then:
   |  |  |-manticore                         <- In this dir happens everything related to testing Manticore Search WRT the current test (Hackernews)
   |  |  |  |-init                           <- This is a common script which should be in every <test>/<database> directory which is responsible for generating all for the <database>
   |  |  |-ch                                <- "Hackernews test -> ClickHouse" directory
-  |  |  |  |-data_limited                   <- This will be mounted to ClickHouse docker if the docker-compose is run with env. var. suffix=_limited 
+  |  |  |  |-data_limited                   <- This will be mounted to ClickHouse Docker if the docker-compose is run with env. var. suffix=_limited 
   |  |  |  |-post_load_limited.sh           <- This is a hook which is triggered after the data load, called by ./init in the same directory
                                                Note, there's no post_load.sh (with no suffix), which means that no hook will be called in this case.
   |  |  |  |-data                           <- This is another ClickHouse directory, no suffix means the docker-compose should be run with suffix= (empty value)
@@ -350,7 +350,7 @@ Want to get involved in the project? Here's how you can contribute:
 * mongodb vs ferretdb
 * whatever else vs whatever else
 
-these all are waiting for your contribution.
+These all are waiting for your contribution!
 
 ### Features wishlist: 
 * Measure not only response time, but resource consumption:
