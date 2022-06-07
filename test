@@ -285,9 +285,18 @@ abstract class engine {
                 $queryTimes = [];
                 foreach (self::$queries as $query) {
                     $originalQuery = is_array($query)?current($query):$query;
+                    $preparedQuery = false;
                     self::log("Original query: $originalQuery", 3, 'yellow');
                     if (!is_array($query)) $preparedQuery = $engine->prepareQuery($query);
-                    else $preparedQuery = $query[$engineOptions['engine']];
+                    else { // query is an array (json node, not just a single string common for all dbs)
+                        if (isset($query[$engineOptions['engine'].':'.$engineOptions['type']])) $preparedQuery = $query[$engineOptions['engine'].':'.$engineOptions['type']];
+                        if (!$preparedQuery) {// exact match is not found, let's check if there's regex query keys
+                            foreach ($query as $k=>$v) if ($k[0] == '/' and preg_match($k, $engineOptions['engine'].':'.$engineOptions['type'])) $preparedQuery = $v;
+                        }
+                        if (!$preparedQuery) if (isset($query[$engineOptions['engine']])) $preparedQuery = $query[$engineOptions['engine']];
+                        if (!$preparedQuery) if (isset($query['default'])) $preparedQuery = $query['default'];
+                        if (!$preparedQuery) self::die("ERROR: no query found for ".$engineOptions['engine'].':'.$engineOptions['type'], 3);
+                    }
                     self::log("Modified query: $preparedQuery", 3, 'yellow');
 
                     // starting Engine
