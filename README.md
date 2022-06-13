@@ -64,8 +64,9 @@ https://clickhouse.com/benchmark/dbms/
 When you run each query just 3 times, you'll most likely get very high coefficients of variation for each of them. Which means that if you run the test a minute later, you may get a variation of 20%.
 And how does one reproduce a test on one's own hardware? Unfortunately, I can't find how one can do it.
 
+<!-- principles1 -->
 ## Testing principles
-<!-- principles -->
+<!-- principles2 -->
 
 Our belief is that a fair database benchmark should follow some key principles:
 
