@@ -190,6 +190,7 @@ abstract class engine {
             'ps' => 'ps aux',
             'DMIInfo' => 'dmidecode',
             'df' => 'df -h',
+	    'lshw' => 'lshw',
             'hostname' => 'hostname',
             'git' => 'git describe --abbrev=40 --always --dirty=+'
         ];
