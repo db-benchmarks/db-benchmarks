@@ -49,6 +49,7 @@ class clickhouse extends engine {
     protected function beforeQuery() {
         $this->curl = curl_init();
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, ["content-type: application/json"]);
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, ["X-ClickHouse-Format: JSON"]);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($this->curl, CURLOPT_TIMEOUT, self::$commandLineArguments['query_timeout']);
     }
