@@ -195,7 +195,7 @@ for ($n=1;$n<=32;$n++) {
         echo "
 
 index {$test}$n {
-        path = /var/lib/manticore/{$test}$n{$type}
+        path = /var/lib/manticore/{$test}$n
         source = csv$n
 ";
         if (preg_match('/^columnar/', $type)) echo "

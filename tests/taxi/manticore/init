@@ -7,7 +7,7 @@ for type in columnar; do
   docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
   docker-compose -f ../../docker-compose.yml --env-file ../../.env build manticoresearch
   php manticore/generate_manticore_config.php --test=$test --type=$type > manticore/manticore$suffix.conf
-  if [ -f manticore/idx$suffix/${test}1${type}.*sph ]; then
+  if [ -f manticore/idx$suffix/${test}1.*sph ]; then
     echo -e "\tNo need to rebuild"
   else
     mkdir -p manticore/idx$suffix
