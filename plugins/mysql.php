@@ -83,6 +83,7 @@ class mysql extends engine {
             while ($hit = $result->fetch_assoc()) {
                 $ar = [];
                 foreach ($hit as $k=>$v) {
+                    if ($k == 'id') continue; // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
                     if (is_float($v)) $v = round($v, 4); // this is a workaround against different floating point calculations in different engines
                     $ar[$k] = $v;
                 }

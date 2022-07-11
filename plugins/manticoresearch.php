@@ -150,6 +150,7 @@ class manticoresearch extends engine {
             while ($hit = $result->fetch_assoc()) {
                 $ar = [];
                 foreach ($hit as $k=>$v) {
+                    if ($k == 'id') continue; // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
                     if (is_float($v)) $v = round($v, 4); // this is a workaround against different floating point calculations in different engines
                     $ar[$k] = $v;
                 }
@@ -167,6 +168,7 @@ class manticoresearch extends engine {
 //              $ar = ['id' => $hit->_id];
                 $ar = [];
                 foreach ($hit->_source as $k=>$v) {
+                    if ($k == 'id') continue; // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
                     if (is_float($v)) $v = round($v, 4); // this is a workaround against different floating point calculations in different engines
                     if (is_array($v)) $v = implode(',',$v);
                     $ar[$k] = $v;
