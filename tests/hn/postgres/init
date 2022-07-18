@@ -1,0 +1,32 @@
+#for type in "" limited; do
+for type in tuned; do
+  [ ! -z "$type" ] && suffix="_$type" || suffix="";
+  echo -e "Postgres (type $type):"
+
+# TODO fix to actual name
+  if [[ -a postgres/data$suffix/default/$test.ibd ]]; then
+    echo -e "\tNo need to rebuild"
+  else
+    which psql || {
+      echo -e "\tERROR: install postgres client"
+      exit 1
+    }
+    cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d postgres"
+    echo -e "\tStarting postgres ($cmd)"
+    eval "$cmd"
+    while ! nc -z localhost 5432; do sleep 1; done
+    sleep 5
+    while ! nc -z localhost 5432; do sleep 1; done
+    sleep 5
+    psql -h0 -U postgres -с "DROP TABLE IF EXISTS default.$test; CREATE TABLE default.$test(id bigint,story_id bigint,story_text text,story_author varchar(1024),comment_id bigint,comment_text text,comment_author varchar(1024),comment_ranking bigint unsigned,author_comment_count bigint unsigned,story_comment_count bigint unsigned, FULLTEXT(story_text,story_author,comment_text,comment_author), KEY(comment_ranking), KEY(comment_ranking asc, author_comment_count asc, story_comment_count asc, comment_id asc), key story_author(700))"
+    echo -en "\tStarting loading at "; date
+    psql -h0 -U postgres -с "COPY default.$test FROM '/input/data.csv' WITH (FORMAT csv);"
+
+    hook="postgres/post_load$suffix.sh"; if [ -f "${hook}" ] && [ -r "${hook}" ] && [ -x "${hook}" ]; then
+      echo -e "\tDetected post loading hook, running it";
+      . $hook
+    fi
+    echo -en "\tFinished loading to index at "; date
+  fi
+done
+
