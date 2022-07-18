@@ -121,7 +121,7 @@ services:
   postgres:
     image: postgres:14.3
     container_name: "postgres_engine"
-    mem_limit: ${mem}
+    mem_limit: ${mem}m
     cpuset: "${cpuset}"
     privileged: true
     mem_swappiness: 0
