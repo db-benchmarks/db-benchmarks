@@ -55,7 +55,7 @@
     "elasticsearch": "select * from hn_small where query('\\\"elon musk\\\"') limit 20",
     "mysql": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('\"elon musk\"') limit 20",
     "mysql_percona": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('\"elon musk\"') limit 20",
-    "postgres": "select * from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc & !google') limit 20"
+    "postgres": "select * from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', '\"elon musk\"') limit 20"
 },
 {
     "manticoresearch": "select * from hn_small where match('abc') order by comment_ranking asc limit 20",
