@@ -12,9 +12,8 @@ class postgres extends engine
 {
 
     protected $port = 5432;
-    protected $mysql = null; // mysql connection
     protected $user = 'postgres';
-    protected $db = "default";
+    protected $connection;
 
     public function __construct($type)
     {
@@ -28,23 +27,19 @@ class postgres extends engine
 
     }
 
-    protected function url()
+    protected function url(): string
     {
         return "https://www.postgresql.org/";
     }
 
-    protected function description()
+    protected function description(): string
     {
         return "The PostgreSQL object-relational database system provides reliability and data integrity.";
     }
 
     private function getConnection()
     {
-
-        if ($this->mysql !== null) {
-            return $this->mysql;
-        }
-        return pg_pconnect("host=127.0.0.1 port=$this->port user=$this->user");
+        return $this->connection ?? pg_pconnect("host=127.0.0.1 port=$this->port user=$this->user");
     }
 
     // attempts to fetch info about engine and return it
@@ -56,6 +51,7 @@ class postgres extends engine
         if ($status === PGSQL_CONNECTION_OK) {
             $result = pg_query($connection, "SELECT name, setting FROM pg_settings;");
             if ($result) {
+                $out = [];
                 while ($row = pg_fetch_row($result)) {
                     $out[$row[0]] = $row[1];
                 }
@@ -73,7 +69,7 @@ class postgres extends engine
         return $ret ?? false;
     }
 
-    protected function appendType($info)
+    protected function appendType($info): string
     {
         return "";
     }
@@ -84,7 +80,7 @@ class postgres extends engine
     }
 
     // returns true when it's possible to connect to engine and it can run a simple query
-    protected function canConnect()
+    protected function canConnect(): bool
     {
         $connection = $this->getConnection();
         $status = pg_connection_status($connection);
@@ -94,24 +90,22 @@ class postgres extends engine
                 return true;
             }
 
-        } else {
-            if (pg_ping($connection)) {
-                $result = pg_query($connection, "show all");
-                if ($result) {
-                    return true;
-                }
+        } elseif (pg_ping($connection)) {
+            $result = pg_query($connection, "show all");
+            if ($result) {
+                return true;
             }
         }
 
         return false;
     }
 
-    protected function beforeQuery()
+    protected function beforeQuery():void
     {
-        $this->mysql = $this->getConnection();
+        $this->connection = $this->getConnection();
 
         $timeout = self::$commandLineArguments['query_timeout'] * 1000;
-        pg_query($this->mysql, "SET statement_timeout TO ".$timeout.";");
+        pg_query($this->connection, "SET statement_timeout TO ".$timeout.";");
     }
 
     // runs one query against engine
@@ -119,38 +113,40 @@ class postgres extends engine
     // must return ['timeout' => true] in case of timeout
     protected function testOnce($query)
     {
-        if (!pg_connection_busy($this->mysql)) {
-            pg_send_query($this->mysql, $query.';');
+        if (!pg_connection_busy($this->connection)) {
+            pg_send_query($this->connection, $query.';');
         }
 
-        $res = pg_get_result($this->mysql);
+        $res = pg_get_result($this->connection);
         if ($res) {
             $state = pg_result_error_field($res, PGSQL_DIAG_SQLSTATE);
 
-            if ($state == 0) {
+            if ($state === null) {
                 return $res;
-            } else {
-                $errorDescription = pg_result_error($res);
-                $out = ['mysqlError' => trim($errorDescription), 'mysqlErrorCode' => $state];
-
-                // TODO check timeout code.
-                if ($state == "!@#SA") {
-                    $out['timeout'] = true;
-                }
-                return $out;
             }
+
+            $errorDescription = pg_result_error($res);
+            $out              = ['mysqlError' => trim($errorDescription), 'mysqlErrorCode' => $state];
+
+            if ($state === "57014") {
+                $out['timeout'] = true;
+            }
+
+            return $out;
         }
+
+        return ['mysqlError' => 'Empty response from driver', 'mysqlErrorCode' => -1];
     }
 
     // parses query result and returns it in the format that should be common across all engines
-    protected function parseResult($result)
+    protected function parseResult($result): array
     {
         $res = [];
-        if ($result and pg_num_rows($result) > 0) {
+        if ($result && pg_num_rows($result) > 0) {
             while ($hit = pg_fetch_assoc($result)) {
                 $ar = [];
                 foreach ($hit as $k => $v) {
-                    if ($k == 'id') {
+                    if ($k === 'id') {
                         continue;
                     } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
                     if (is_float($v)) {
@@ -166,7 +162,7 @@ class postgres extends engine
     }
 
     // sends a command to engine to drop its caches
-    protected function dropEngineCache()
+    protected function dropEngineCache(): bool
     {
         if (!pg_connection_busy($this->getConnection())) {
             $query = pg_query($this->getConnection(), "DISCARD PLANS;");
