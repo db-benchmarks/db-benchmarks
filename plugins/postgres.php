@@ -126,7 +126,7 @@ class postgres extends engine
             }
 
             $errorDescription = pg_result_error($res);
-            $out              = ['mysqlError' => trim($errorDescription), 'mysqlErrorCode' => $state];
+            $out              = ['postgresError' => trim($errorDescription), 'postgresErrorCode' => $state];
 
             if ($state === "57014") {
                 $out['timeout'] = true;
@@ -135,7 +135,7 @@ class postgres extends engine
             return $out;
         }
 
-        return ['mysqlError' => 'Empty response from driver', 'mysqlErrorCode' => -1];
+        return ['postgresError' => 'Empty response from driver', 'postgresErrorCode' => -1];
     }
 
     // parses query result and returns it in the format that should be common across all engines

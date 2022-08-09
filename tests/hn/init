@@ -35,7 +35,7 @@ fi
 . postgres/init
 
 # MySQL Percona
-if [[ -d mysql_percona ]]; then
+if [[ -d mysql_percona ]]; then 
   . mysql_percona/init
 fi
 
