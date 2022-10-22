@@ -13,67 +13,78 @@
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn where match('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "clickhouse": "select comment_ranking, avg(author_comment_count) avg from hn where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "elasticsearch": "select comment_ranking, avg(author_comment_count) avg from hn where query('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "mysql": "select comment_ranking, avg(author_comment_count) avg from hn where match(story_text,story_author,comment_text,comment_author) against ('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20"
+    "mysql": "select comment_ranking, avg(author_comment_count) avg from hn where match(story_text,story_author,comment_text,comment_author) against ('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
+    "postgres": "select comment_ranking, avg(author_comment_count) avg from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') group by comment_ranking order by avg desc, comment_ranking desc limit 20"
 },
 {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "clickhouse":"select comment_ranking, avg(author_comment_count) avg from hn where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "elasticsearch":"select comment_ranking, avg(author_comment_count) avg from hn where query('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "mysql":"select comment_ranking, avg(author_comment_count) avg from hn where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20"
+    "mysql":"select comment_ranking, avg(author_comment_count) avg from hn where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
+    "postgres": "select comment_ranking, avg(author_comment_count) avg from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20"
 },
 {
     "manticoresearch": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "clickhouse": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "elasticsearch": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn where query('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "mysql": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20"
+    "mysql": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
+    "postgres": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20"
 },
 {
     "manticoresearch": "select * from hn where match('abc') limit 20",
     "clickhouse": "select * from hn where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) limit 20",
     "elasticsearch": "select * from hn where query('abc') limit 20",
-    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('google') limit 20"
+    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('google') limit 20",
+    "postgres": "select * from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') limit 20"
 },
 {
     "manticoresearch": "select * from hn where match('abc -google') limit 20",
     "clickhouse": "select * from hn where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) and not (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) limit 20",
     "elasticsearch": "select * from hn where query('abc !google') limit 20",
-    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc -google') limit 20"
+    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc -google') limit 20",
+    "postgres": "select * from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc & !google') limit 20"
 },
 {
     "manticoresearch": "select * from hn where match('\"elon musk\"') limit 20",
     "clickhouse": "select * from hn where (match(story_text, '(?i)\\Welon\\Wmusk\\W') or match(story_author,'(?i)\\Welon\\Wmusk\\W') or match(comment_text, '(?i)\\Welon\\Wmusk\\W') or match(comment_author, '(?i)\\Welon\\Wmusk\\W')) limit 20",
     "elasticsearch": "select * from hn where query('\\\"elon musk\\\"') limit 20",
-    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('\"elon musk\"') limit 20"
+    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('\"elon musk\"') limit 20",
+    "postgres": "select * from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ phraseto_tsquery('english', 'elon musk') limit 20"
 },
 {
     "manticoresearch": "select * from hn where match('abc') order by comment_ranking asc limit 20",
     "clickhouse": "select * from hn where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) order by comment_ranking asc limit 20",
     "elasticsearch": "select * from hn where query('abc') order by comment_ranking asc limit 20",
-    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc') order by comment_ranking asc limit 20"
+    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc') order by comment_ranking asc limit 20",
+    "postgres": "select * from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc') order by comment_ranking asc limit 20"
 },
 {
     "manticoresearch": "select * from hn where match('abc') order by comment_ranking asc, story_id desc limit 20",
     "clickhouse": "select * from hn where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) order by comment_ranking asc, story_id desc limit 20",
     "elasticsearch": "select * from hn where query('abc') order by comment_ranking asc, story_id desc limit 20",
-    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc') order by comment_ranking asc, story_id desc limit 20"
+    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc') order by comment_ranking asc, story_id desc limit 20",
+    "postgres": "select * from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc') order by comment_ranking asc limit 20"
 },
 {
     "manticoresearch": "select count(*) from hn where match('google') and comment_ranking > 200",
     "clickhouse": "select count(*) from hn where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) and comment_ranking > 200",
     "elasticsearch": "select count(*) from hn where query('google') and comment_ranking > 200",
-    "mysql": "select count(*) from hn where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200"
+    "mysql": "select count(*) from hn where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200",
+    "postgres": "select count(*) from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200"
 },
 {
     "manticoresearch": "select story_id from hn where match('me') order by comment_ranking asc limit 20",
     "clickhouse": "select story_id from hn where (match(story_text, '(?i)\\Wme\\W') or match(story_author,'(?i)\\Wme\\W') or match(comment_text, '(?i)\\Wme\\W') or match(comment_author, '(?i)\\Wme\\W')) order by comment_ranking asc limit 20",
     "elasticsearch": "select story_id from hn where query('me') order by comment_ranking asc limit 20",
-    "mysql": "select story_id from hn where match(story_text,story_author,comment_text,comment_author) against ('me') order by comment_ranking asc limit 20"
+    "mysql": "select story_id from hn where match(story_text,story_author,comment_text,comment_author) against ('me') order by comment_ranking asc limit 20",
+    "postgres": "select story_id from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'me') order by comment_ranking asc limit 20"
 },
 {
     "manticoresearch": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn where match('abc') limit 20",
     "clickhouse": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) limit 20",
     "elasticsearch": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn where query('abc') limit 20",
-    "mysql": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn where match(story_text,story_author,comment_text,comment_author) against ('abc') limit 20"
+    "mysql": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn where match(story_text,story_author,comment_text,comment_author) against ('abc') limit 20",
+    "postgres": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc') limit 20"
 },
 "select * from hn order by comment_ranking asc limit 20",
 "select * from hn order by comment_ranking desc limit 20",

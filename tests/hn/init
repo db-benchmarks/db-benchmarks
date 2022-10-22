@@ -31,6 +31,9 @@ fi
 # MySQL
 . mysql/init
 
+# Postgres
+. postgres/init
+
 # MySQL Percona
 if [[ -d mysql_percona ]]; then 
   . mysql_percona/init
