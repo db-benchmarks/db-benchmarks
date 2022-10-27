@@ -149,7 +149,11 @@ class postgres extends engine
                     if ($k === 'id') {
                         continue;
                     } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
-                    if (is_float($v)) {
+
+                    if (substr($k, -3) === "_ts"){
+                        continue;
+                    }
+                    if (is_numeric($v) && strpos($v, '.')) {
                         $v = round($v, 4);
                     } // this is a workaround against different floating point calculations in different engines
                     $ar[$k] = $v;
