@@ -1,4 +1,4 @@
-for type in "" tuned limited; do
+for type in tuned; do
   [ ! -z "$type" ] && suffix="_$type" || suffix=""; 
   echo -e "Elasticsearch (type $type):"
   if [ -d es/idx$suffix/nodes/0/indices ]; then
