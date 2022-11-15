@@ -46,6 +46,10 @@ abstract class engine {
     // TODO: control the timeout automatically
     abstract protected function testOnce($query);
 
+
+    // runs after query to collect query stats
+    abstract protected function afterQuery();
+
     // parses query result and returns it in the format that should be common across all engines
     abstract protected function parseResult($result);
 
@@ -138,7 +142,7 @@ abstract class engine {
         curl_setopt($curl, CURLOPT_USERPWD, self::$commandLineArguments['username'].":".self::$commandLineArguments['password']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        $query = "create table if not exists results(test_name string, memory int, test_info text, test_time timestamp, server_id string, server_info string stored, format_version int, engine_name string engine='rowwise', type string engine='rowwise', info json, avg float, cv float, avg_fastest float, cv_avg_fastest float, cold bigint, fastest bigint, slowest bigint, times json, times_count int, original_query text indexed attribute, modified_query text indexed attribute, result string, checksum int, warmup_time bigint, query_timeout int, error json) min_word_len = '1' min_infix_len = '2' engine='columnar'";
+        $query = "create table if not exists results(test_name string, memory int, test_info text, test_time timestamp, server_id string, server_info string stored, format_version int, engine_name string engine='rowwise', type string engine='rowwise', info json, avg float, cv float, avg_fastest float, cv_avg_fastest float, cold bigint, fastest bigint, slowest bigint, times json, times_count int, original_query text indexed attribute, modified_query text indexed attribute, result string, stats text stored, checksum int, warmup_time bigint, query_timeout int, error json) min_word_len = '1' min_infix_len = '2' engine='columnar'";
 
         curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
         $curlResult = curl_exec($curl);
@@ -146,14 +150,14 @@ abstract class engine {
         if ($httpCode != 200) self::die("ERROR: can't create or verify table to save results: http code: $httpCode", 3);
 
 
-        $fields = ['id', 'test_name', 'memory', 'test_info', 'test_time', 'server_id', 'server_info', 'format_version', 'engine_name', 'type', 'info', 'avg', 'cv', 'avg_fastest', 'cv_avg_fastest', 'cold', 'fastest', 'slowest', 'times', 'times_count', 'original_query', 'modified_query', 'result', 'checksum', 'warmup_time', 'query_timeout', 'error' ];
+        $fields = ['id', 'test_name', 'memory', 'test_info', 'test_time', 'server_id', 'server_info', 'format_version', 'engine_name', 'type', 'info', 'avg', 'cv', 'avg_fastest', 'cv_avg_fastest', 'cold', 'fastest', 'slowest', 'times', 'times_count', 'original_query', 'modified_query', 'result', 'stats', 'checksum', 'warmup_time', 'query_timeout', 'error' ];
 
         foreach ($queries as $query) {
            
             // protection from saving the same result more than once by making its id a hash of the result
             $id = unpack('q', sha1("{$results['testTime']}_{$results['engine']}_{$results['type']}_{$query['originalQuery']}_".implode(',', $query['times']), true));
             $id = abs($id[1]);
-            $values = [$id, "'".self::mres($results['testName'])."'", $results['memory'], "'".self::mres($results['testInfo'])."'", $results['testTime'], "'".$results['serverId']."'", "'".self::mres(json_encode($results['serverInfo'], JSON_PRETTY_PRINT))."'", self::$formatVersion,  "'{$results['engine']}'", "'{$results['type']}'", "'".self::mres(json_encode($results['info']))."'", $query['avg'], $query['cv'], $query['avgFastest'], $query['cvAvgFastest'], $query['cold'], $query['fastest'], $query['slowest'], "'".json_encode($query['times'])."'", count($query['times']), "'".self::mres($query['originalQuery'])."'", "'".self::mres($query['modifiedQuery'])."'", "'".self::mres(json_encode($query['result'], JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK))."'", $query['checksum'], $query['warmupTime'], (int)@$query['result']['error']['timeout'], "'".self::mres(json_encode(@$query['result']['error']))."'"];
+            $values = [$id, "'".self::mres($results['testName'])."'", $results['memory'], "'".self::mres($results['testInfo'])."'", $results['testTime'], "'".$results['serverId']."'", "'".self::mres(json_encode($results['serverInfo'], JSON_PRETTY_PRINT))."'", self::$formatVersion,  "'{$results['engine']}'", "'{$results['type']}'", "'".self::mres(json_encode($results['info']))."'", $query['avg'], $query['cv'], $query['avgFastest'], $query['cvAvgFastest'], $query['cold'], $query['fastest'], $query['slowest'], "'".json_encode($query['times'])."'", count($query['times']), "'".self::mres($query['originalQuery'])."'", "'".self::mres($query['modifiedQuery'])."'", "'".self::mres(json_encode($query['result'], JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK))."'", "'".@self::mres($query['stats'])."'", $query['checksum'], $query['warmupTime'], (int)@$query['result']['error']['timeout'], "'".self::mres(json_encode(@$query['result']['error']))."'"];
             $query = "replace into results (".implode(',', $fields).") values (".implode(',', $values).")";
 
             curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
@@ -254,8 +258,8 @@ abstract class engine {
                         self::log("Sending informational query \"$preparedQuery\" to {$engineOptions['engine']}". ($engineOptions['type']?" (type {$engineOptions['type']})":""), 3, 'yellow');
                         $engine->beforeQuery();
                         $result = $engine->testOnce($preparedQuery);
-                        $outs[$type] = $engine->parseResult($result);
-                    }
+			$outs[$type] = $engine->parseResult($result);
+		    }
                     $count = @array_shift(array_values(array_shift($outs['count'])));
                     if (!$count) self::die("ERROR: cannot continue since the dataset is empty (COUNT query returned zero)", 3);
                     $enginesInfo[$engineOptions['engine']][$engineOptions['type']]['datasetCount'] = $count;
@@ -337,6 +341,7 @@ abstract class engine {
                         $times[] = microtime(true) - $t;
                         self::log(floor((microtime(true) - $t) * 1000000)." us", 5, 'white');
                         $normalizedResult = $engine->parseResult($result);
+                        $queryStats = $engine->afterQuery();
 
                         $tmpTimes = $times; 
                         sort($tmpTimes); 
@@ -350,7 +355,7 @@ abstract class engine {
                     }
                     $engine->stop();
 
-                    $queryTimes[] = ['originalQuery' => $originalQuery, 'modifiedQuery' => $preparedQuery, 'times' => $times, 'result' => $normalizedResult, 'checksum' => self::checksum($normalizedResult), 'warmupTime' => $warmupTime];
+                    $queryTimes[] = ['originalQuery' => $originalQuery, 'modifiedQuery' => $preparedQuery, 'times' => $times, 'result' => $normalizedResult, 'stats' => $queryStats, 'checksum' => self::checksum($normalizedResult), 'warmupTime' => $warmupTime];
                 }
                 $engine->saveToDir($queryTimes, $mem, $engineOptions, $enginesInfo[$engineOptions['engine']][$engineOptions['type']], $serverId, $serverInfo);
             }
@@ -416,6 +421,7 @@ abstract class engine {
             $out['originalQuery'] = $result['originalQuery'];
             $out['modifiedQuery'] = $result['modifiedQuery'];
             $out['result'] = $result['result'];
+            $out['stats'] = $result['stats'];
             $out['checksum'] = $result['checksum'];
             $out['warmupTime'] = $result['warmupTime'];
             $final['queries'][] = $out;

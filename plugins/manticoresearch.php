@@ -61,8 +61,8 @@ class manticoresearch extends engine {
 
     // returns true when it's possible to connect to engine and it can run a simple query
     protected function canConnect() {
-        if (@self::$commandLineArguments['mysql']) return $this->canConnectMysql();
-        else return $this->canConnectHTTP();
+        if (@self::$commandLineArguments['http']) return $this->canConnectHTTP();
+        else return $this->canConnectMysql();
     }
 
     private function canConnectMysql() {
@@ -87,8 +87,8 @@ class manticoresearch extends engine {
     }
 
     protected function beforeQuery() {
-        if (@self::$commandLineArguments['mysql']) return $this->beforeMysql();
-        else return $this->beforeHTTP();
+        if (@self::$commandLineArguments['http']) return $this->beforeHTTP();
+        else return $this->beforeMysql();
     }
 
     private function beforeMysql() {
@@ -109,8 +109,8 @@ class manticoresearch extends engine {
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
     protected function testOnce($query) {
-        if (@self::$commandLineArguments['mysql']) return $this->testMysql($query);
-        else return $this->testHTTP($query);
+        if (@self::$commandLineArguments['http']) return $this->testHTTP($query);
+        else return $this->testMysql($query);
     }
 
     private function testMysql($query) {
@@ -138,10 +138,30 @@ class manticoresearch extends engine {
 
     }
 
+
+    // To run SHOW META and collect other stats after a query is made
+    protected function afterQuery() {
+        if (@self::$commandLineArguments['http']) return $this->afterHTTP();
+        else return $this->afterMysql();
+    }
+
+    // Runs SHOW META
+    private function afterMysql() {
+        $res = $this->mysql->query('SHOW META');
+        $ar = [];
+        if ($res and $res->num_rows > 0) while ($row = $res->fetch_row()) $ar[] = '"'.$row[0].'": "'.$row[1].'"';
+        return "{\n".implode(",\n", $ar)."\n}";
+    }
+
+    // Returns empty array, because in HTTP it's problematic to run SHOW META after a query
+    private function afterHTTP() {
+        return '';
+    }
+
     // parses query result and returns it in the format that should be common across all engines
     protected function parseResult($result) {
-        if (@self::$commandLineArguments['mysql']) return $this->parseMysqlResult($result);
-        else return $this->parseHTTPResult($result);
+        if (@self::$commandLineArguments['http']) return $this->parseHTTPResult($result);
+        else return $this->parseMysqlResult($result);
     }
 
     private function parseMysqlResult($result) {
