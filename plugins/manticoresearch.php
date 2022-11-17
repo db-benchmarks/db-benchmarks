@@ -35,7 +35,7 @@ class manticoresearch extends engine {
         $row = $res->fetch_row();
         if (preg_match('/ (\w+)@(\d+) .*?\(columnar ([0-9.\-]+) (.*?)@(.*?)\)/', $row[1], $match)) {
             $version = $match[3];
-            $commit = substr($match[1], 0, 4)."_".substr($match[4], 0, 4);
+            $commit = substr($match[1], 0, 5)."_".substr($match[4], 0, 5);
             $date = max($match[2], $match[5]);
         } else if (!preg_match('/^(\d\.\d\.\d+) (.*?)@(.*?) /', $row[1], $match)) {
             return false;
