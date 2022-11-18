@@ -41,7 +41,7 @@
     "manticoresearch": "select * from hn where match('abc -google') limit 20",
     "clickhouse": "select * from hn where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) and not (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) limit 20",
     "elasticsearch": "select * from hn where query('abc !google') limit 20",
-    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc -google') limit 20",
+    "mysql": "select * from hn where match(story_text,story_author,comment_text,comment_author) against ('abc -google' IN BOOLEAN MODE) limit 20",
     "postgres": "select * from hn WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc & !google') limit 20"
 },
 {
