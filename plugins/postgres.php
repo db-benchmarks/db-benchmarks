@@ -138,6 +138,11 @@ class postgres extends engine
         return ['postgresError' => 'Empty response from driver', 'postgresErrorCode' => -1];
     }
 
+    // To collect query stats after the query
+    protected function afterQuery() {
+        return '';
+    }
+
     // parses query result and returns it in the format that should be common across all engines
     protected function parseResult($result): array
     {
