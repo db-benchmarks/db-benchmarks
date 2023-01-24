@@ -45,7 +45,7 @@ https://imply.io/blog/druid-nails-cost-efficiency-challenge-against-clickhouse-a
 
 > We actually wanted to do the benchmark on the same hardware, an m5.8xlarge, but the only pre-baked configuration we have for m5.8xlarge is actually the m5d.8xlarge ... Instead, we run on a c5.9xlarge instance
 
-Bad news, guys: when you run benchmarks on different hardware, at the very least you can't then say that something is "106.76%" and "103.13%" of something else. Even when you test on the same bare-metal server, it's quite difficult to get a coefficient of variation lower than 5%. 3% difference on different servers can highly likely be ignored. Provided all that, how can one make sure the final conclusion is true?
+Bad news, guys: when you run benchmarks on different hardware, at the very least you can't then say that something is "106.76%" and "103.13%" of something else. Even when you test on the same bare-metal server, it's quite difficult to get a coefficient of variation lower than 5%. A 3% difference on different servers can most likely be ignored. Given all that, how can one make sure the final conclusion is true?
 
 -------
 
@@ -53,7 +53,8 @@ Bad news, guys: when you run benchmarks on different hardware, at the very least
 
 https://tech.marksblogg.com/benchmarks.html
 
-Mark did a great job making the taxi rides test on so many different databases and search engines. But since the tests are made on different hardware, the numbers in the resulting table aren't really comparable. You always need to keep this in mind when you evaluate the results in the table.
+Mark did a great job making the taxi rides test on so many different databases and search engines. But since the tests are made on different hardware, the numbers in the resulting table aren't really comparable. You always need to keep this in mind when evaluating the results in the table.
+
 
 -------
 
@@ -61,8 +62,7 @@ Mark did a great job making the taxi rides test on so many different databases a
 
 https://clickhouse.com/benchmark/dbms/
 
-When you run each query just 3 times, you'll most likely get very high coefficients of variation for each of them. Which means that if you run the test a minute later, you may get a variation of 20%.
-And how does one reproduce a test on one's own hardware? Unfortunately, I can't find how one can do it.
+When you run each query just 3 times, you'll most likely get very high coefficients of variation for each of them. Which means that if you run the test a minute later, you may get a variation of 20%. And how does one reproduce a test on one's own hardware? Unfortunately, I can't find how one can do it.
 
 <!-- principles1 -->
 ## Testing principles
@@ -90,65 +90,66 @@ Our belief is that a fair database benchmark should follow some key principles:
 
 > Otherwise your test results may be very unstable.
 
-✅ You need to restart database before each query
+✅ You need to restart the database before each query
 
-> Otherwise previous queries can still impact current query's response time, despite clearing internal caches.
+> Otherwise, previous queries can still impact current query's response time, despite clearing internal caches.
 
 ✅ You need to wait until the database warms up completely after it's started
 
-> Otherwise you may end up competing with db's warmup process for I/O which can spoil your test results severely.
+> Otherwise, you may end up competing with the database's warm-up process for I/O which can severely spoil your test results.
 
 ✅ Best if you provide a coefficient of variation, so everyone understands how stable your results are and make sure yourself it's low enough
 
-> [Coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) is a very good metric which shows how stable your test results are. If it's higher than N% you can't say one database is N% faster than another.
+> [Coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) is a very good metric which shows how stable your test results are. If it's higher than N%, you can't say one database is N% faster than another.
 
 ✅ Best if you test on a fixed CPU frequency
 
-> Otherwise if you are using "on-demand" cpu governor (which is normally a default) it can easily turn your 500ms response time into a 1000+ ms.
+> Otherwise, if you are using "on-demand" CPU governor (which is normally a default) it can easily turn your 500ms response time into a 1000+ ms.
 
 ✅ Best if you test on SSD/NVME rather than HDD
 
-> Otherwise depending on where your files are located on HDD you can get up to 2x lower/higher I/O performance (we tested), which can make at least your cold queries results wrong.
+> Otherwise, depending on where your files are located on HDD you can get up to 2x lower/higher I/O performance (we tested), which can make at least your cold queries results wrong.
+
 
 <!-- framework -->
 ## Test framework
 
 The test framework which is used on the backend of https://db-benchmarks.com is fully Open Source (AGPLv3 license) and can be found at https://github.com/db-benchmarks/db-benchmarks . Here's what it does:
 
-* Automates data loading to the databases / search engines included in the repository
-* Can run database / search engine in Docker with a particular CPU/RAM constraint
+* Automates data loading to the databases/search engines included in the repository.
+* Can run a database/search engine in Docker with a particular CPU/RAM constraint.
 * While testing:
   * Purges OS cache automatically
   * Automates purging database caches before each cold run
-  * Restarts database before each cold run
+  * Restarts the database before each cold run
   * Looks after your CPU temperature to avoid throttling
-  * Looks after coefficient of variation while making queries and can stop as soon as:
-    - the CV is low enough
-    - and the number of queries made is sufficient
-  * After starting a database / search engine, lets it do its warmup stage (preread needed data from disk), stops waiting as soon as:
-    - there's no IO for a few seconds
-    - and it can connect to the database / search engine
-  * After stopping a database / search engine waits until it fully stops
-  * Can accept different timeouts: start, warmup, initial connection, getting info about the database / search engine, query
+  * Looks after the coefficient of variation while making queries and can stop as soon as:
+    - The CV is low enough
+    - And the number of queries made is sufficient
+  * After starting a database/search engine, lets it do its warm-up stage (pre-read needed data from disk), stops waiting as soon as:
+    - There's no IO for a few seconds
+    - And it can connect to the database/search engine
+  * After stopping a database/search engine waits until it fully stops
+  * Can accept different timeouts: start, warm-up, initial connection, getting info about the database/search engine, query
   * Can emulate one physical core which allows benchmarking algorithmic capabilities of databases more objectively (`--limited`)
-  * Can accept all the values as command line arguments as well as envionment variables for easier intergation with CI systems
+  * Can accept all the values as command line arguments as well as environment variables for easier integration with CI systems
   * `--test` saves test results to file
-  * `--save` saves test results from files to remote database (neither of those that have been tested)
-  * Tracks A LOT of things while testing:
+  * `--save` saves test results from files to a remote database (neither of those that have been tested)
+  * Tracks a lot of things while testing:
     - Server info: CPU, memory, running processes, filesystem, hostname
     - Current repository info to make sure there's no local changes
-    - Performance metrics: each query response time in microseconds, aggregated stats: 
+    - Performance metrics: each query response time in microseconds, aggregated stats:
       - Coefficient of variation of all queries
       - Coefficient of variation of 80% fastest queries
       - Cold query's response time
       - Avg(response times)
       - Avg(80% fastest queries' response times)
       - Slowest query's response time
-    - Database / search engine info:
+    - Database/search engine info:
       - `select count(*)` and `select * limit 1` to make sure the data collections are similar in different databases
-      - internal database / search engine data structures status (chunks, shards, segments, partitions, parts, etc.) 
-* Makes it easy to limit CPU / RAM consumption inside or outside the test (using environment variables `cpuset` and `mem`)
-* Allows to start each database / search engine easily the same way it's started by the framework for manual testing and preparation of test queries
+      - internal database/search engine data structures status (chunks, shards, segments, partitions, parts, etc.)
+* Makes it easy to limit CPU/RAM consumption inside or outside the test (using environment variables `cpuset` and `mem`).
+* Allows to start each database/search engine easily the same way it's started by the framework for manual testing and preparation of test queries.
 
 ## Installation
 
@@ -188,10 +189,10 @@ Run the init script:
 ./init
 ```
 
-to:
+This will:
 
 * download the data collection from the Internet
-* build tables and indexes
+* build the tables/indices
 
 ### Run test
 
@@ -240,7 +241,7 @@ Now you have test results in `./results/` (in the root of the repository), for e
 
 ### Save to db to visualize
 
-You can now upload the results to db for further visualization. The visualization tool which is used on https://db-benchmarks.com/ is also Open Source and can be found here https://github.com/db-benchmarks/ui .
+You can now upload the results to the database for further visualization. The visualization tool, which is used on https://db-benchmarks.com/, is also open source and can be found at https://github.com/db-benchmarks/ui.
 
 Here's how you can save the results:
 
@@ -256,16 +257,19 @@ or
 
 ### Make pull request
 
-We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com please make a pull request of your results to this repository:
-* Your results should be located in directory `./results`
-* If it's a new test/engine - the other changes should be in the same pull request
-* Please keep in mind that we (and anyone else) should be able to reproduce your test and hopefully get similar results.
+We are eager to see your test results. If you believe they should be added to https://db-benchmarks.com, please make a pull request of your results to this repository.
+
+Please keep the following in mind:
+* Your results should be located in the directory `./results`.
+* If it's a new test/engine, any other changes should be included in the same pull request.
+* It is important that we, and anyone else, should be able to reproduce your test and hopefully get similar results.
 
 We will then:
-* Review your results to make sure they follow the testing principles
-* Perhaps reproduce your test on our hardware so they are comparable with the other tests
-* Discuss with you any arising questions 
-* And will merge your pull request
+
+* Review your results to ensure they follow the testing principles.
+* Reproduce your test on our hardware to ensure they are comparable with other tests.
+* Discuss any arising questions with you.
+* And, if everything checks out, we will merge your pull request.
 
 ## Directory structure
 
@@ -354,11 +358,11 @@ Want to get involved in the project? Here's how you can contribute:
 These all are waiting for your contribution!
 
 ### Features wishlist: 
-* Measure not only response time, but resource consumption:
+* Measure not only response time, but also resource consumption, such as:
   - RAM consumption for each query
   - CPU consumption
   - IO consumption
-* Measure not only response time, but throughput
-* Make it easy to use it in CI, so each new commit is tested and if it's slower than previously the test is not passed
-* Make it mobile-friendly
-* Higher quality for cold query tests (there's only one cold run made per query now which makes the metric usable in purely information purposes, it's not as high quality as Fast avg")
+* Measure not only response time, but also throughput.
+* Make it easy to use in CI, so that each new commit is tested and if it's slower than previously, the test is not passed.
+* Make it mobile-friendly.
+* Improve the quality of cold query tests (currently, only one cold run is made per query, which makes the metric usable for informational purposes only, it's not as high quality as Fast avg").
