@@ -1,4 +1,16 @@
 {
-  "count": "select count(*) from logs10m",
-  "doc": "select * from logs10m limit 1"
+  "count": {
+    "default": "select count(*) from logs10m",
+    "meilisearch": [
+      "/indexes/logs10m/stats",
+      []
+    ]
+  },
+  "doc": {
+    "default": "select * from logs10m limit 1",
+    "meilisearch": [
+      "/indexes/logs10m/documents?offset=0&limit=1",
+      []
+    ]
+  }
 }

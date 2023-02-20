@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 if (count($argv) < 5) die("Usage: ".__FILE__." <csv file> <batch size> <concurrency> <columnar/rowwise>\n");
 

@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 $options = getopt('', ["type:", "test:"]);
 if (!isset($options['type'])) exit(1);

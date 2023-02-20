@@ -27,3 +27,6 @@ fi
 
 # Clickhouse
 . ch/init
+
+# Meilisearch
+. meilisearch/init

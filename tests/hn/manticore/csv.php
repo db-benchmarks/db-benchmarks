@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 $options = getopt('', ["file:", "batch::", "host::", "port::", "index:", "fields:", "truncate::", "quiet::", "shards::", "limit::"]);
 if (!isset($options['file'])) die("ERROR: specify --file\n");
