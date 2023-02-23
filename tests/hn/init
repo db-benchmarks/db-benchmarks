@@ -39,3 +39,5 @@ if [[ -d mysql_percona ]]; then
   . mysql_percona/init
 fi
 
+# Meilisearch
+. meilisearch/init

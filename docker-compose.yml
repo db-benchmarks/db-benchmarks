@@ -17,7 +17,7 @@ services:
         hard: 262144
     ports:
       - "127.0.0.1:9200:9200"
-    environment: 
+    environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true # as said on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping it needs to be done for performance
     volumes:
@@ -141,3 +141,32 @@ services:
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=default
+  meilisearch:
+    image: getmeili/meilisearch:v1.0.0
+    container_name: "meilisearch_engine"
+    mem_limit: ${mem}m
+    cpuset: "${cpuset}"
+    privileged: true
+    mem_swappiness: 0
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "127.0.0.1:7700:7700"
+    volumes:
+      - ./tests/${test}/meilisearch/data${suffix}:/meili_data:rw
+      - ./tests/${test}/data:/input
+    entrypoint: ["meilisearch"]
+    command:
+      - --http-addr
+      - 0.0.0.0:7700
+      - --env
+      - development
+      - --no-analytics
+      - --max-indexing-memory=85Mb
+      - --max-indexing-threads=24
