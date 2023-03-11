@@ -33,7 +33,6 @@ for type in columnar rowwise; do
   echo -e "Manticore Search (type $type):"
   docker-compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
   docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
-  docker-compose -f ../../docker-compose.yml --env-file ../../.env build manticoresearch
   php manticore/generate_manticore_config.php --test=$test --type=$type > manticore/manticore$suffix.conf
   if [ -f manticore/idx$suffix/${test}.sph ]; then
     echo -e "\tNo need to rebuild"

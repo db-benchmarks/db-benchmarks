@@ -237,7 +237,8 @@ abstract class engine {
                 ob_start();
                 $info = $engine->getInfo();
                 if (!$info) self::die("ERROR: can't get info", 3);
-                $info['typeAppendum'] = $engine->appendType($info);
+		$info['typeAppendum'] = $engine->appendType($info);
+		if (!$info['typeAppendum']) $info['typeAppendum'] = $info['version'];
                 $info['url'] = $engine->url();
                 $info['description'] = $engine->description();
                 self::log(ob_get_clean(), 3);
@@ -264,7 +265,8 @@ abstract class engine {
                         $result = $engine->testOnce($preparedQuery);
 			$outs[$type] = $engine->parseResult($result);
 		    }
-                    $count = @array_shift(array_values(array_shift($outs['count'])));
+		    $count = false;
+		    if (isset($outs['count']) and is_array($outs['count']) and !empty($outs['count'])) $count = @array_shift(@array_values(@array_shift($outs['count'])));
                     if (!$count) self::die("ERROR: cannot continue since the dataset is empty (COUNT query returned zero)", 3);
                     $enginesInfo[$engineOptions['engine']][$engineOptions['type']]['datasetCount'] = $count;
                     $doc = (object)array_shift($outs['doc']);
@@ -291,10 +293,10 @@ abstract class engine {
                 self::log("Engine: ".$engineOptions['engine'].", type: ".$engineOptions['type'], 2);
                 $engine = new $engineOptions['engine']($engineOptions['type']);
                 $queryTimes = [];
-                foreach (self::$queries as $query) {
+                foreach (self::$queries as $qn=>$query) {
                     $originalQuery = is_array($query)?current($query):$query;
                     $preparedQuery = false;
-                    self::log("Original query: $originalQuery", 3, 'yellow');
+                    self::log("Original query(".($qn+1)."/".count(self::$queries)."): $originalQuery", 3, 'yellow');
                     if (!is_array($query)) $preparedQuery = $engine->prepareQuery($query);
                     else { // query is an array (json node, not just a single string common for all dbs)
                         if (isset($query[$engineOptions['engine'].':'.$engineOptions['type']])) $preparedQuery = $query[$engineOptions['engine'].':'.$engineOptions['type']];
@@ -396,14 +398,14 @@ abstract class engine {
             'testTime' => self::$startTime,
             'formatVersion' => self::$formatVersion,
             'engine' => $engine,
-            'type' => $this->type.$info['typeAppendum'],
+            'type' => ltrim($this->type.($info['typeAppendum']?('_'.$info['typeAppendum']):''), '_'),
             'memory' => $memory,
             'info' => $info,
             'queries' => [],
             'limited' => (int)$limited,
             'serverId' => $serverId,
             'serverInfo' => $serverInfo
-        ];
+	];
 
         $final['testInfo'] = file_get_contents('tests/'.self::$commandLineArguments['test'].'/description');
 

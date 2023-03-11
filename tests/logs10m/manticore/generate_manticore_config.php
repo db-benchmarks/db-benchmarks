@@ -35,7 +35,6 @@ index $test
         path = /var/lib/manticore/$test
         source = $test
 	" . (strstr($type, 'columnar') ? "columnar_attrs = id, remote_addr, remote_user, request_type, request_protocol, referer,  runtime, status, size, usearagent, request_path" : "") . "
-	stored_fields = remote_addr, remote_user, request_type, referer, usearagent, request_protocol
 }
 
 searchd

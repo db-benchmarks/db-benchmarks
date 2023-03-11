@@ -33,17 +33,11 @@ class manticoresearch extends engine {
             return false;
         }
         $row = $res->fetch_row();
-        if (preg_match('/ (\w+)@(\d+) .*?\(columnar ([0-9.\-]+) (.*?)@(.*?)\)/', $row[1], $match)) {
-            $version = $match[3];
-            $commit = substr($match[1], 0, 5)."_".substr($match[4], 0, 5);
-            $date = max($match[2], $match[5]);
-        } else if (!preg_match('/^(\d\.\d\.\d+) (.*?)@(.*?) /', $row[1], $match)) {
-            return false;
-        } else {
-            $date = $match[3];
+        if (preg_match('/(\d+\.\d+\.\d+) (\w+)@(\d+) .*?\(columnar ([0-9.\-]+) (.*?)@(.*?)\)/', $row[1], $match)) {
             $version = $match[1];
-            $commit = $match[2];
-        }
+            $commit = substr($match[2], 0, 5)."_".substr($match[5], 0, 5);
+            $date = max($match[3], $match[6]);
+        } else return false;
         $date = date_parse_from_format('ymd', $date);
         $time = mktime($date['hour'], $date['minute'], $date['second'], $date['month'], $date['day'], $date['year']);
 

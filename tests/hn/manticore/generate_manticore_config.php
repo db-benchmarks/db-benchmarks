@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 $options = getopt('', ["type:", "test:"]);
-if (!isset($options['type'])) exit(1);
+if (!isset($options['type'])) $options['type'] = 'rowwise';
 if (!isset($options['test'])) exit(1);
 
 $type = $options['type'];

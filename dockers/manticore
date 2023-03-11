@@ -1,4 +1,0 @@
-FROM manticoresearch/manticore:5.0.0
-RUN apt-get -y update && apt-get -y install wget
-RUN wget https://repo.manticoresearch.com/manticore-repo.noarch.deb && dpkg -i manticore-repo.noarch.deb
-RUN apt-get -y update && apt-get -y install manticore-columnar-lib

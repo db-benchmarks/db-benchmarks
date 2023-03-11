@@ -10,38 +10,28 @@ init_meilisearch() {
 
   chunk_size="${3:-250000}"
 
-  # docker-compose -f ../../docker-compose.yml --env-file ../../.env stop meilisearch
-  # docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f meilisearch
-  # docker-compose -f ../../docker-compose.yml --env-file ../../.env build meilisearch
   pushd ../..
+  test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env stop meilisearch
+  test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env rm -f meilisearch  
   test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env up -d meilisearch
   popd || exit 1
 
   count=$(curl -s -X GET "http://localhost:7700/indexes/$index/stats" \
     | jq | grep numberOfDocuments | head -n 1 | cut -d':' -f2 | tr -d ' ,')
-  echo "$count";
+  echo "Found ${count:-0} documents in Meilisearch"
   csv_file=./data/data.csv
-  lines=$(wc -l "$csv_file")
 
-  # If count is the same probably we loaded it before
-  if [[ "$count" == "$lines" ]]; then
-    echo -en "\nIndex is loaded already"
-    return
-  fi
-
+  # If the index is not empty, probably we loaded the data before
   if (( count > 0 )); then
-    echo -en "\tDeleting index at "; date
-    curl -s -X DELETE "http://localhost:7700/indexes/$index/documents" | jq
-    curl -s -X DELETE "http://localhost:7700/indexes/$index" | jq
-    echo
-
-    echo -en "\tIndex was deleted at "; date
+    echo -e "\tNo need to rebuild"
+    exit 1
   fi
 
-  echo -en "\tStarting loading into $index at "; date
+  # Remove old split files in case they exist
   ls "$csv_file."????? 2> /dev/null && rm -f $csv_file.?????
   # Split big file into chunks and process one by one with curl
   split_csv "$csv_file" "$chunk_size"
+  echo -en "\tStarting loading into $index at "; date
   for f in "$csv_file."?????; do
     sed -i "1i$header" "$f"
     task_id=$(curl -s \

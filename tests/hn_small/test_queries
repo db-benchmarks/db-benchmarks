@@ -288,7 +288,7 @@
     ]
 },
 {
-    "default": "select story_id from hn_small order by comment_ranking asc, author_comment_count asc, story_comment_count ,asc, comment_id asc limit 20",
+    "default": "select story_id from hn_small order by comment_ranking asc, author_comment_count asc, story_comment_count asc, comment_id asc limit 20",
     "meilisearch": [
         "/indexes/hn_small/search",
         {

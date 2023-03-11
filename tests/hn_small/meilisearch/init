@@ -11,7 +11,7 @@ if meilisearch_has_data "$index"; then
 else
   header="id:number,story_id:number,story_text,story_author,comment_id:number,comment_text,comment_author,comment_ranking:number,author_comment_count:number,story_comment_count:number"
 
-  init_meilisearch "$index" "$header" "100000"
+  init_meilisearch "$index" "$header" "100000" || exit
 
   echo -e "\tAdding various attributes at"; date
   task_id=$(curl -s \

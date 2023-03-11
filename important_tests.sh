@@ -4,15 +4,17 @@
 
 ./test --test=hn_small --engines=elasticsearch --memory=110000 --dir=results/hn_small/elasticsearch
 ./test --test=hn_small --engines=clickhouse --memory=110000 --dir=results/hn_small/clickhouse
-./test --test=hn_small --engines=manticoresearch:rowwise --memory=110000 --dir=results/hn_small/manticoresearch
+./test --test=hn_small --engines=manticoresearch --memory=110000 --dir=results/hn_small/manticoresearch
 ./test --test=hn_small --engines=mysql --memory=110000 --dir=results/hn_small/mysql
 ./test --test=hn_small --engines=mysql_percona --memory=110000 --dir=results/hn_small/mysql_percona
+./test --test=hn_small --engines=meilisearch --memory=110000 --dir=results/hn_small/meilisearch
 
 ./test --test=hn_small --engines=elasticsearch --memory=1024 --dir=results/hn_small/elasticsearch
 ./test --test=hn_small --engines=clickhouse --memory=1024 --dir=results/hn_small/clickhouse
-./test --test=hn_small --engines=manticoresearch:rowwise --memory=1024 --dir=results/hn_small/manticoresearch
+./test --test=hn_small --engines=manticoresearch --memory=1024 --dir=results/hn_small/manticoresearch
 ./test --test=hn_small --engines=mysql --memory=1024 --dir=results/hn_small/mysql
 ./test --test=hn_small --engines=mysql_percona --memory=1024 --dir=results/hn_small/mysql_percona
+./test --test=hn_small --engines=meilisearch --memory=1024 --dir=results/hn_small/meilisearch
 
 ./test --test=hn --engines=mysql:tuned --memory=110000 --dir=results/hn/mysql
 ./test --test=hn --engines=elasticsearch:tuned --memory=110000 --dir=results/hn/elasticsearch

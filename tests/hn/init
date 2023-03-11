@@ -1,4 +1,4 @@
-trap 'kill $(jobs -p)' EXIT
+trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")
 test_dir=$(realpath "$(dirname "$0")")
@@ -39,5 +39,6 @@ if [[ -d mysql_percona ]]; then
   . mysql_percona/init
 fi
 
+# Meilisearch never finishes ingesting the data, hence commented out
 # Meilisearch
-. meilisearch/init
+# . meilisearch/init

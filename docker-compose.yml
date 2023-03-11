@@ -94,13 +94,10 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_ROOT_PASSWORD=
   manticoresearch:
+    image: manticoresearch/manticore:6.0.2-extra
     container_name: "manticoresearch_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
-    build:
-      context: ./dockers/
-      dockerfile: manticore
-    image: manticoresearch:test
     privileged: true
     mem_swappiness: 0
     ulimits:
@@ -114,6 +111,8 @@ services:
     ports:
       - "127.0.0.1:9306:9306"
       - "127.0.0.1:9308:9308"
+    environment:
+      - EXTRA=1
     volumes:
       - ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore
       - ./tests/${test}/data:/input
