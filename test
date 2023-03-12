@@ -157,8 +157,9 @@ abstract class engine {
 
         foreach ($queries as $query) {
 
-            // protection from saving the same result more than once by making its id a hash of the result
-            $id = unpack('q', sha1("{$results['testTime']}_{$results['engine']}_{$results['type']}_{$query['originalQuery']}_".implode(',', $query['times']), true));
+            // if we retest the same version the results should override those that are already saved
+            $hashBase = "{$results['testName']} / {$results['memory']} / {$results['engine']} / {$results['type']} / {$results['info']['version']} / {$query['originalQuery']}";
+            $id = unpack('q', sha1($hashBase, true));
             $id = abs($id[1]);
             $values = [$id, "'".self::mres($results['testName'])."'", $results['memory'], "'".self::mres($results['testInfo'])."'", $results['testTime'], "'".$results['serverId']."'", "'".self::mres(json_encode($results['serverInfo'], JSON_PRETTY_PRINT))."'", self::$formatVersion,  "'{$results['engine']}'", "'{$results['type']}'", "'".self::mres(json_encode($results['info']))."'", $query['avg'], $query['cv'], $query['avgFastest'], $query['cvAvgFastest'], $query['cold'], $query['fastest'], $query['slowest'], "'".json_encode($query['times'])."'", count($query['times']), "'".self::mres($query['originalQuery'])."'", "'".self::mres($query['modifiedQuery'])."'", "'".self::mres(json_encode($query['result'], JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK))."'", "'".@self::mres($query['stats'])."'", $query['checksum'], $query['warmupTime'], (int)@$query['result']['error']['timeout'], "'".self::mres(json_encode(@$query['result']['error']))."'"];
             $query = "replace into results (".implode(',', $fields).") values (".implode(',', $values).")";
@@ -170,7 +171,7 @@ abstract class engine {
             $errorMessage = "ERROR: can't save results to db: http code: $httpCode";
             if (isset($curlResult->error)) $errorMessage .= "; error: ".$curlResult->error;
             if ($httpCode != 200) self::die($errorMessage, 3);
-            else self::log('Saved '.$id, 3);
+            else self::log("Saved $id (doc $hashBase)", 3);
         }
         return true;
     }
