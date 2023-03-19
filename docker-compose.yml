@@ -3,7 +3,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
     container_name: "elasticsearch_engine"
-    mem_limit: ${mem}m # used for testing with limiated capabilities, e.g. RAM capped at 256MB
+    mem_limit: ${mem}m # used for testing with limited capabilities, e.g. RAM capped at 256MB
     cpuset: "${cpuset}" # used for testing with limited capabilities, e.g. single physical core
     privileged: true # we give containers all privileges since otherwise (as previous tests showed) in-docker and on-host performances can differe significantly
     mem_swappiness: 0 # we disable swappiness since it can lower test results quality
