@@ -79,8 +79,7 @@ class clickhouse extends engine {
     // parses query result and returns it in the format that should be common across all engines
     protected function parseResult($curlResult) {
         $res = [];
-
-        if ($curlResult and $curlResult = @json_decode($curlResult) and isset($curlResult->data)) {
+        if ($curlResult and is_string($curlResult) and $curlResult = @json_decode($curlResult) and isset($curlResult->data)) {
             foreach ($curlResult->data as $hit) {
                 $ar = [];
                 foreach ($hit as $k=>$v) {
