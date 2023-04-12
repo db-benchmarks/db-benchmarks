@@ -339,7 +339,8 @@ abstract class engine {
                             $engine->beforeQuery();
                             $engine->dropEngineCache(); // before we test we need to drop caches inside the engine, otherwise we'll test cache performance which in most cases is wrong
                             $t = microtime(true);
-                            $result = $engine->testOnce($preparedQuery);
+			                $result = $engine->testOnce($preparedQuery);
+			                $t2 = microtime(true) - $t;
                             if (is_array($result)) { // means testOnce() returned an error
                                 if (@$result['timeout']) $result['timeout'] = self::$commandLineArguments['query_timeout'];
                                 $s = "WARNING: query failed. Details: ";
@@ -349,7 +350,7 @@ abstract class engine {
                                 $normalizedResult = ['error' => $result];
                                 break;
                             }
-                            $times[] = microtime(true) - $t;
+                            $times[] = $t2;
                             self::log(floor((microtime(true) - $t) * 1000000)." us", 5, 'white');
                             $normalizedResult = $engine->parseResult($result);
                             $queryStats = $engine->afterQuery();
@@ -362,7 +363,7 @@ abstract class engine {
                                     self::log(($n+1)." queries is enough, the quality is sufficient", 5, 'white');
                                     break;
                                 }
-                            }
+			                }
                         }
                         $engine->stop();
 
