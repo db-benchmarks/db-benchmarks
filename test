@@ -145,7 +145,7 @@ abstract class engine {
         curl_setopt($curl, CURLOPT_USERPWD, self::$commandLineArguments['username'].":".self::$commandLineArguments['password']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        $query = "create table if not exists results(test_name string, memory int, test_info text, test_time timestamp, server_id string, server_info string stored, format_version int, engine_name string engine='rowwise', type string engine='rowwise', info json, avg float, cv float, avg_fastest float, cv_avg_fastest float, cold bigint, fastest bigint, slowest bigint, times json, times_count int, original_query text indexed attribute, modified_query text indexed attribute, result string, stats text stored, checksum int, warmup_time bigint, query_timeout int, error json) min_word_len = '1' min_infix_len = '2' engine='columnar'";
+        $query = "create table if not exists results(test_name string, memory int, test_info text, test_time timestamp, server_id string, server_info string stored, format_version int, engine_name string engine='rowwise', type string engine='rowwise', info json, avg float, cv float, avg_fastest float, cv_avg_fastest float, cold bigint, fastest bigint, slowest bigint, times json, times_count int, original_query text indexed attribute, modified_query text indexed attribute, result string, stats text stored, checksum int, warmup_time bigint, query_timeout int, error json, retest bool) min_word_len = '1' min_infix_len = '2' engine='columnar'";
 
         curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
         $curlResult = curl_exec($curl);
@@ -153,24 +153,26 @@ abstract class engine {
         if ($httpCode != 200) self::die("ERROR: can't create or verify table to save results: http code: $httpCode", 3);
 
 
-        $fields = ['id', 'test_name', 'memory', 'test_info', 'test_time', 'server_id', 'server_info', 'format_version', 'engine_name', 'type', 'info', 'avg', 'cv', 'avg_fastest', 'cv_avg_fastest', 'cold', 'fastest', 'slowest', 'times', 'times_count', 'original_query', 'modified_query', 'result', 'stats', 'checksum', 'warmup_time', 'query_timeout', 'error' ];
+        $fields = ['id', 'test_name', 'memory', 'test_info', 'test_time', 'server_id', 'server_info', 'format_version', 'engine_name', 'type', 'info', 'avg', 'cv', 'avg_fastest', 'cv_avg_fastest', 'cold', 'fastest', 'slowest', 'times', 'times_count', 'original_query', 'modified_query', 'result', 'stats', 'checksum', 'warmup_time', 'query_timeout', 'error', 'retest' ];
 
         foreach ($queries as $query) {
 
             // if we retest the same version the results should override those that are already saved
-            $hashBase = "{$results['testName']} / {$results['memory']} / {$results['engine']} / {$results['type']} / {$results['info']['version']} / {$query['originalQuery']}";
+            if (!isset($query['retest'])) $query['retest'] = 0;
+            $hashBase = "{$results['testName']} / {$results['memory']} / {$results['engine']} / {$results['type']} / {$results['info']['version']} / {$query['originalQuery']} / ".(int)$query['retest'];
             $id = unpack('q', sha1($hashBase, true));
             $id = abs($id[1]);
-            $values = [$id, "'".self::mres($results['testName'])."'", $results['memory'], "'".self::mres($results['testInfo'])."'", $results['testTime'], "'".$results['serverId']."'", "'".self::mres(json_encode($results['serverInfo'], JSON_PRETTY_PRINT))."'", self::$formatVersion,  "'{$results['engine']}'", "'{$results['type']}'", "'".self::mres(json_encode($results['info']))."'", $query['avg'], $query['cv'], $query['avgFastest'], $query['cvAvgFastest'], $query['cold'], $query['fastest'], $query['slowest'], "'".json_encode($query['times'])."'", count($query['times']), "'".self::mres($query['originalQuery'])."'", "'".self::mres($query['modifiedQuery'])."'", "'".self::mres(json_encode($query['result'], JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK))."'", "'".@self::mres($query['stats'])."'", $query['checksum'], $query['warmupTime'], (int)@$query['result']['error']['timeout'], "'".self::mres(json_encode(@$query['result']['error']))."'"];
+            $values = [$id, "'".self::mres($results['testName'])."'", $results['memory'], "'".self::mres($results['testInfo'])."'", $results['testTime'], "'".$results['serverId']."'", "'".self::mres(json_encode($results['serverInfo'], JSON_PRETTY_PRINT))."'", self::$formatVersion,  "'{$results['engine']}'", "'{$results['type']}'", "'".self::mres(json_encode($results['info']))."'", $query['avg'], $query['cv'], $query['avgFastest'], $query['cvAvgFastest'], $query['cold'], $query['fastest'], $query['slowest'], "'".json_encode($query['times'])."'", count($query['times']), "'".self::mres($query['originalQuery'])."'", "'".self::mres($query['modifiedQuery'])."'", "'".self::mres(json_encode($query['result'], JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK))."'", "'".@self::mres($query['stats'])."'", $query['checksum'], $query['warmupTime'], (int)@$query['result']['error']['timeout'], "'".self::mres(json_encode(@$query['result']['error']))."'", (int)$query['retest']];
             $query = "replace into results (".implode(',', $fields).") values (".implode(',', $values).")";
 
             curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
             $curlResult = curl_exec($curl);
             $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($curlResult = @json_decode($curlResult));
+            $curlResult = @json_decode($curlResult);
+            if (is_array($curlResult)) $curlResult = array_shift($curlResult);
             $errorMessage = "ERROR: can't save results to db: http code: $httpCode";
-            if (isset($curlResult->error)) $errorMessage .= "; error: ".$curlResult->error;
-            if ($httpCode != 200) self::die($errorMessage, 3);
+            if (isset($curlResult->error) and $curlResult->error) $errorMessage .= "; error: ".$curlResult->error;
+            if ($httpCode != 200 or (isset($curlResult->error) and $curlResult->error)) self::die($errorMessage, 3);
             else self::log("Saved $id (doc $hashBase)", 3);
         }
         return true;
@@ -293,79 +295,81 @@ abstract class engine {
                 $engineOptions = self::parseEngineName($engine);
                 self::log("Engine: ".$engineOptions['engine'].", type: ".$engineOptions['type'], 2);
                 $engine = new $engineOptions['engine']($engineOptions['type']);
-                $queryTimes = [];
-                foreach (self::$queries as $qn=>$query) {
-                    $originalQuery = is_array($query)?current($query):$query;
-                    $preparedQuery = false;
-                    self::log("Original query(".($qn+1)."/".count(self::$queries)."): $originalQuery", 3, 'yellow');
-                    if (!is_array($query)) $preparedQuery = $engine->prepareQuery($query);
-                    else { // query is an array (json node, not just a single string common for all dbs)
-                        if (isset($query[$engineOptions['engine'].':'.$engineOptions['type']])) $preparedQuery = $query[$engineOptions['engine'].':'.$engineOptions['type']];
-                        if (!$preparedQuery) {// exact match is not found, let's check if there's regex query keys
-                            foreach ($query as $k=>$v) if ($k[0] == '/' and preg_match($k, $engineOptions['engine'].':'.$engineOptions['type'])) $preparedQuery = $v;
+                for ($attempt = 0; $attempt <= 1; $attempt++) {
+                    $queryTimes = [];
+                    foreach (self::$queries as $qn=>$query) {
+                        $originalQuery = is_array($query)?current($query):$query;
+                        $preparedQuery = false;
+                        self::log("Original query(".($qn+1)."/".count(self::$queries).", ".($attempt?'retest':'first attempt')."): $originalQuery", 3, 'yellow');
+                        if (!is_array($query)) $preparedQuery = $engine->prepareQuery($query);
+                        else { // query is an array (json node, not just a single string common for all dbs)
+                            if (isset($query[$engineOptions['engine'].':'.$engineOptions['type']])) $preparedQuery = $query[$engineOptions['engine'].':'.$engineOptions['type']];
+                            if (!$preparedQuery) {// exact match is not found, let's check if there's regex query keys
+                                foreach ($query as $k=>$v) if ($k[0] == '/' and preg_match($k, $engineOptions['engine'].':'.$engineOptions['type'])) $preparedQuery = $v;
+                            }
+                            if (!$preparedQuery) if (isset($query[$engineOptions['engine']])) $preparedQuery = $query[$engineOptions['engine']];
+                            if (!$preparedQuery) if (isset($query['default'])) $preparedQuery = $query['default'];
+                            if (!$preparedQuery) self::die("ERROR: no query found for ".$engineOptions['engine'].':'.$engineOptions['type'], 3);
                         }
-                        if (!$preparedQuery) if (isset($query[$engineOptions['engine']])) $preparedQuery = $query[$engineOptions['engine']];
-                        if (!$preparedQuery) if (isset($query['default'])) $preparedQuery = $query['default'];
-                        if (!$preparedQuery) self::die("ERROR: no query found for ".$engineOptions['engine'].':'.$engineOptions['type'], 3);
-                    }
-                    $preparedQueryJson = json_encode($preparedQuery);
-                    self::log("Modified query: $preparedQueryJson", 3, 'yellow');
+                        $preparedQueryJson = json_encode($preparedQuery);
+                        self::log("Modified query: $preparedQueryJson", 3, 'yellow');
 
-                    // starting Engine
-                    ob_start();
-                    self::dropIOCache();
-                    $warmupTime = $engine->start($mem);
-                    if ($warmupTime === true or $warmupTime === false) $warmupTime = -1;
-                    self::log(ob_get_clean(), 4, false, true, true); self::log(ob_get_clean(), 4);
+                        // starting Engine
+                        ob_start();
+                        self::dropIOCache();
+                        $warmupTime = $engine->start($mem);
+                        if ($warmupTime === true or $warmupTime === false) $warmupTime = -1;
+                        self::log(ob_get_clean(), 4, false, true, true); self::log(ob_get_clean(), 4);
 
-                    // making initial connection to make sure the 1st real query doesn't spend extra time on connection
-                    ob_start();
-                    $t = microtime(true);
-                    while (true) {
-                        $canConnect = $engine->canConnect();
-                        if ($canConnect) break;
-                        if (microtime(true) - $t > self::$commandLineArguments['probe_timeout']) break;
-                    }
-                    self::log(ob_get_clean(), 4);
-                    if (!$canConnect) self::die("ERROR: couldn't connect to engine", 4);
-
-                    self::log("Making queries", 4);
-                    $times = [];
-                    for ($n=0;$n<self::$commandLineArguments['times'];$n++) {
-                        if (!self::checkTempAndWait()) self::die("ERROR: can't check temperature. High risk of inaccuracy!", 4);
-                        $engine->beforeQuery();
-                        $engine->dropEngineCache(); // before we test we need to drop caches inside the engine, otherwise we'll test cache performance which in most cases is wrong
+                        // making initial connection to make sure the 1st real query doesn't spend extra time on connection
+                        ob_start();
                         $t = microtime(true);
-                        $result = $engine->testOnce($preparedQuery);
-                        if (is_array($result)) { // means testOnce() returned an error
-                            if (@$result['timeout']) $result['timeout'] = self::$commandLineArguments['query_timeout'];
-                            $s = "WARNING: query failed. Details: ";
-                            $s .= json_encode($result);
-                            $s .= ". It doesn't make sense to test this query further.";
-                            self::log($s, 5);
-                            $normalizedResult = ['error' => $result];
-                            break;
+                        while (true) {
+                            $canConnect = $engine->canConnect();
+                            if ($canConnect) break;
+                            if (microtime(true) - $t > self::$commandLineArguments['probe_timeout']) break;
                         }
-                        $times[] = microtime(true) - $t;
-                        self::log(floor((microtime(true) - $t) * 1000000)." us", 5, 'white');
-                        $normalizedResult = $engine->parseResult($result);
-                        $queryStats = $engine->afterQuery();
+                        self::log(ob_get_clean(), 4);
+                        if (!$canConnect) self::die("ERROR: couldn't connect to engine", 4);
 
-                        $tmpTimes = $times;
-                        sort($tmpTimes);
-                        if (count($tmpTimes) > self::$commandLineArguments['times'] / 3) {
-                            $cv = self::cv(array_slice($tmpTimes, 0, floor(0.8 * count($tmpTimes))));
-                            if ($cv > 0 and $cv <= 2) { // if the CV of fastest 80% of response times <2% and there were at least 1/3 of attempts made - that's enough
-                                self::log(($n+1)." queries is enough, the quality is sufficient", 5, 'white');
+                        self::log("Making queries", 4);
+                        $times = [];
+                        for ($n=0;$n<self::$commandLineArguments['times'];$n++) {
+                            if (!self::checkTempAndWait()) self::die("ERROR: can't check temperature. High risk of inaccuracy!", 4);
+                            $engine->beforeQuery();
+                            $engine->dropEngineCache(); // before we test we need to drop caches inside the engine, otherwise we'll test cache performance which in most cases is wrong
+                            $t = microtime(true);
+                            $result = $engine->testOnce($preparedQuery);
+                            if (is_array($result)) { // means testOnce() returned an error
+                                if (@$result['timeout']) $result['timeout'] = self::$commandLineArguments['query_timeout'];
+                                $s = "WARNING: query failed. Details: ";
+                                $s .= json_encode($result);
+                                $s .= ". It doesn't make sense to test this query further.";
+                                self::log($s, 5);
+                                $normalizedResult = ['error' => $result];
                                 break;
                             }
-                        }
-                    }
-                    $engine->stop();
+                            $times[] = microtime(true) - $t;
+                            self::log(floor((microtime(true) - $t) * 1000000)." us", 5, 'white');
+                            $normalizedResult = $engine->parseResult($result);
+                            $queryStats = $engine->afterQuery();
 
-                    $queryTimes[] = ['originalQuery' => $originalQuery, 'modifiedQuery' => $preparedQuery, 'times' => $times, 'result' => $normalizedResult, 'stats' => $queryStats, 'checksum' => self::checksum($normalizedResult), 'warmupTime' => $warmupTime];
+                            $tmpTimes = $times;
+                            sort($tmpTimes);
+                            if (count($tmpTimes) > self::$commandLineArguments['times'] / 3) {
+                                $cv = self::cv(array_slice($tmpTimes, 0, floor(0.8 * count($tmpTimes))));
+                                if ($cv > 0 and $cv <= 2) { // if the CV of fastest 80% of response times <2% and there were at least 1/3 of attempts made - that's enough
+                                    self::log(($n+1)." queries is enough, the quality is sufficient", 5, 'white');
+                                    break;
+                                }
+                            }
+                        }
+                        $engine->stop();
+
+                        $queryTimes[] = ['originalQuery' => $originalQuery, 'modifiedQuery' => $preparedQuery, 'times' => $times, 'result' => $normalizedResult, 'stats' => $queryStats, 'checksum' => self::checksum($normalizedResult), 'warmupTime' => $warmupTime];
+                    }
+                    $engine->saveToDir($queryTimes, $mem, $engineOptions, $enginesInfo[$engineOptions['engine']][$engineOptions['type']], $serverId, $serverInfo, ($attempt == 1));
                 }
-                $engine->saveToDir($queryTimes, $mem, $engineOptions, $enginesInfo[$engineOptions['engine']][$engineOptions['type']], $serverId, $serverInfo);
             }
         }
     }
@@ -381,8 +385,8 @@ abstract class engine {
     }
 
     // saves test results
-    protected function saveToDir($queryTimes, $memory, $engineOptions, $info, $serverId, $serverInfo) {
-        self::log("Saving data for engine \"".get_class($this)."\"", 1, 'cyan');
+    protected function saveToDir($queryTimes, $memory, $engineOptions, $info, $serverId, $serverInfo, $retest = false) {
+        self::log("Saving data for engine \"".get_class($this)."\"".($retest?' (retest)':''), 1, 'cyan');
 
         $engine = get_class($this);
         if (!isset($info['version'])) {
@@ -392,7 +396,7 @@ abstract class engine {
 
         $limited = (@self::$commandLineArguments['limited'] or $engineOptions['limited']);
 
-        $fileName = self::$commandLineArguments['test']."_{$engine}_{$this->type}_{$memory}";
+        $fileName = self::$commandLineArguments['test']."_{$engine}_{$this->type}_{$memory}".($retest?'_retest':'');
 
         $final = [
             'testName' => self::$commandLineArguments['test'],
@@ -432,9 +436,10 @@ abstract class engine {
             $out['stats'] = $result['stats'];
             $out['checksum'] = $result['checksum'];
             $out['warmupTime'] = $result['warmupTime'];
+            $out['retest'] = $retest;
             $final['queries'][] = $out;
         }
-
+        
         $time = date('ymd_his', self::$startTime);
         @mkdir(self::$commandLineArguments['dir']."/".$time, 0777, true);
         $fileName = self::$commandLineArguments['dir']."/".$time."/".$fileName;
