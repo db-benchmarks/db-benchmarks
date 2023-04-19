@@ -141,7 +141,7 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=default
   meilisearch:
-    image: getmeili/meilisearch:v1.0.0
+    image: getmeili/meilisearch:v1.1.1
     container_name: "meilisearch_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
