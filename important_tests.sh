@@ -33,4 +33,4 @@
 ./test --test=logs10m --engines=clickhouse --memory=110000 --dir=results/logs10m/clickhouse --query_timeout=600
 ./test --test=logs10m --engines=manticoresearch:columnar --memory=110000 --dir=results/logs10m/manticoresearch --query_timeout=600
 ./test --test=logs10m --engines=manticoresearch:rowwise --memory=110000 --dir=results/logs10m/manticoresearch --query_timeout=600
-
+./test --test=logs10m --engines=meilisearch --memory=110000 --dir=results/logs10m/meilisearch --query_timeout=600

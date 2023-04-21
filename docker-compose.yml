@@ -167,5 +167,5 @@ services:
       - --env
       - development
       - --no-analytics
-      - --max-indexing-memory=85Mb
+      - --max-indexing-memory=2Gb
       - --max-indexing-threads=24

@@ -31,19 +31,50 @@ init_meilisearch() {
   ls "$csv_file."????? 2> /dev/null && rm -f $csv_file.?????
   # Split big file into chunks and process one by one with curl
   split_csv "$csv_file" "$chunk_size"
-  echo -en "\tStarting loading into $index at "; date
-  for f in "$csv_file."?????; do
-    sed -i "1i$header" "$f"
-    task_id=$(curl -s \
-      -X POST "http://localhost:7700/indexes/$index/documents?primaryKey=id" \
-      -H 'Content-Type: text/csv' \
-      --data-binary @"$f" | jq | grep taskUid | cut -d: -f2 | tr -d ' ,"' )
-    printf "\tFile: %s\n" "$f"
-    printf "\tTask: %s" "$task_id"
-    meilisearch_wait "$task_id"
+
+  # Create an array of CSV files in the data directory
+  csv_files=($(ls "$csv_file."*))
+
+  for f in "${csv_files[@]}"; do
+    head -1 $f|grep -q $header || sed -i "1i$header" "$f"
   done
 
+  echo -en "\tStarting loading into $index at "; date
+
+  # Iterate through the CSV files
+  for csv_file in "${csv_files[@]}"; do
+    # Process the current CSV file
+    insert_data "$csv_file" &
+    wait
+
+    # Check the length of the "results" array and break the loop if it's less than 8
+    while true; do
+      if [ "$(curl -s -X GET "http://localhost:7700/tasks/?limit=10000&statuses=enqueued,processing" | jq '.results|length')" -lt 8 ]; then break; fi
+
+      # Pause for 1 second before the next attempt
+      sleep 1
+    done
+  done
+
+  # Wait until the results_length becomes 0 before exiting
+  while true; do
+    if [ "$(curl -s -X GET "http://localhost:7700/tasks/?limit=10000&statuses=enqueued,processing" | jq '.results|length')" -eq 0 ]; then break; fi
+
+    # Pause for 1 second before the next attempt
+    sleep 1
+  done
+  
   echo -en "\tFinished loading at "; date
+}
+
+
+insert_data() {
+  task_id=$(curl -s \
+    -X POST "http://localhost:7700/indexes/$index/documents?primaryKey=id" \
+    -H 'Content-Type: text/csv' \
+    --data-binary @"$1" | jq | grep taskUid | cut -d: -f2 | tr -d ' ,"' )
+  printf "\tFile: %s\n" "$1"
+  printf "\tTask: %s" "$task_id"
 }
 
 meilisearch_has_data() {
@@ -136,4 +167,5 @@ split_csv() {
     awk '{gsub(/<-nl->/, "\n"); print}' "$chunk" > "$chunk.fix"
     mv "$chunk.fix" "$chunk"
   done
+  rm "$file.fix"
 }
