@@ -44,16 +44,7 @@ init_meilisearch() {
   # Iterate through the CSV files
   for csv_file in "${csv_files[@]}"; do
     # Process the current CSV file
-    insert_data "$csv_file" &
-    wait
-
-    # Check the length of the "results" array and break the loop if it's less than 8
-    while true; do
-      if [ "$(curl -s -X GET "http://localhost:7700/tasks/?limit=10000&statuses=enqueued,processing" | jq '.results|length')" -lt 8 ]; then break; fi
-
-      # Pause for 1 second before the next attempt
-      sleep 1
-    done
+    insert_data "$csv_file"
   done
 
   # Wait until the results_length becomes 0 before exiting
