@@ -21,6 +21,10 @@ else
       "pagination": {
         "maxTotalHits": 2000
       },
+      "searchableAttributes": [
+        "story_text",
+        "comment_text"
+      ],
       "filterableAttributes": [
         "comment_ranking"
       ],
