@@ -10,12 +10,6 @@ init_meilisearch() {
 
   chunk_size="${3:-250000}"
 
-  pushd ../..
-  test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env stop meilisearch
-  test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env rm -f meilisearch  
-  test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env up -d meilisearch
-  popd || exit 1
-
   count=$(curl -s -X GET "http://localhost:7700/indexes/$index/stats" \
     | jq | grep numberOfDocuments | head -n 1 | cut -d':' -f2 | tr -d ' ,')
   echo "Found ${count:-0} documents in Meilisearch"
@@ -58,58 +52,21 @@ init_meilisearch() {
   echo -en "\tFinished loading at "; date
 }
 
-
 insert_data() {
+  printf "\tFile: %s. " "$1"
   task_id=$(curl -s \
     -X POST "http://localhost:7700/indexes/$index/documents?primaryKey=id" \
     -H 'Content-Type: text/csv' \
     --data-binary @"$1" | jq | grep taskUid | cut -d: -f2 | tr -d ' ,"' )
-  printf "\tFile: %s\n" "$1"
-  printf "\tTask: %s" "$task_id"
+  printf "Task: %s\n" "$task_id"
 }
 
 meilisearch_has_data() {
-  test=$1
-  if [[ -z "$test" ]]; then
-    >&2 echo 'You must pass index name as first argument'
-    false
-  fi
-
   if ls ./data/data.ms/indexes/*/data.mdb 2> /dev/null; then
     return
   fi
 
   false
-}
-
-meilisearch_wait() {
-  task_id="$1"
-  if [[ -z "$task_id" ]]; then
-    >&2 echo "Usage: $0 task_id"
-    exit 1
-  fi
-
-  # Little helper with map for sleeping while awaitin for task is done
-  sleep_map=([0]=1 [1]=3 [2]=5 [3]=8 [4]=16 [5]=30 [6]=60)
-
-  n=0
-  prev_status=
-  while true; do
-    status=$(curl -s -X GET "http://localhost:7700/tasks/$task_id" | jq | grep status | head -n 1 | cut -d: -f2 | tr -d ' ,"')
-    if [[ "$prev_status" != "$status" ]]; then
-      prev_status="$status"
-      printf "\n\t\t%s" "$status"
-    fi
-
-    if [[ "$status" == "succeeded" ]]; then
-      break
-    fi
-    echo -n '.'
-    sleep "${sleep_map[$n]:-1}"
-    n=$(( n + 1 ))
-  done
-
-  echo
 }
 
 # Helper to split csv with new lines symbols in fields that make it impossilbe
@@ -135,13 +92,13 @@ split_csv() {
       }
 
       {
-        if ($0 ~ /^"/) {
+        if ($0 ~ /^"[0-9]/) {
           if (prev_line != "") {
             print prev_line
           }
           prev_line = $0
         } else {
-          prev_line = prev_line "<-nl->" substr($0, 2)
+          prev_line = prev_line "<-nl->" substr($0, 1)
         }
       }
 

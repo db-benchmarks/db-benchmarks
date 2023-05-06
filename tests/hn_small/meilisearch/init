@@ -6,15 +6,35 @@ type=
 echo -e "Meilisearch (type $type):"
 
 index="hn_small"
+
+echo -e "Starting Meilisearch"
+pushd ../..
+test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env stop meilisearch
+test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env rm -f meilisearch
+test="$index" suffix="" docker-compose -f "./docker-compose.yml" --env-file .env up -d meilisearch
+popd || exit 1
+
+sleep 5
+
 if meilisearch_has_data "$index"; then
   echo -e "\tNo need to rebuild"
 else
   header="id:number,story_id:number,story_text,story_author,comment_id:number,comment_text,comment_author,comment_ranking:number,author_comment_count:number,story_comment_count:number"
+  
+  echo -e "Creating an index"
+  curl -s \
+    -X POST "http://localhost:7700/indexes" \
+    -H 'Content-Type: application/json' \
+    --data-binary "{
+      \"uid\": \"$index\",
+      \"primaryKey\": \"id\"
+    }"|jq .
 
-  init_meilisearch "$index" "$header" "100000" || exit
+  sleep 5
 
-  echo -e "\tAdding various attributes at"; date
-  task_id=$(curl -s \
+  # maxTotalHits is overrided since otherwise a query like "select count(*) from hn_small where comment_ranking > 300 and comment_ranking < 500" returns 1000 at max
+  echo -e "Patching the index"
+  curl -s \
     -X PATCH "http://localhost:7700/indexes/$index/settings" \
     -H 'Content-Type: application/json' \
     --data-binary '{
@@ -23,20 +43,25 @@ else
       },
       "searchableAttributes": [
         "story_text",
-        "comment_text"
+        "comment_text",
+	"story_author",
+	"comment_author"
       ],
       "filterableAttributes": [
-        "comment_ranking"
+        "comment_ranking",
+	"story_author"
       ],
       "sortableAttributes": [
         "comment_ranking",
         "author_comment_count",
         "story_id",
         "comment_id"
-      ]
-    }' | jq | grep taskUid | cut -d: -f2 | tr -d ' ,"'
-  )
+      ],
+      "typoTolerance": {"enabled": false}
+    }'
 
-  meilisearch_wait "$task_id"
-  echo -e "\tFinish setup of filterable attributes at"; date
+  sleep 5
+  echo -e "Index settings:"
+  curl -s "http://localhost:7700/indexes/$index/settings"|jq .
+  init_meilisearch "$index" "$header" "100000" || exit
 fi
