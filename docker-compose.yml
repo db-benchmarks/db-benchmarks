@@ -118,7 +118,7 @@ services:
       - ./tests/${test}/data:/input
       - ./tests/${test}/manticore/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
   postgres:
-    image: postgres:14.3
+    image: postgres:15.2
     container_name: "postgres_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
