@@ -1,7 +1,7 @@
 for type in tuned; do
   [ ! -z "$type" ] && suffix="_$type" || suffix="";
   echo -e "Elasticsearch (type $type):"
-  if [ -d es/idx$suffix/nodes/0/indices ]; then
+  if [ "$(ls es/idx$suffix)" ]; then
     echo -e "${COLORED}\tNo need to rebuild${NC}"
   else
     docker-compose -f ../../docker-compose.yml --env-file ../../.env stop elasticsearch
