@@ -17,7 +17,23 @@ for type in tuned; do
     sleep 5
     while ! nc -z localhost 3306; do sleep 1; done
     sleep 5
-    mysql -uroot -h0 -e "DROP TABLE IF EXISTS default.$test; CREATE TABLE default.$test(id bigint,story_id bigint,story_text text,story_author varchar(1024),comment_id bigint,comment_text text,comment_author varchar(1024),comment_ranking bigint unsigned,author_comment_count bigint unsigned,story_comment_count bigint unsigned, FULLTEXT(story_text,story_author,comment_text,comment_author), KEY(comment_ranking), KEY(comment_ranking asc, author_comment_count asc, story_comment_count asc, comment_id asc), key story_author(700))"
+    mysql -uroot -h0 -e "DROP TABLE IF EXISTS default.$test; CREATE TABLE default.$test (
+  id bigint,
+  story_id bigint,
+  story_text text,
+  story_author varchar(1024),
+  comment_id bigint,
+  comment_text text,
+  comment_author varchar(1024),
+  comment_ranking bigint unsigned,
+  author_comment_count bigint unsigned,
+  story_comment_count bigint unsigned,
+  FULLTEXT(story_text, story_author, comment_text, comment_author),
+  KEY(comment_ranking),
+  KEY(comment_ranking asc, author_comment_count asc, story_comment_count asc, comment_id asc),
+  KEY(comment_ranking asc, story_id desc),
+  KEY(story_author(768))
+)";
     echo -en "\tStarting loading at "; date
     mysql -uroot -h0 -e "LOAD DATA INFILE '/input/data.csv' INTO TABLE default.$test FIELDS TERMINATED BY ',' ENCLOSED BY '\"' ESCAPED BY '\"' LINES TERMINATED BY '\n'"
     hook="mysql/post_load$suffix.sh"; if [ -f "${hook}" ] && [ -r "${hook}" ] && [ -x "${hook}" ]; then
