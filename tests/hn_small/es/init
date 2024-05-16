@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #for type in "" tuned limited; do
 for type in ""; do

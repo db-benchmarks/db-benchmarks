@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")

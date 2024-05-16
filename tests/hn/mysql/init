@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #for type in "" limited; do
 for type in tuned; do
   [ ! -z "$type" ] && suffix="_$type" || suffix="";

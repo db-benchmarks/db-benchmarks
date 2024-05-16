@@ -51,6 +51,7 @@ services:
 
   mysql:
     image: mysql:8.0.28
+    platform: linux/x86_64
     networks:
       - default
     container_name: "mysql_engine"
@@ -79,6 +80,7 @@ services:
 
   mysql_percona:
     image: percona:8.0.28-19
+    platform: linux/x86_64
     networks:
       - default
     container_name: "mysql_percona_engine"
