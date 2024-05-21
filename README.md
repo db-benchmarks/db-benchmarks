@@ -171,7 +171,7 @@ To install:
    git clone git@github.com:db-benchmarks/db-benchmarks.git
    cd db-benchmarks
    ```
-2. Update `mem` in `.env` with the default value of the memory (in megabytes) the test framework can use for secondary tasks (data loading, getting info about databases)
+2. Update `mem` and `cpuset` in `.env` with the default value of the memory (in megabytes) and CPUs the test framework can use for secondary tasks (data loading, getting info about databases)
 3. Tune JVM limits `ES_JAVA_OPTS` for your tests. Usually it's size of allocated memory for Docker Machine
 
 
@@ -223,6 +223,7 @@ To save to db all results it finds by path
 	--username=USERNAME
 	--password=PASSWORD
 	--rm - remove after successful saving to database
+	--skip_calm - avoid waiting until discs become calm
 ----------------------
 Environment variables:
 	All the options can be specified as environment variables, but you can't use the same option as an environment variables and as a command line argument at the same time.
@@ -232,6 +233,11 @@ And run the test:
 
 ```bash
 ../../test --test=hn_small --engines=elasticsearch,clickhouse --memory=16384
+```
+
+If you run your tests in local mode and don't care about discs calm you can avoid this behaviour by setting parameter `--skip_calm`
+```bash
+../../test --test=hn_small --engines=elasticsearch,clickhouse --memory=16384 --skip_calm
 ```
 
 Now you have test results in `./results/` (in the root of the repository), for example:
