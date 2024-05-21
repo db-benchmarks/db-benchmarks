@@ -235,9 +235,9 @@ And run the test:
 ../../test --test=hn_small --engines=elasticsearch,clickhouse --memory=16384
 ```
 
-If you run your tests in local mode and don't care about discs calm you can avoid this behaviour by setting parameter `--skip_calm`
+If you run your tests in local mode (development) and don't care about tests inaccuracy you can avoid discs calm and cpu checks by setting parameter `--skip_inaccuracy`
 ```bash
-../../test --test=hn_small --engines=elasticsearch,clickhouse --memory=16384 --skip_calm
+../../test --test=hn_small --engines=elasticsearch,clickhouse --memory=16384 --skip_inaccuracy
 ```
 
 Now you have test results in `./results/` (in the root of the repository), for example:
