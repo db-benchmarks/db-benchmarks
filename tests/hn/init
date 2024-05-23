@@ -20,6 +20,9 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+. typesense/init
+
+exit 0
 # Elasticsearch
 . es/init
 
