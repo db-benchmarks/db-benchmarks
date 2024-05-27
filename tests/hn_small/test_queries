@@ -446,7 +446,7 @@
       "/collections/hn_small/documents/search",
       {
         "q": "*",
-        "filter_by": "comment_ranking[100,200]"
+        "filter_by": "comment_ranking:[100,200]"
       }
     ]
   },
