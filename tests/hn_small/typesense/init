@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d typesense"
-echo -e "\tStarting mysql percona ($cmd)"
+echo -e "\tStarting Typesense ($cmd)"
 eval "$cmd"
 
 # WAIT UNTIL TYPESENCE BECAME AVAILABLE
 
 temp_log_file=$(mktemp)
-timeout 60 docker logs -f typesense_engine >"$temp_log_file" 2>&1 &
+timeout 300 docker logs -f typesense_engine >"$temp_log_file" 2>&1 &
 log_pid=$!
 
 while true; do

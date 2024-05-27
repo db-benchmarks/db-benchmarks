@@ -4,13 +4,15 @@
     "meilisearch": [
       "/indexes/hn_small/stats",
       []
-    ]
+    ],
+    "typesense": "/collections/hn_small"
   },
   "doc": {
     "default": "select * from hn_small limit 1",
     "meilisearch": [
       "/indexes/hn_small/documents?offset=0&limit=1",
       []
-    ]
+    ],
+    "typesense": "/collections/hn_small/documents/search?per_page=1&q=*"
   }
 }
