@@ -75,7 +75,11 @@ class typesense extends engine {
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
     protected function testOnce($query) {
-        return $this->sendRequest($query);
+        if (is_string($query)) {
+            return ['timeout' => true];
+        }
+        assert(is_array($query));
+        return $this->sendRequest($query[0], $query[1]);
     }
 
     // To collect query stats after the query
@@ -87,7 +91,7 @@ class typesense extends engine {
     protected function parseResult($curlResult) {
 
         $curlResult = json_decode($curlResult, true);
-        return match(true) {
+        return match (true) {
 
             isset($curlResult['num_documents']) => [
                 ['count(*)' => $curlResult['num_documents']],
@@ -127,8 +131,14 @@ class typesense extends engine {
         // ? Do nothing due no information available
     }
 
-    protected function sendRequest(string $path): string {
-        curl_setopt($this->curl, CURLOPT_URL, "http://localhost:{$this->port}{$path}");
+    protected function sendRequest(string $path, $payload): string {
+
+        $query = "http://localhost:{$this->port}{$path}";
+
+        if (!empty($payload)) {
+            $query .= '?' . http_build_query($payload);
+        }
+        curl_setopt($this->curl, CURLOPT_URL, $query);
         $curlResult = curl_exec($this->curl);
         $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $curlErrorCode = curl_errno($this->curl);
