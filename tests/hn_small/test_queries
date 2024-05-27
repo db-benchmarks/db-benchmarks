@@ -466,14 +466,6 @@
         "limit": 20
       }
     ],
-    "typesense": [
-      "/collections/hn_small/documents/search",
-      {
-        "q": "*",
-        "include_fields": "story_id",
-        "sort_by": "comment_ranking:asc,author_comment_count:asc,story_comment_count:asc,comment_id:asc",
-        "per_page": "20"
-      }
-    ]
+    "typesense": "-"
   }
 ]
