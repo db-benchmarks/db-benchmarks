@@ -4,6 +4,10 @@
     "meilisearch": [
       "/indexes/hn/stats",
       []
+    ],
+    "typesense": [
+      "/collections/hn",
+      []
     ]
   },
   "doc": {
@@ -11,6 +15,13 @@
     "meilisearch": [
       "/indexes/hn/documents?offset=0&limit=1",
       []
+    ],
+    "typesense": [
+      "/collections/hn/documents/search",
+      {
+        "per_page": 1,
+        "q": "*"
+      }
     ]
   }
 }

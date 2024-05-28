@@ -337,7 +337,6 @@
         "q": "*",
         "sort_by": "comment_ranking:asc",
         "per_page": "20"
-
       }
     ]
   },
@@ -358,7 +357,6 @@
         "q": "*",
         "sort_by": "comment_ranking:desc",
         "per_page": "20"
-
       }
     ]
   },
@@ -431,7 +429,6 @@
         "per_page": "20"
       }
     ]
-
   },
   {
     "default": "select count(*) from hn_small where comment_ranking in (100,200)",
