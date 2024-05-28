@@ -171,8 +171,9 @@ To install:
    git clone git@github.com:db-benchmarks/db-benchmarks.git
    cd db-benchmarks
    ```
-2. Update `mem` and `cpuset` in `.env` with the default value of the memory (in megabytes) and CPUs the test framework can use for secondary tasks (data loading, getting info about databases)
-3. Tune JVM limits `ES_JAVA_OPTS` for your tests. Usually it's size of allocated memory for Docker Machine
+2. Copy `.env.example` to `.env` 
+3. Update `mem` and `cpuset` in `.env` with the default value of the memory (in megabytes) and CPUs the test framework can use for secondary tasks (data loading, getting info about databases)
+4. Tune JVM limits `ES_JAVA_OPTS` for your tests. Usually it's size of allocated memory for Docker Machine
 
 
 ## Get started
