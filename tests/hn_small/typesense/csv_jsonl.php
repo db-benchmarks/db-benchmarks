@@ -7,7 +7,7 @@ if (!isset($argv[1], $argv[2])) {
 
 $source = $argv[1];
 $destination = $argv[2];
-if (mime_content_type($source) !== 'text/csv') {
+if (!in_array(mime_content_type($source), ['text/csv', 'application/csv'])) {
     echo "Source file isn't CSV";
     exit(1);
 }
@@ -35,24 +35,24 @@ $fields = [
     "story_comment_count"
 ];
 
-$intFields = ['story_id','comment_id','comment_ranking','author_comment_count','story_comment_count'];
+$intFields = ['story_id', 'comment_id', 'comment_ranking', 'author_comment_count', 'story_comment_count'];
 
 
 if (($handle = fopen($source, "r")) !== FALSE) {
     while (($data = fgetcsv($handle, 20000, ",")) !== FALSE) {
         $result = [];
-        foreach ($data as $k=>$field){
-            if (!isset($fields[$k])){
+        foreach ($data as $k => $field) {
+            if (!isset($fields[$k])) {
                 continue 2;
             }
 
-            if (in_array($fields[$k], $intFields)){
-                $field = (int) $field;
+            if (in_array($fields[$k], $intFields)) {
+                $field = (int)$field;
             }
             $result[$fields[$k]] = $field;
         }
 
-        if (fwrite($fp, json_encode($result)."\n") === FALSE) {
+        if (fwrite($fp, json_encode($result) . "\n") === FALSE) {
             echo "Cannot write to file ($destination)";
             exit(1);
         }

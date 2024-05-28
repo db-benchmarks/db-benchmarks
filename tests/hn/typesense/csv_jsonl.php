@@ -7,7 +7,7 @@ if (!isset($argv[1], $argv[2])) {
 
 $source = $argv[1];
 $destination = $argv[2];
-if (mime_content_type($source) !== 'text/csv') {
+if (!in_array(mime_content_type($source), ['text/csv', 'application/csv'])) {
     echo "Source file isn't CSV";
     exit(1);
 }
