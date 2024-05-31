@@ -16,6 +16,7 @@ for type in ""; do
     while ! nc -z localhost 3306; do sleep 1; done
     sleep 5
 
+docker exec mysql_engine mysql -e "SHOW DATABASES"
     docker exec mysql_engine mysql \
     -e "DROP TABLE IF EXISTS default.$test;
     CREATE TABLE default.$test(

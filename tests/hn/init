@@ -22,7 +22,6 @@ fi
 
 . typesense/init
 
-exit 0
 # Elasticsearch
 . es/init
 
