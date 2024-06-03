@@ -61,24 +61,39 @@ if curl -v --silent ${TYPESENSE_HOST}/collections/${test} \
 
     curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
       --data-binary @./data/data.jsonl \
-      "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | head -n 10
+      "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | grep -v '{"success":true}'
     echo -en "\tFinished loading to index at "
     date
+
+    insertSize=$(cat data/data.jsonl | wc -l)
+
+    sleep 5
+    echo -en "\tWait until Typesense come available"
+    for i in $(seq 1 120); do
+      if curl -s -I -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+        -X GET "${TYPESENSE_HOST}/collections/${test}" 2>&1 | grep "HTTP/1.1 200 OK"; then
+        break
+      fi
+      printf '%s' "."
+      sleep 1
+    done
+
+    echo -en "\tWait until Typesense process batch"
+    for i in $(seq 1 300); do
+      if curl -s -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+        -X GET "${TYPESENSE_HOST}/collections/${test}" | jq .num_documents | grep $insertSize; then
+        echo -en "\tSuccess"
+        break
+      fi
+      printf '%s' "."
+      sleep 1
+    done
+
     rm data/data.jsonl
+    echo -en "\tFinished"
   fi
 
-  sleep 5
-  echo -en "\tWait until Typesence process batch"
-  for i in $(seq 1 120); do
-    if curl -I -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
-      -X GET "${TYPESENSE_HOST}/collections/${test}" 2>&1 | grep "HTTP/1.1 200 OK"; then
-      break
-    fi
-    printf '%s' "."
-    sleep 1
-  done
-  echo -en "\tFinished"
-
 else
+
   echo -e "\tNo need to rebuild"
 fi
