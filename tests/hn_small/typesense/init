@@ -4,7 +4,7 @@ cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-
 echo -e "\tStarting Typesense ($cmd)"
 eval "$cmd"
 
-# WAIT UNTIL TYPESENCE BECAME AVAILABLE
+# WAIT UNTIL TYPESENSE BECAME AVAILABLE
 
 temp_log_file=$(mktemp)
 timeout 300 docker logs -f typesense_engine >"$temp_log_file" 2>&1 &
