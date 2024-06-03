@@ -56,29 +56,50 @@ if curl -v --silent ${TYPESENSE_HOST}/collections/${test} \
   if [ ! -f data/data.jsonl ]; then
     php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
 
+    split -l 500000 ./data/data.jsonl ./data/data_splitted.
+
     echo -en "\tStarting loading at "
     date
+    for f in ./data/data_splitted.*; do
+      echo "\tUpload chunk $f"
+      curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
+        --data-binary @$f \
+        "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | grep -v '{"success":true}'
 
-    curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
-      --data-binary @./data/data.jsonl \
-      "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | head -n 10
+      rm $f
+    done
     echo -en "\tFinished loading to index at "
     date
+
+    insertSize=$(cat data/data.jsonl | wc -l)
+
+    sleep 5
+    echo -en "\tWait until Typesense come available"
+    for i in $(seq 1 120); do
+      if curl -s -I -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+        -X GET "${TYPESENSE_HOST}/collections/${test}" 2>&1 | grep "HTTP/1.1 200 OK"; then
+        break
+      fi
+      printf '%s' "."
+      sleep 1
+    done
+
+    echo -en "\tWait until Typesense process batch"
+    for i in $(seq 1 300); do
+      if curl -s -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+        -X GET "${TYPESENSE_HOST}/collections/${test}" | jq .num_documents | grep $insertSize; then
+        echo -en "\tSuccess"
+        break
+      fi
+      printf '%s' "."
+      sleep 1
+    done
+
     rm data/data.jsonl
+    echo -en "\tFinished"
   fi
 
-  sleep 5
-  echo -en "\tWait until Typesence process batch"
-  for i in $(seq 1 120); do
-    if curl -I -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
-      -X GET "${TYPESENSE_HOST}/collections/${test}" 2>&1 | grep "HTTP/1.1 200 OK"; then
-      break
-    fi
-    printf '%s' "."
-    sleep 1
-  done
-  echo -en "\tFinished"
-
 else
+
   echo -e "\tNo need to rebuild"
 fi

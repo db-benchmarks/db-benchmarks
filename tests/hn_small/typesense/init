@@ -56,12 +56,18 @@ if curl -v --silent ${TYPESENSE_HOST}/collections/${test} \
   if [ ! -f data/data.jsonl ]; then
     php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
 
+    split -l 500000 ./data/data.jsonl ./data/data_splitted.
+
     echo -en "\tStarting loading at "
     date
+    for f in ./data/data_splitted.*; do
+      echo "\tUpload chunk $f"
+      curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
+        --data-binary @$f \
+        "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | grep -v '{"success":true}'
 
-    curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
-      --data-binary @./data/data.jsonl \
-      "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | grep -v '{"success":true}'
+      rm $f
+    done
     echo -en "\tFinished loading to index at "
     date
 
