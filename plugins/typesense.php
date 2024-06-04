@@ -13,6 +13,8 @@ class typesense extends engine {
     private $port = 8108;
     private $curl = null; // curl connection
 
+    private $getCountFromRequest = false;
+
     protected function url() {
         return "https://typesense.org/";
     }
@@ -79,6 +81,7 @@ class typesense extends engine {
             return ['timeout' => true];
         }
         assert(is_array($query));
+        $this->getCountFromRequest = $query[2];
         return $this->sendRequest($query[0], $query[1]);
     }
 
@@ -95,6 +98,9 @@ class typesense extends engine {
 
             isset($curlResult['num_documents']) => [
                 ['count(*)' => $curlResult['num_documents']],
+            ],
+            $this->getCountFromRequest => [
+                ['count(*)' => $curlResult['found']],
             ],
             isset($curlResult['hits']) => self::filterResults($curlResult['hits']),
             default => [],

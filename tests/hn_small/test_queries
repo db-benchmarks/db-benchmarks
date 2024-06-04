@@ -7,7 +7,8 @@
     ],
     "typesense": [
       "/collections/hn_small",
-      []
+      [],
+      true
     ]
   },
   {
@@ -24,7 +25,8 @@
       {
         "filter_by": "comment_ranking:100",
         "q": "*"
-      }
+      },
+      true
     ]
   },
   {
@@ -41,7 +43,8 @@
       {
         "filter_by": "comment_ranking:500",
         "q": "*"
-      }
+      },
+      true
     ]
   },
   {
@@ -58,7 +61,8 @@
       {
         "filter_by": "comment_ranking:>300&&comment_ranking:<500",
         "q": "*"
-      }
+      },
+      true
     ]
   },
   {
@@ -141,7 +145,8 @@
         "q": "abc",
         "per_page": 20,
         "query_by": "*"
-      }
+      },
+      false
     ]
   },
   {
@@ -158,7 +163,8 @@
         "q": "abc -google",
         "per_page": 20,
         "query_by": "*"
-      }
+      },
+      false
     ]
   },
   {
@@ -201,7 +207,8 @@
         "per_page": 20,
         "query_by": "*",
         "sort_by": "comment_ranking:asc"
-      }
+      },
+      false
     ]
   },
   {
@@ -229,7 +236,8 @@
         "per_page": 20,
         "query_by": "*",
         "sort_by": "comment_ranking:asc,story_id:desc"
-      }
+      },
+      false
     ]
   },
   {
@@ -253,7 +261,8 @@
         "q": "google",
         "query_by": "*",
         "filter_by": "comment_ranking:>200"
-      }
+      },
+      true
     ]
   },
   {
@@ -284,7 +293,8 @@
         "per_page": "20",
         "query_by": "*",
         "sort_by": "comment_ranking:asc"
-      }
+      },
+      false
     ]
   },
   {
@@ -317,7 +327,8 @@
         "include_fields": "story_id,comment_id,comment_ranking,author_comment_count,story_comment_count,story_author,comment_author",
         "per_page": "20",
         "query_by": "*"
-      }
+      },
+      false
     ]
   },
   {
@@ -337,7 +348,8 @@
         "q": "*",
         "sort_by": "comment_ranking:asc",
         "per_page": "20"
-      }
+      },
+      false
     ]
   },
   {
@@ -357,7 +369,8 @@
         "q": "*",
         "sort_by": "comment_ranking:desc",
         "per_page": "20"
-      }
+      },
+      false
     ]
   },
   {
@@ -378,7 +391,8 @@
         "q": "*",
         "sort_by": "comment_ranking:asc,story_id:asc",
         "per_page": "20"
-      }
+      },
+      false
     ]
   },
   {
@@ -402,7 +416,8 @@
         "include_fields": "comment_ranking",
         "sort_by": "comment_ranking:asc",
         "per_page": "20"
-      }
+      },
+      false
     ]
   },
   {
@@ -427,7 +442,8 @@
         "include_fields": "comment_ranking,story_text",
         "sort_by": "comment_ranking:asc",
         "per_page": "20"
-      }
+      },
+      false
     ]
   },
   {
@@ -444,7 +460,8 @@
       {
         "q": "*",
         "filter_by": "comment_ranking:[100,200]"
-      }
+      },
+      true
     ]
   },
   {
