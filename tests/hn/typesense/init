@@ -96,6 +96,11 @@ if curl -v --silent ${TYPESENSE_HOST}/collections/${test} \
     done
 
     rm data/data.jsonl
+
+    curl "${TYPESENSE_HOST}/operations/snapshot?snapshot_path=/data/typesense-data-snapshot" -X POST \
+    -H "Content-Type: application/json" \
+    -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}"
+
     echo -en "\tFinished"
   fi
 
