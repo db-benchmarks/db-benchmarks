@@ -39,36 +39,19 @@ $intFields = ['story_id', 'comment_id', 'comment_ranking', 'author_comment_count
 
 
 if (($handle = fopen($source, "r")) !== FALSE) {
-    $combinedLine='';
-    while (($line = fgets($handle,20000)) !== false) {
+    while (($data = fgetcsv($handle, 20000, ",", '"','"')) !== FALSE) {
+        $result = [];
 
-
-if ($combinedLine === ''){
-    $combinedLine = $line;
-}else{
-    $combinedLine .= $line;
-}
-
-        $matches=[];
-        if (preg_match('/^"(?<id>.*)","(?<story_id>.*)","(?<story_text>.*)",'.
-            '"(?<story_author>.*)","(?<comment_id>.*)","(?<comment_text>.*)","(?<comment_author>.*)",'.
-            '"(?<comment_ranking>.*)","(?<author_comment_count>.*)",'.
-            '"(?<story_comment_count>.*)"$/usi', $combinedLine, $matches)){
-            $combinedLine='';
-            $result = [];
-            foreach ($fields as $field) {
-                $value = $matches[$field];
-                if (in_array($field, $intFields)) {
-                    $value = (int)$matches[$field];
-                }
-                $result[$field] = $value;
+        foreach ($data as $k=>$field){
+            if (in_array($fields[$k], $intFields)){
+                $field = (int) $field;
             }
+            $result[$fields[$k]] = $field;
+        }
 
-            if (fwrite($fp, json_encode($result) . "\n") === FALSE) {
-                echo "Cannot write to file ($destination)";
-                exit(1);
-            }
-
+        if (fwrite($fp, json_encode($result)."\n") === FALSE) {
+            echo "Cannot write to file ($destination)";
+            exit(1);
         }
     }
 
