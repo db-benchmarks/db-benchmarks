@@ -1,93 +1,131 @@
 [
-{
+  {
     "default": "select count(*) from hn_small",
     "meilisearch": [
-        "/indexes/hn_small/stats",
-        []
+      "/indexes/hn_small/stats",
+      []
+    ],
+    "typesense": [
+      "/collections/hn_small",
+      [],
+      true
     ]
-},
-{
+  },
+  {
     "default": "select count(*) from hn_small where comment_ranking=100",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "filter": "comment_ranking = 100",
-            "limit": 0
-        }
+      "/indexes/hn_small/search",
+      {
+        "filter": "comment_ranking = 100",
+        "limit": 0
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "filter_by": "comment_ranking:100",
+        "q": "*"
+      },
+      true
     ]
-},
-{
+  },
+  {
     "default": "select count(*) from hn_small where comment_ranking=500",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "filter": "comment_ranking = 500",
-            "limit": 0
-        }
+      "/indexes/hn_small/search",
+      {
+        "filter": "comment_ranking = 500",
+        "limit": 0
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "filter_by": "comment_ranking:500",
+        "q": "*"
+      },
+      true
     ]
-},
-{
+  },
+  {
     "default": "select count(*) from hn_small where comment_ranking > 300 and comment_ranking < 500",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "filter": "comment_ranking > 300 AND comment_ranking < 500",
-            "limit": 0
-        }
+      "/indexes/hn_small/search",
+      {
+        "filter": "comment_ranking > 300 AND comment_ranking < 500",
+        "limit": 0
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "filter_by": "comment_ranking:>300&&comment_ranking:<500",
+        "q": "*"
+      },
+      true
     ]
-},
-{
+  },
+  {
     "default": "select story_author, count(*) from hn_small group by story_author order by count(*) desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "default": "select story_author, avg(comment_ranking) avg from hn_small group by story_author order by avg desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "default": "select comment_ranking, count(*) from hn_small group by comment_ranking order by count(*) desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "default": "select comment_ranking, avg(author_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where comment_ranking < 10 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "clickhouse": "select comment_ranking, avg(author_comment_count) avg from hn_small where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "elasticsearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where query('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "mysql": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "mysql_percona": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "clickhouse":"select comment_ranking, avg(author_comment_count) avg from hn_small where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "elasticsearch":"select comment_ranking, avg(author_comment_count) avg from hn_small where query('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "mysql":"select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "mysql_percona":"select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
+    "clickhouse": "select comment_ranking, avg(author_comment_count) avg from hn_small where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
+    "elasticsearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where query('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
+    "mysql": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
+    "mysql_percona": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "manticoresearch": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "clickhouse": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "elasticsearch": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where query('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "mysql": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "mysql_percona": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": "-"
+  },
+  {
     "manticoresearch": "select * from hn_small where match('abc') limit 20",
     "clickhouse": "select * from hn_small where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) limit 20",
     "elasticsearch": "select * from hn_small where query('abc') limit 20",
@@ -95,23 +133,41 @@
     "mysql_percona": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') limit 20",
     "postgres": "select * from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "q": "abc",
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "q": "abc",
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "abc",
+        "per_page": 20,
+        "query_by": "*"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "manticoresearch": "select * from hn_small where match('abc -google') limit 20",
     "clickhouse": "select * from hn_small where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) and not (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) limit 20",
     "elasticsearch": "select * from hn_small where query('abc !google') limit 20",
     "mysql": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('abc -google' IN BOOLEAN MODE) limit 20",
     "mysql_percona": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('abc -google' IN BOOLEAN MODE) limit 20",
     "postgres": "select * from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc & !google') limit 20",
-    "meilisearch": "-"
-},
-{
+    "meilisearch": "-",
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "abc -google",
+        "per_page": 20,
+        "query_by": "*"
+      },
+      false
+    ]
+  },
+  {
     "manticoresearch": "select * from hn_small where match('\"elon musk\"') limit 20",
     "clickhouse": "select * from hn_small where (match(story_text, '(?i)\\Welon\\Wmusk\\W') or match(story_author,'(?i)\\Welon\\Wmusk\\W') or match(comment_text, '(?i)\\Welon\\Wmusk\\W') or match(comment_author, '(?i)\\Welon\\Wmusk\\W')) limit 20",
     "elasticsearch": "select * from hn_small where query('\\\"elon musk\\\"') limit 20",
@@ -119,14 +175,15 @@
     "mysql_percona": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('\"elon musk\"') limit 20",
     "postgres": "select * from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ phraseto_tsquery('english', 'elon musk') limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "q": "elon musk",
-            "limit": 20
-        }
-    ]
-},
-{
+      "/indexes/hn_small/search",
+      {
+        "q": "elon musk",
+        "limit": 20
+      }
+    ],
+    "typesense": "-"
+  },
+  {
     "manticoresearch": "select * from hn_small where match('abc') order by comment_ranking asc limit 20",
     "clickhouse": "select * from hn_small where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) order by comment_ranking asc limit 20",
     "elasticsearch": "select * from hn_small where query('abc') order by comment_ranking asc limit 20",
@@ -134,17 +191,27 @@
     "mysql_percona": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('abc') order by comment_ranking asc limit 20",
     "postgres": "select * from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc') order by comment_ranking asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "q": "abc",
-            "sort": [
-                "comment_ranking:asc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "q": "abc",
+        "sort": [
+          "comment_ranking:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "abc",
+        "per_page": 20,
+        "query_by": "*",
+        "sort_by": "comment_ranking:asc"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "manticoresearch": "select * from hn_small where match('abc') order by comment_ranking asc, story_id desc limit 20",
     "clickhouse": "select * from hn_small where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) order by comment_ranking asc, story_id desc limit 20",
     "elasticsearch": "select * from hn_small where query('abc') order by comment_ranking asc, story_id desc limit 20",
@@ -152,18 +219,28 @@
     "mysql_percona": "select * from hn_small where match(story_text,story_author,comment_text,comment_author) against ('abc') order by comment_ranking asc, story_id desc limit 20",
     "postgres": "select * from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc') order by comment_ranking asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "q": "abc",
-            "sort": [
-                "comment_ranking:asc",
-                "story_id:desc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "q": "abc",
+        "sort": [
+          "comment_ranking:asc",
+          "story_id:desc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "abc",
+        "per_page": 20,
+        "query_by": "*",
+        "sort_by": "comment_ranking:asc,story_id:desc"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "manticoresearch": "select count(*) from hn_small where match('google') and comment_ranking > 200",
     "clickhouse": "select count(*) from hn_small where (match(story_text, '(?i)\\Wgoogle\\W') or match(story_author,'(?i)\\Wgoogle\\W') or match(comment_text, '(?i)\\Wgoogle\\W') or match(comment_author, '(?i)\\Wgoogle\\W')) and comment_ranking > 200",
     "elasticsearch": "select count(*) from hn_small where query('google') and comment_ranking > 200",
@@ -171,15 +248,24 @@
     "mysql_percona": "select count(*) from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200",
     "postgres": "select count(*) from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "q": "google",
-            "filter": "comment_ranking > 200",
-            "limit": 0
-        }
+      "/indexes/hn_small/search",
+      {
+        "q": "google",
+        "filter": "comment_ranking > 200",
+        "limit": 0
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "google",
+        "query_by": "*",
+        "filter_by": "comment_ranking:>200"
+      },
+      true
     ]
-},
-{
+  },
+  {
     "manticoresearch": "select story_id from hn_small where match('me') order by comment_ranking asc limit 20",
     "clickhouse": "select story_id from hn_small where (match(story_text, '(?i)\\Wme\\W') or match(story_author,'(?i)\\Wme\\W') or match(comment_text, '(?i)\\Wme\\W') or match(comment_author, '(?i)\\Wme\\W')) order by comment_ranking asc limit 20",
     "elasticsearch": "select story_id from hn_small where query('me') order by comment_ranking asc limit 20",
@@ -187,18 +273,31 @@
     "mysql_percona": "select story_id from hn_small where match(story_text,story_author,comment_text,comment_author) against ('me') order by comment_ranking asc limit 20",
     "postgres": "select story_id from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'me') order by comment_ranking asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "q": "me",
-            "attributesToRetrieve": ["story_id"],
-            "sort": [
-                "comment_ranking:asc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "q": "me",
+        "attributesToRetrieve": [
+          "story_id"
+        ],
+        "sort": [
+          "comment_ranking:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "me",
+        "include_fields": "story_id",
+        "per_page": "20",
+        "query_by": "*",
+        "sort_by": "comment_ranking:asc"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "manticoresearch": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn_small where match('abc') limit 20",
     "clickhouse": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn_small where (match(story_text, '(?i)\\Wabc\\W') or match(story_author,'(?i)\\Wabc\\W') or match(comment_text, '(?i)\\Wabc\\W') or match(comment_author, '(?i)\\Wabc\\W')) limit 20",
     "elasticsearch": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn_small where query('abc') limit 20",
@@ -206,100 +305,181 @@
     "mysql_percona": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn_small where match(story_text,story_author,comment_text,comment_author) against ('abc') limit 20",
     "postgres": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'abc') limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "q": "abc",
-            "attributesToRetrieve": ["story_id", "comment_id", "comment_ranking", "author_comment_count", "story_comment_count", "story_author", "comment_author"],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "q": "abc",
+        "attributesToRetrieve": [
+          "story_id",
+          "comment_id",
+          "comment_ranking",
+          "author_comment_count",
+          "story_comment_count",
+          "story_author",
+          "comment_author"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "abc",
+        "include_fields": "story_id,comment_id,comment_ranking,author_comment_count,story_comment_count,story_author,comment_author",
+        "per_page": "20",
+        "query_by": "*"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "default": "select * from hn_small order by comment_ranking asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "sort": [
-                "comment_ranking:asc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "sort": [
+          "comment_ranking:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "*",
+        "sort_by": "comment_ranking:asc",
+        "per_page": "20"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "default": "select * from hn_small order by comment_ranking desc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "sort": [
-                "comment_ranking:desc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "sort": [
+          "comment_ranking:desc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "*",
+        "sort_by": "comment_ranking:desc",
+        "per_page": "20"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "default": "select * from hn_small order by comment_ranking asc, story_id asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "sort": [
-                "comment_ranking:asc",
-                "story_id:asc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "sort": [
+          "comment_ranking:asc",
+          "story_id:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "*",
+        "sort_by": "comment_ranking:asc,story_id:asc",
+        "per_page": "20"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "default": "select comment_ranking from hn_small order by comment_ranking asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "attributesToRetrieve": ["comment_ranking"],
-            "sort": [
-                "comment_ranking:asc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "attributesToRetrieve": [
+          "comment_ranking"
+        ],
+        "sort": [
+          "comment_ranking:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "*",
+        "include_fields": "comment_ranking",
+        "sort_by": "comment_ranking:asc",
+        "per_page": "20"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "default": "select comment_ranking, story_text from hn_small order by comment_ranking asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "attributesToRetrieve": ["comment_ranking", "story_text"],
-            "sort": [
-                "comment_ranking:asc"
-            ],
-            "limit": 20
-        }
+      "/indexes/hn_small/search",
+      {
+        "attributesToRetrieve": [
+          "comment_ranking",
+          "story_text"
+        ],
+        "sort": [
+          "comment_ranking:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "*",
+        "include_fields": "comment_ranking,story_text",
+        "sort_by": "comment_ranking:asc",
+        "per_page": "20"
+      },
+      false
     ]
-},
-{
+  },
+  {
     "default": "select count(*) from hn_small where comment_ranking in (100,200)",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "filter": "comment_ranking = 100 OR comment_ranking = 200",
-            "limit": 0
-        }
+      "/indexes/hn_small/search",
+      {
+        "filter": "comment_ranking = 100 OR comment_ranking = 200",
+        "limit": 0
+      }
+    ],
+    "typesense": [
+      "/collections/hn_small/documents/search",
+      {
+        "q": "*",
+        "filter_by": "comment_ranking:[100,200]"
+      },
+      true
     ]
-},
-{
+  },
+  {
     "default": "select story_id from hn_small order by comment_ranking asc, author_comment_count asc, story_comment_count asc, comment_id asc limit 20",
     "meilisearch": [
-        "/indexes/hn_small/search",
-        {
-            "attributesToRetrieve": ["story_id"],
-            "sort": [
-                "comment_ranking:asc",
-                "author_comment_count:asc",
-                "comment_id:asc"
-            ],
-            "limit": 20
-        }
-    ]
-}
+      "/indexes/hn_small/search",
+      {
+        "attributesToRetrieve": [
+          "story_id"
+        ],
+        "sort": [
+          "comment_ranking:asc",
+          "author_comment_count:asc",
+          "comment_id:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "typesense": "-"
+  }
 ]

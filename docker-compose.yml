@@ -2,6 +2,8 @@ version: '2.4'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    networks:
+      - default
     container_name: "elasticsearch_engine"
     mem_limit: ${mem}m # used for testing with limited capabilities, e.g. RAM capped at 256MB
     cpuset: "${cpuset}" # used for testing with limited capabilities, e.g. single physical core
@@ -23,8 +25,11 @@ services:
     volumes:
       - ./tests/${test}/es/idx${suffix}:/usr/share/elasticsearch/data
       - ./tests/${test}/es/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+
   clickhouse:
     image: yandex/clickhouse-server:21.8.11.4
+    networks:
+      - default
     container_name: "clickhouse_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
@@ -43,8 +48,12 @@ services:
       - "127.0.0.1:9000:9000"
     volumes:
       - ./tests/${test}/ch/data${suffix}:/var/lib/clickhouse
+
   mysql:
     image: mysql:8.0.28
+    platform: linux/x86_64
+    networks:
+      - default
     container_name: "mysql_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
@@ -68,8 +77,12 @@ services:
       - MYSQL_DATABASE=default
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_ROOT_PASSWORD=
+
   mysql_percona:
     image: percona:8.0.28-19
+    platform: linux/x86_64
+    networks:
+      - default
     container_name: "mysql_percona_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
@@ -93,8 +106,11 @@ services:
       - MYSQL_DATABASE=default
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_ROOT_PASSWORD=
+
   manticoresearch:
     image: manticoresearch/manticore:6.0.2-extra
+    networks:
+      - default
     container_name: "manticoresearch_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
@@ -117,8 +133,11 @@ services:
       - ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore
       - ./tests/${test}/data:/input
       - ./tests/${test}/manticore/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
+
   postgres:
     image: postgres:15.2
+    networks:
+      - default
     container_name: "postgres_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
@@ -140,8 +159,35 @@ services:
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=default
+
+  typesense:
+    image: typesense/typesense:26.0
+    container_name: "typesense_engine"
+    networks:
+      - default
+    mem_limit: ${mem}m
+    cpuset: "${cpuset}"
+    privileged: true
+    mem_swappiness: 0
+    ports:
+      - "127.0.0.1:8108:8108"
+    command: '--data-dir /data --api-key=manticore --enable-cors'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./tests/${test}/typesense/data${suffix}:/data
+      - ./tests/${test}/data:/input
+
   meilisearch:
     image: getmeili/meilisearch:v1.1.1
+    networks:
+      - default
     container_name: "meilisearch_engine"
     mem_limit: ${mem}m
     cpuset: "${cpuset}"
@@ -169,3 +215,6 @@ services:
       - --no-analytics
       - --max-indexing-memory=2Gb
       - --max-indexing-threads=24
+networks:
+  default:
+    driver: bridge

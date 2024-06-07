@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")
@@ -18,6 +19,8 @@ if [ $? -ne 0 ]; then
   echo -e "\tCouldn't prepare CSV"
   exit 1
 fi
+
+. typesense/init
 
 # Elasticsearch
 . es/init

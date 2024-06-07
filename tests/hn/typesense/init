@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d typesense"
+echo -e "\tStarting Typesense ($cmd)"
+eval "$cmd"
+
+# WAIT UNTIL TYPESENSE BECAME AVAILABLE
+
+temp_log_file=$(mktemp)
+timeout 300 docker logs -f typesense_engine >"$temp_log_file" 2>&1 &
+log_pid=$!
+
+while true; do
+  if grep 'Peer refresh succeeded' "$temp_log_file"; then
+    echo 'accepting connections'
+    kill $log_pid 2>/dev/null
+    rm "$temp_log_file"
+    break
+  fi
+
+  if ! kill -0 $log_pid 2>/dev/null; then
+    echo 'Timeout failed'
+    rm "$temp_log_file"
+    exit 1
+  fi
+
+  sleep 1
+done
+
+export TYPESENSE_API_KEY='manticore'
+export TYPESENSE_HOST='http://localhost:8108'
+
+if curl -v --silent ${TYPESENSE_HOST}/collections/${test} \
+  -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" 2>&1 | grep "Not Found"; then
+
+  curl "${TYPESENSE_HOST}/collections" \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -d "{
+                    \"name\": \"${test}\",
+                    \"fields\": [
+                      {\"name\": \"id\", \"type\": \"int64\" },
+                      {\"name\": \"story_id\", \"type\": \"int32\" },
+                      {\"name\": \"story_text\", \"type\": \"string\" },
+                      {\"name\": \"story_author\", \"type\": \"string\" },
+                      {\"name\": \"comment_id\", \"type\": \"int32\" },
+                      {\"name\": \"comment_text\", \"type\": \"string\" },
+                      {\"name\": \"comment_author\", \"type\": \"string\" },
+                      {\"name\": \"comment_ranking\", \"type\": \"int32\" },
+                        {\"name\": \"author_comment_count\", \"type\": \"int32\" },
+                      {\"name\": \"story_comment_count\", \"type\": \"int32\" }
+                    ],
+                    \"default_sorting_field\": \"story_id\"
+                  }"
+
+  if [ ! -f data/data.jsonl ]; then
+    php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
+
+    split -l 500000 ./data/data.jsonl ./data/data_splitted.
+
+    echo -en "\tStarting loading at "
+    date
+    for f in ./data/data_splitted.*; do
+      echo "\tUpload chunk $f"
+      curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
+        --data-binary @$f \
+        "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | grep -v '{"success":true}'
+
+      rm $f
+    done
+    echo -en "\tFinished loading to index at "
+    date
+
+    insertSize=$(cat data/data.jsonl | wc -l)
+
+    sleep 5
+    echo -en "\tWait until Typesense come available"
+    for i in $(seq 1 120); do
+      if curl -s -I -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+        -X GET "${TYPESENSE_HOST}/collections/${test}" 2>&1 | grep "HTTP/1.1 200 OK"; then
+        break
+      fi
+      printf '%s' "."
+      sleep 1
+    done
+
+    echo -en "\tWait until Typesense process batch"
+    for i in $(seq 1 300); do
+      if curl -s -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+        -X GET "${TYPESENSE_HOST}/collections/${test}" | jq .num_documents | grep $insertSize; then
+        echo -en "\tSuccess"
+        break
+      fi
+      printf '%s' "."
+      sleep 1
+    done
+
+    rm data/data.jsonl
+
+    curl "${TYPESENSE_HOST}/operations/snapshot?snapshot_path=/data/typesense-data-snapshot" -X POST \
+    -H "Content-Type: application/json" \
+    -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}"
+
+    echo -en "\tFinished"
+  fi
+
+else
+
+  echo -e "\tNo need to rebuild"
+fi

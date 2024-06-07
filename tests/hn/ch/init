@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #for type in "" limited; do
 for type in ""; do
   [ ! -z "$type" ] && suffix="_$type" || suffix="";
@@ -6,19 +8,28 @@ for type in ""; do
   if [[ -h ch/data$suffix/data/default/$test ]] || [[ -a ch/data$suffix/data/default/$test ]]; then
     echo -e "\tNo need to rebuild"
   else
-    which clickhouse-client || {
-      echo -e "\tERROR: install clickhouse-client"
-      exit 1
-    }
     cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d clickhouse"
     echo -e "\tStarting clickhouse ($cmd)"
     eval "$cmd"
     while ! nc -z localhost 9000; do sleep 1; done
     sleep 5
-    clickhouse-client --query="DROP TABLE IF EXISTS default.$test"
+    docker exec clickhouse_engine clickhouse-client --query="DROP TABLE IF EXISTS default.$test"
     echo -en "\tStarting loading at "; date
-    clickhouse-client --query="CREATE TABLE default.$test(id UInt64,story_id UInt64,story_text String,story_author String,comment_id UInt64,comment_text String,comment_author String,comment_ranking UInt64,author_comment_count UInt64,story_comment_count UInt64) ENGINE = MergeTree() ORDER BY id"
-    cat data/data.csv | clickhouse-client --query="INSERT INTO default.$test FORMAT CSV"
+    docker exec clickhouse_engine clickhouse-client --query="CREATE TABLE default.$test(
+    id UInt64,
+    story_id UInt64,
+    story_text String,
+    story_author String,
+    comment_id UInt64,
+    comment_text String,
+    comment_author String,
+    comment_ranking UInt64,
+    author_comment_count UInt64,
+    story_comment_count UInt64) ENGINE = MergeTree() ORDER BY id"
+
+    cat data/data.csv | docker exec -i clickhouse_engine clickhouse-client \
+    --query="INSERT INTO default.$test FORMAT CSV"
+
     hook="ch/post_load$suffix.sh"; if [ -f "${hook}" ] && [ -r "${hook}" ] && [ -x "${hook}" ]; then
       echo -e "\tDetected post loading hook, running it";
       . $hook
