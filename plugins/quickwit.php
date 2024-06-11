@@ -91,7 +91,7 @@ class quickwit extends engine {
         return match (true) {
             isset($curlResult['hits']) &&
             $curlResult['hits'] === [] &&
-            isset($curlResult['aggregations']) => [self::parseAggregations($curlResult['aggregations'])],
+            isset($curlResult['aggregations']) => self::parseAggregations($curlResult['aggregations']),
 
             // If elastic compatibility request
             isset($curlResult['hits']['hits']) => self::filterResults($curlResult['hits']['hits'], true),
@@ -103,15 +103,15 @@ class quickwit extends engine {
 
     private function parseAggregations($aggregations): array {
         if (isset($aggregations['count(*)']['value'])) {
-            return ['count(*)' => (int)$aggregations['count(*)']['value']];
+            return [['count(*)' => (int)$aggregations['count(*)']['value']]];
         }
 
         if (isset($aggregations['count(*)']['buckets'])) {
-            return array_map(
+            return [array_map(
                 function ($row) {
                     return ['count(*)' => $row['doc_count'], 'story_author' => $row['key']];
                 }, $aggregations['count(*)']['buckets']
-            );
+            )];
         }
 
         // For aggregation, we name keys as "key_name_aggType", so here we can understand how to parse keys
@@ -129,7 +129,7 @@ class quickwit extends engine {
                         $desiredField => $row['key']
                     ];
                 }, $aggregations[$firstKey]['buckets'],
-            )[0];
+            );
         }
 
         if ($aggregationType === 'count') {
@@ -140,7 +140,7 @@ class quickwit extends engine {
                         $desiredField => $row['key']
                     ];
                 }, $aggregations[$firstKey]['buckets'],
-            )[0];
+            );
         }
 
 
