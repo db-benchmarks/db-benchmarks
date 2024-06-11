@@ -641,7 +641,26 @@
       },
       false
     ],
-    "quickwit": "-"
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      [
+        "story_id",
+        "comment_id",
+        "comment_ranking",
+        "author_comment_count",
+        "story_comment_count",
+        "story_author",
+        "comment_author"
+      ],
+      {
+        "query": {
+          "query_string": {
+            "query": "me"
+          }
+        },
+        "size": 20
+      }
+    ]
   },
   {
     "default": "select * from hn_small order by comment_ranking asc limit 20",
@@ -778,7 +797,22 @@
       },
       false
     ],
-    "quickwit": "-"
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      [
+        "comment_ranking"
+      ],
+      {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "default": "select comment_ranking, story_text from hn_small order by comment_ranking asc limit 20",
@@ -805,7 +839,23 @@
       },
       false
     ],
-    "quickwit": "-"
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      [
+        "comment_ranking",
+        "story_text"
+      ],
+      {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "default": "select count(*) from hn_small where comment_ranking in (100,200)",
@@ -857,6 +907,36 @@
       }
     ],
     "typesense": "-",
-    "quickwit": "-"
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      [
+        "story_id"
+      ],
+      {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          },
+          {
+            "author_comment_count": {
+              "order": "asc"
+            }
+          },
+          {
+            "story_comment_count": {
+              "order": "asc"
+            }
+          },
+          {
+            "comment_id": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
