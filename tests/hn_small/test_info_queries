@@ -16,7 +16,7 @@
         "query": "*",
         "max_hits": 0,
         "aggs": {
-          "id_count": {
+          "count(*)": {
             "value_count": {
               "field": "id"
             }

@@ -16,7 +16,7 @@
         "query": "*",
         "max_hits": 0,
         "aggs": {
-          "id_count": {
+          "count(*)": {
             "value_count": {
               "field": "id"
             }
@@ -48,7 +48,7 @@
         "query": "comment_ranking:100",
         "max_hits": 0,
         "aggs": {
-          "id_count": {
+          "count(*)": {
             "value_count": {
               "field": "id"
             }
@@ -80,7 +80,7 @@
         "query": "comment_ranking:500",
         "max_hits": 0,
         "aggs": {
-          "id_count": {
+          "count(*)": {
             "value_count": {
               "field": "id"
             }
@@ -112,7 +112,7 @@
         "query": "comment_ranking:[300 TO 500]",
         "max_hits": 0,
         "aggs": {
-          "id_count": {
+          "count(*)": {
             "value_count": {
               "field": "id"
             }
@@ -159,11 +159,11 @@
               "field": "story_author",
               "size": 20,
               "order": {
-                "avg_comment_ranking": "desc"
+                "avg_field": "desc"
               }
             },
             "aggs": {
-              "avg_comment_ranking": {
+              "avg_field": {
                 "avg": {
                   "field": "comment_ranking"
                 }
@@ -212,12 +212,12 @@
               "field": "comment_ranking",
               "size": 20,
               "order": {
-                "avg_author_comment_count": "desc",
+                "avg_field": "desc",
                 "_key": "desc"
               }
             },
             "aggs": {
-              "avg_author_comment_count": {
+              "avg_field": {
                 "avg": {
                   "field": "author_comment_count"
                 }
@@ -260,12 +260,12 @@
               "field": "comment_ranking",
               "size": 20,
               "order": {
-                "avg_author_comment_count": "desc",
+                "avg_field": "desc",
                 "_key": "desc"
               }
             },
             "aggs": {
-              "avg_author_comment_count": {
+              "avg_field": {
                 "avg": {
                   "field": "author_comment_count"
                 }
@@ -296,12 +296,12 @@
               "field": "comment_ranking",
               "size": 20,
               "order": {
-                "avg_author_comment_count": "desc",
+                "avg_field": "desc",
                 "_key": "desc"
               }
             },
             "aggs": {
-              "avg_author_comment_count": {
+              "avg_field": {
                 "avg": {
                   "field": "author_comment_count"
                 }
@@ -530,7 +530,7 @@
         "query": "google AND comment_ranking:>200",
         "max_hits": 0,
         "aggs": {
-          "id_count": {
+          "count(*)": {
             "value_count": {
               "field": "id"
             }
@@ -791,7 +791,7 @@
         "query": "comment_ranking:100 OR comment_ranking:200",
         "max_hits": 0,
         "aggs": {
-          "id_count": {
+          "count(*)": {
             "value_count": {
               "field": "id"
             }

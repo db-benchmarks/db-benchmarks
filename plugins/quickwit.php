@@ -12,6 +12,7 @@ class quickwit extends engine {
 
     private $port = 7280;
     private $curl = null; // curl connection
+
     protected function url() {
         return "https://quickwit.io/";
     }
@@ -84,14 +85,59 @@ class quickwit extends engine {
 
         $curlResult = json_decode($curlResult, true);
         return match (true) {
+            isset($curlResult['hits']) &&
+            $curlResult['hits'] === [] &&
+            isset($curlResult['aggregations']) => [self::parseAggregations($curlResult['aggregations'])],
 
-            isset($curlResult['aggregations']['id_count']['value']) => [
-                ['count(*)' => (int)$curlResult['aggregations']['id_count']['value']],
-            ],
-
-            isset($curlResult['hits']) => self::filterResults($curlResult['hits']),
+            !empty($curlResult['hits']) => self::filterResults($curlResult['hits']),
             default => [],
         };
+    }
+
+    private function parseAggregations($aggregations): array {
+        if (isset($aggregations['count(*)']['value'])) {
+            return ['count(*)' => (int)$aggregations['count(*)']['value']];
+        }
+
+        if (isset($aggregations['count(*)']['buckets'])) {
+            return array_map(
+                function ($row) {
+                    return ['count(*)' => $row['doc_count'], 'story_author' => $row['key']];
+                }, $aggregations['count(*)']['buckets']
+            );
+        }
+
+        // For aggregation, we name keys as "key_name_aggType", so here we can understand how to parse keys
+
+        $firstKey = array_key_first($aggregations);
+        $parsedFirstKey = explode('_', $firstKey);
+        $aggregationType = array_pop($parsedFirstKey);
+        $desiredField = implode("_", $parsedFirstKey);
+
+        if ($aggregationType === 'avg') {
+            return array_map(
+                function ($row) use ($desiredField) {
+                    return [
+                        'avg' => round($row['avg_field']['value'], 4),
+                        $desiredField => $row['key']
+                    ];
+                }, $aggregations[$firstKey]['buckets'],
+            );
+        }
+
+        if ($aggregationType === 'count') {
+            return array_map(
+                function ($row) use ($desiredField) {
+                    return [
+                        'count(*)' => $row['doc_count'],
+                        $desiredField => $row['key']
+                    ];
+                }, $aggregations[$firstKey]['buckets'],
+            );
+        }
+
+
+        return $aggregations;
     }
 
     /**
