@@ -388,7 +388,11 @@ abstract class engine {
         foreach ($normalizedResult as $v) {
             $csPayload = array_merge($csPayload, array_values($v));
         }
-        return crc32(implode('_', $csPayload));
+        $implodedArray = implode('_', $csPayload);
+        if (is_array($implodedArray)){
+            $e = 1;
+        }
+        return crc32($implodedArray);
     }
 
     // saves test results

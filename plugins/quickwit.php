@@ -122,7 +122,7 @@ class quickwit extends engine {
                         $desiredField => $row['key']
                     ];
                 }, $aggregations[$firstKey]['buckets'],
-            );
+            )[0];
         }
 
         if ($aggregationType === 'count') {
@@ -133,7 +133,7 @@ class quickwit extends engine {
                         $desiredField => $row['key']
                     ];
                 }, $aggregations[$firstKey]['buckets'],
-            );
+            )[0];
         }
 
 
