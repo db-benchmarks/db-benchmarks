@@ -13,6 +13,8 @@ class quickwit extends engine {
     private $port = 7280;
     private $curl = null; // curl connection
 
+    private $selectFields = [];
+
     protected function url() {
         return "https://quickwit.io/";
     }
@@ -72,7 +74,9 @@ class quickwit extends engine {
             return ['timeout' => true];
         }
         assert(is_array($query));
-        return $this->sendRequest($query[0], $query[1]);
+
+        $this->selectFields = $query[1];
+        return $this->sendRequest($query[0], $query[2]);
     }
 
     // To collect query stats after the query
@@ -147,7 +151,7 @@ class quickwit extends engine {
      * @param array<string,mixed> $results
      * @return array<string,mixed>
      */
-    protected static function filterResults(array $results, $elasticStyle = false): array {
+    protected function filterResults(array $results, $elasticStyle = false): array {
         $filtered = [];
         foreach ($results as $row) {
             $ar = [];
@@ -161,6 +165,9 @@ class quickwit extends engine {
                     continue;
                 } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
 
+                if ($this->selectFields !== [] && !in_array($k, $this->selectFields)){
+                    continue;
+                }
                 if (is_numeric($v) && strpos($v, '.')) {
                     $v = round($v, 4);
                 } // this is a workaround against different floating point calculations in different engines

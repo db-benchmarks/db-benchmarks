@@ -12,6 +12,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "*",
         "max_hits": 0,
@@ -41,6 +42,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "*",
         "max_hits": 1

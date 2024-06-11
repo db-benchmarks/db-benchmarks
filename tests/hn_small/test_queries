@@ -12,6 +12,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "*",
         "max_hits": 0,
@@ -44,6 +45,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "comment_ranking:100",
         "max_hits": 0,
@@ -76,6 +78,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "comment_ranking:500",
         "max_hits": 0,
@@ -108,6 +111,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "comment_ranking:[300 TO 500]",
         "max_hits": 0,
@@ -127,6 +131,7 @@
     "typesense": "-",
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "*",
         "max_hits": 0,
@@ -150,6 +155,7 @@
     "typesense": "-",
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "*",
         "max_hits": 0,
@@ -180,6 +186,7 @@
     "typesense": "-",
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "*",
         "max_hits": 0,
@@ -203,6 +210,7 @@
     "typesense": "-",
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "*",
         "max_hits": 0,
@@ -251,6 +259,7 @@
     "typesense": "-",
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "google",
         "max_hits": 0,
@@ -287,6 +296,7 @@
     "typesense": "-",
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "(google) AND comment_ranking:>200",
         "max_hits": 0,
@@ -348,6 +358,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "abc",
         "max_hits": 20
@@ -373,6 +384,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "abc -google",
         "max_hits": 20
@@ -396,6 +408,7 @@
     "typesense": "-",
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "\"elon musk\"",
         "max_hits": 20
@@ -431,6 +444,7 @@
     ],
     "quickwit": [
       "/api/v1/_elastic/hn_small/_search",
+      [],
       {
         "query": {
           "query_string": {
@@ -478,6 +492,7 @@
     ],
     "quickwit": [
       "/api/v1/_elastic/hn_small/_search",
+      [],
       {
         "query": {
           "query_string": {
@@ -526,6 +541,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "google AND comment_ranking:>200",
         "max_hits": 0,
@@ -570,7 +586,27 @@
       },
       false
     ],
-    "quickwit": "-"
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      [
+        "story_id"
+      ],
+      {
+        "query": {
+          "query_string": {
+            "query": "me"
+          }
+        },
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "manticoresearch": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn_small where match('abc') limit 20",
@@ -629,6 +665,7 @@
     ],
     "quickwit": [
       "/api/v1/_elastic/hn_small/_search",
+      [],
       {
         "size": 20,
         "sort": [
@@ -663,6 +700,7 @@
     ],
     "quickwit": [
       "/api/v1/_elastic/hn_small/_search",
+      [],
       {
         "size": 20,
         "sort": [
@@ -698,6 +736,7 @@
     ],
     "quickwit": [
       "/api/v1/_elastic/hn_small/_search",
+      [],
       {
         "size": 20,
         "sort": [
@@ -787,6 +826,7 @@
     ],
     "quickwit": [
       "/api/v1/hn_small/search/",
+      [],
       {
         "query": "comment_ranking:100 OR comment_ranking:200",
         "max_hits": 0,
