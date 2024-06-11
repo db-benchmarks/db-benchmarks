@@ -89,6 +89,9 @@ class quickwit extends engine {
             $curlResult['hits'] === [] &&
             isset($curlResult['aggregations']) => [self::parseAggregations($curlResult['aggregations'])],
 
+            // If elastic compatibility request
+            isset($curlResult['hits']['hits']) => self::filterResults($curlResult['hits']['hits'], true),
+            // Quickwit regular request
             !empty($curlResult['hits']) => self::filterResults($curlResult['hits']),
             default => [],
         };
@@ -144,10 +147,15 @@ class quickwit extends engine {
      * @param array<string,mixed> $results
      * @return array<string,mixed>
      */
-    protected static function filterResults(array $results): array {
+    protected static function filterResults(array $results, $elasticStyle = false): array {
         $filtered = [];
         foreach ($results as $row) {
             $ar = [];
+
+            if ($elasticStyle){
+                $row = $row['_source'];
+            }
+
             foreach ($row as $k => $v) {
                 if ($k === 'id') {
                     continue;
