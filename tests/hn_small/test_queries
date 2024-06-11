@@ -9,6 +9,20 @@
       "/collections/hn_small",
       [],
       true
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "id_count": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      }
     ]
   },
   {
@@ -27,6 +41,20 @@
         "q": "*"
       },
       true
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "comment_ranking:100",
+        "max_hits": 0,
+        "aggs": {
+          "id_count": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      }
     ]
   },
   {
@@ -45,6 +73,20 @@
         "q": "*"
       },
       true
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "comment_ranking:500",
+        "max_hits": 0,
+        "aggs": {
+          "id_count": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      }
     ]
   },
   {
@@ -63,37 +105,140 @@
         "q": "*"
       },
       true
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "comment_ranking:[300 TO 500]",
+        "max_hits": 0,
+        "aggs": {
+          "id_count": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      }
     ]
   },
   {
     "default": "select story_author, count(*) from hn_small group by story_author order by count(*) desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "story_author_count": {
+            "terms": {
+              "field": "story_author",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      }
+    ]
   },
   {
     "default": "select story_author, avg(comment_ranking) avg from hn_small group by story_author order by avg desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "story_author_avg": {
+            "terms": {
+              "field": "story_author",
+              "size": 20,
+              "order": {
+                "avg_comment_ranking": "desc"
+              }
+            },
+            "aggs": {
+              "avg_comment_ranking": {
+                "avg": {
+                  "field": "comment_ranking"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
   },
   {
     "default": "select comment_ranking, count(*) from hn_small group by comment_ranking order by count(*) desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "comment_ranking_count": {
+            "terms": {
+              "field": "comment_ranking",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      }
+    ]
   },
   {
     "default": "select comment_ranking, avg(author_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "comment_ranking_avg": {
+            "terms": {
+              "field": "comment_ranking",
+              "size": 20,
+              "order": {
+                "avg_author_comment_count": "desc",
+                "_key": "desc"
+              }
+            },
+            "aggs": {
+              "avg_author_comment_count": {
+                "avg": {
+                  "field": "author_comment_count"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where comment_ranking < 10 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -103,7 +248,33 @@
     "mysql_percona": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "google",
+        "max_hits": 0,
+        "aggs": {
+          "comment_ranking_avg": {
+            "terms": {
+              "field": "comment_ranking",
+              "size": 20,
+              "order": {
+                "avg_author_comment_count": "desc",
+                "_key": "desc"
+              }
+            },
+            "aggs": {
+              "avg_author_comment_count": {
+                "avg": {
+                  "field": "author_comment_count"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -113,7 +284,33 @@
     "mysql_percona": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "(google) AND comment_ranking:>200",
+        "max_hits": 0,
+        "aggs": {
+          "comment_ranking_avg": {
+            "terms": {
+              "field": "comment_ranking",
+              "size": 20,
+              "order": {
+                "avg_author_comment_count": "desc",
+                "_key": "desc"
+              }
+            },
+            "aggs": {
+              "avg_author_comment_count": {
+                "avg": {
+                  "field": "author_comment_count"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -123,7 +320,8 @@
     "mysql_percona": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select * from hn_small where match('abc') limit 20",
@@ -147,6 +345,13 @@
         "query_by": "*"
       },
       false
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "abc",
+        "max_hits": 20
+      }
     ]
   },
   {
@@ -165,6 +370,13 @@
         "query_by": "*"
       },
       false
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "abc -google",
+        "max_hits": 20
+      }
     ]
   },
   {
@@ -181,7 +393,14 @@
         "limit": 20
       }
     ],
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "\"elon musk\"",
+        "max_hits": 20
+      }
+    ]
   },
   {
     "manticoresearch": "select * from hn_small where match('abc') order by comment_ranking asc limit 20",
@@ -209,6 +428,24 @@
         "sort_by": "comment_ranking:asc"
       },
       false
+    ],
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      {
+        "query": {
+          "query_string": {
+            "query": "abc"
+          }
+        },
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -238,6 +475,29 @@
         "sort_by": "comment_ranking:asc,story_id:desc"
       },
       false
+    ],
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      {
+        "query": {
+          "query_string": {
+            "query": "abc"
+          }
+        },
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          },
+          {
+            "story_id": {
+              "order": "desc"
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -263,6 +523,20 @@
         "filter_by": "comment_ranking:>200"
       },
       true
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "google AND comment_ranking:>200",
+        "max_hits": 0,
+        "aggs": {
+          "id_count": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      }
     ]
   },
   {
@@ -295,7 +569,8 @@
         "sort_by": "comment_ranking:asc"
       },
       false
-    ]
+    ],
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select story_id, comment_id, comment_ranking, author_comment_count, story_comment_count, story_author, comment_author from hn_small where match('abc') limit 20",
@@ -329,7 +604,8 @@
         "query_by": "*"
       },
       false
-    ]
+    ],
+    "quickwit": "-"
   },
   {
     "default": "select * from hn_small order by comment_ranking asc limit 20",
@@ -350,6 +626,19 @@
         "per_page": "20"
       },
       false
+    ],
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -371,6 +660,19 @@
         "per_page": "20"
       },
       false
+    ],
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "desc"
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -393,6 +695,24 @@
         "per_page": "20"
       },
       false
+    ],
+    "quickwit": [
+      "/api/v1/_elastic/hn_small/_search",
+      {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          },
+          {
+            "story_id": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -418,7 +738,8 @@
         "per_page": "20"
       },
       false
-    ]
+    ],
+    "quickwit": "-"
   },
   {
     "default": "select comment_ranking, story_text from hn_small order by comment_ranking asc limit 20",
@@ -444,7 +765,8 @@
         "per_page": "20"
       },
       false
-    ]
+    ],
+    "quickwit": "-"
   },
   {
     "default": "select count(*) from hn_small where comment_ranking in (100,200)",
@@ -462,6 +784,20 @@
         "filter_by": "comment_ranking:[100,200]"
       },
       true
+    ],
+    "quickwit": [
+      "/api/v1/hn_small/search/",
+      {
+        "query": "comment_ranking:100 OR comment_ranking:200",
+        "max_hits": 0,
+        "aggs": {
+          "id_count": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      }
     ]
   },
   {
@@ -480,6 +816,7 @@
         "limit": 20
       }
     ],
-    "typesense": "-"
+    "typesense": "-",
+    "quickwit": "-"
   }
 ]
