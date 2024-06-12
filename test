@@ -389,9 +389,6 @@ abstract class engine {
             $csPayload = array_merge($csPayload, array_values($v));
         }
         $implodedArray = implode('_', $csPayload);
-        if (is_array($implodedArray)){
-            $e = 1;
-        }
         return crc32($implodedArray);
     }
 

@@ -907,36 +907,6 @@
       }
     ],
     "typesense": "-",
-    "quickwit": [
-      "/api/v1/_elastic/hn_small/_search",
-      [
-        "story_id"
-      ],
-      {
-        "size": 20,
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          },
-          {
-            "author_comment_count": {
-              "order": "asc"
-            }
-          },
-          {
-            "story_comment_count": {
-              "order": "asc"
-            }
-          },
-          {
-            "comment_id": {
-              "order": "asc"
-            }
-          }
-        ]
-      }
-    ]
+    "quickwit": "-"
   }
 ]

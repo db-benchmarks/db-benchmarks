@@ -135,10 +135,12 @@ class quickwit extends engine {
         if ($aggregationType === 'count') {
             return array_map(
                 function ($row) use ($desiredField) {
-                    return [
+                    $result = [
+                        $desiredField => $row['key'],
                         'count(*)' => $row['doc_count'],
-                        $desiredField => $row['key']
                     ];
+                    ksort($result);
+                    return $result;
                 }, $aggregations[$firstKey]['buckets'],
             );
         }
