@@ -113,7 +113,7 @@
       "/api/v1/hn_small/search/",
       [],
       {
-        "query": "comment_ranking:[300 TO 500]",
+        "query": "comment_ranking:[301 TO 499]",
         "max_hits": 0,
         "aggs": {
           "count(*)": {
@@ -221,7 +221,7 @@
               "size": 20,
               "order": {
                 "avg_field": "desc",
-                "_key": "desc"
+                "_count": "desc"
               }
             },
             "aggs": {
