@@ -221,7 +221,7 @@
               "size": 20,
               "order": {
                 "avg_field": "desc",
-                "_count": "desc"
+                "_key": "desc"
               }
             },
             "aggs": {
