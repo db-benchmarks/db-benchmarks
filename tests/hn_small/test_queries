@@ -230,6 +230,7 @@
     "mysql_percona": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
+    "typesense": "-",
     "quickwit": "-"
   },
   {
