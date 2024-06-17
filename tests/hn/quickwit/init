@@ -13,7 +13,7 @@ fi
 
 export HOST='http://localhost:7280'
 
-if [[ $(find -f ./quickwit/data/indexes/${test}/*.split | wc -l) -eq 0 ]]; then
+if [[ $(find -f ./quickwit/data/indexes/hn_full/*.split | wc -l) -eq 0 ]]; then
 
   curl -s -XPOST "${HOST}/api/v1/indexes" \
     --header "content-type: application/yaml" \
@@ -30,7 +30,7 @@ if [[ $(find -f ./quickwit/data/indexes/${test}/*.split | wc -l) -eq 0 ]]; then
       echo "\tUpload chunk $f"
 
       # Index our 10k documents.
-      curl -s -XPOST "${HOST}/api/v1/${test}/ingest?commit=force" --data-binary @$f >/dev/null
+      curl -s -XPOST "${HOST}/api/v1/hn_full/ingest?commit=force" --data-binary @$f >/dev/null
 
       rm $f
     done
