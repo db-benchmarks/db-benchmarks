@@ -11,7 +11,7 @@
       false
     ],
     "quickwit": [
-      "/api/v1/hn/search/",
+      "/api/v1/hn_full/search/",
       [],
       {
         "query": "*",
@@ -41,7 +41,7 @@
       false
     ],
     "quickwit": [
-      "/api/v1/hn/search/",
+      "/api/v1/hn_full/search/",
       [],
       {
         "query": "*",

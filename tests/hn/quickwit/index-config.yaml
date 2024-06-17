@@ -3,7 +3,7 @@
 #
 version: 0.7
 
-index_id: hn
+index_id: hn_full
 
 doc_mapping:
   field_mappings:
