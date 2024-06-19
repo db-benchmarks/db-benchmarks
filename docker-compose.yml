@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
     networks:
       - default
     container_name: "elasticsearch_engine"
@@ -27,7 +27,7 @@ services:
       - ./tests/${test}/es/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
 
   clickhouse:
-    image: yandex/clickhouse-server:21.8.11.4
+    image: clickhouse/clickhouse-server:24.4.3.25
     networks:
       - default
     container_name: "clickhouse_engine"
@@ -50,7 +50,7 @@ services:
       - ./tests/${test}/ch/data${suffix}:/var/lib/clickhouse
 
   mysql:
-    image: mysql:8.0.28
+    image: mysql:8.4.0
     platform: linux/x86_64
     networks:
       - default
@@ -79,7 +79,7 @@ services:
       - MYSQL_ROOT_PASSWORD=
 
   mysql_percona:
-    image: percona:8.0.28-19
+    image: percona:8.0.36-28
     platform: linux/x86_64
     networks:
       - default
@@ -108,7 +108,7 @@ services:
       - MYSQL_ROOT_PASSWORD=
 
   manticoresearch:
-    image: manticoresearch/manticore:6.0.2-extra
+    image: manticoresearch/manticore:6.3.0
     networks:
       - default
     container_name: "manticoresearch_engine"
@@ -135,7 +135,7 @@ services:
       - ./tests/${test}/manticore/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
 
   postgres:
-    image: postgres:15.2
+    image: postgres:16.3
     networks:
       - default
     container_name: "postgres_engine"
@@ -185,7 +185,7 @@ services:
       - ./tests/${test}/data:/input
 
   meilisearch:
-    image: getmeili/meilisearch:v1.1.1
+    image: getmeili/meilisearch:v1.8
     networks:
       - default
     container_name: "meilisearch_engine"
