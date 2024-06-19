@@ -97,7 +97,7 @@ services:
         soft: 262144
         hard: 262144
     ports:
-      - "127.0.0.1:3306:3306"
+      - "127.0.0.1:3302:3306"
     volumes:
       - ./tests/${test}/mysql_percona/data${suffix}:/var/lib/mysql
       - ./tests/${test}/data:/input
