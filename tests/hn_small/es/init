@@ -23,7 +23,7 @@ for type in ""; do
     --env-file ../../.env \
     -e XPACK_MONITORING_ENABLED=false \
     -e PIPELINE_WORKERS=$(nproc) \
-    --network=db-benchmarks_default --rm -it \
+    --network=test_engines_default --rm -it \
     -v $(pwd)/data/:/data/ \
     -v $(pwd)/es/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
     -v $(pwd)/es/logstash$suffix/template.json:/template.json \
