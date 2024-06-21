@@ -15,7 +15,7 @@ for type in tuned; do
     echo -e "\tWaiting for elasticsearch to come up"
     while ! nc -z localhost 9200; do sleep 1; done
     echo -en "\tStarting loading at "; date
-    docker run -e PIPELINE_BATCH_SIZE=10000 -e XPACK_MONITORING_ENABLED=false -e PIPELINE_WORKERS=`nproc` --privileged --network=host --rm -it -v $(pwd)/data/:/data/ -v $(pwd)/es/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf -v $(pwd)/es/logstash$suffix/template.json:/template.json -v $(pwd)/es/logstash$suffix/jvm.options:/etc/logstash/jvm.options docker.elastic.co/logstash/logstash:7.15.2
+    docker run -e PIPELINE_BATCH_SIZE=10000 -e XPACK_MONITORING_ENABLED=false -e PIPELINE_WORKERS=`nproc` --privileged --network=host --rm -it -v $(pwd)/data/:/data/ -v $(pwd)/es/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf -v $(pwd)/es/logstash$suffix/template.json:/template.json -v $(pwd)/es/logstash$suffix/jvm.options:/etc/logstash/jvm.options docker.elastic.co/logstash/logstash:8.14.1
     hook="es/logstash$suffix/post_load.sh"; if [ -f "${hook}" ] && [ -r "${hook}" ] && [ -x "${hook}" ]; then
       echo -e "\tDetected post loading hook, running it";
       . $hook

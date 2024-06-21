@@ -20,10 +20,11 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-. typesense/init
-
 # Elasticsearch
 . es/init
+
+# Typesense
+. typesense/init
 
 # Clickhouse
 . ch/init
