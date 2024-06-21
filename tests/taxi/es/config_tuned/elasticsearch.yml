@@ -1,5 +1,5 @@
 cluster.name: "docker-cluster"
 network.host: 0.0.0.0
 thread_pool:
-      force_merge:
-                size: 32
+  force_merge:
+    size: 32
