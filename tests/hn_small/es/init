@@ -12,6 +12,7 @@ for type in ""; do
     mkdir -p es/idx$suffix
     chmod -R 777 es/idx$suffix # otherwise elasticsearch in docker won't start
     chmod -R 777 data # otherwise logstash may not be able to read the files
+    chmod -R 777 config${suffix}
     cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d elasticsearch"
     echo -e "\tStarting elasticsearch ($cmd)"
     eval "$cmd"
