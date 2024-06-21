@@ -20,9 +20,12 @@ services:
     ports:
       - "127.0.0.1:9200:9200"
     environment:
+      - "ELASTIC_PASSWORD=elasticsearch_pwd"
       - "ES_JAVA_OPTS=${ES_JAVA_OPTS}"
       - cluster.name=docker-cluster
       - discovery.type=single-node
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=trial
       - bootstrap.memory_lock=true # as said on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping it needs to be done for performance
     volumes:
       - ./tests/${test}/es/idx${suffix}:/usr/share/elasticsearch/data

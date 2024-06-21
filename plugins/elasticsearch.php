@@ -25,6 +25,8 @@ class elasticsearch extends engine {
     protected function getInfo() {
         $ret = [];
         $curl = curl_init();
+
+        curl_setopt($curl, CURLOPT_USERPWD, "elastic:elasticsearch_pwd");
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/_cluster/health?level=indices");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $o = curl_exec($curl);
