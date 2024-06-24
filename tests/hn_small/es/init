@@ -24,6 +24,8 @@ for type in ""; do
     --env-file ../../.env \
     -e XPACK_MONITORING_ENABLED=false \
     -e PIPELINE_WORKERS=$(nproc) \
+    -e QUEUE_TYPE=persisted \
+    -e QUEUE_DRAIN=true \
     --network=test_engines_default --rm -it \
     -v $(pwd)/data/:/data/ \
     -v $(pwd)/es/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
