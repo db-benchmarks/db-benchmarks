@@ -480,7 +480,7 @@ abstract class engine {
 
         self::log("Starting $engine", 1, 'cyan');
         $o = [];
-        $exec = "cpuset=4 test=" . self::$commandLineArguments['test'] . " mem=$memory suffix=$suffix $limited docker-compose up -d $engine 2>&1";
+        $exec = "test=" . self::$commandLineArguments['test'] . " mem=$memory suffix=$suffix $limited docker-compose up -d $engine 2>&1";
         self::log($exec, 2);
         exec($exec, $o, $r);
         self::log(implode("\n", $o), 2, 'bright_black');
