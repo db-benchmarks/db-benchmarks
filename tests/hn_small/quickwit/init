@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d quickwit"
+echo -e "\tStarting Quickwit ($cmd)"
+eval "$cmd"
+
+if timeout 10 docker logs -f quickwit_engine | grep -qm1 'REST server is ready'; then
+  echo 'accepting connections'
+else
+  echo 'Quickwit timeout failed'
+  exit 1
+fi
+
+export HOST='http://localhost:7280'
+
+if [[ $(find -f ./quickwit/data/indexes/${test}/*.split | wc -l) -eq 0 ]]; then
+
+  curl -s -XPOST "${HOST}/api/v1/indexes" \
+    --header "content-type: application/yaml" \
+    --data-binary @./quickwit/index-config.yaml >/dev/null
+
+  if [ ! -f data/data.jsonl ]; then
+    php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
+
+    split -l 10000 ./data/data.jsonl ./data/data_splitted.
+
+    echo -en "\tStarting loading at "
+    date
+    for f in ./data/data_splitted.*; do
+      echo "\tUpload chunk $f"
+
+      # Index our 10k documents.
+      curl -s -XPOST "${HOST}/api/v1/${test}/ingest?commit=force" --data-binary @$f >/dev/null
+
+      rm $f
+    done
+    echo -en "\tFinished loading to index at "
+    date
+
+    rm ./data/data.jsonl
+    echo -en "\tFinished"
+  fi
+
+else
+
+  echo -e "\tNo need to rebuild"
+fi
