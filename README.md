@@ -250,7 +250,7 @@ Now you have test results in `./results/` (in the root of the repository), for e
 
 ### Save to db to visualize
 
-You can now upload the results to the database for further visualization. The visualization tool, which is used on https://db-benchmarks.com/, is also open source and can be found at https://github.com/db-benchmarks/ui.
+You can now upload the results to the database for further visualization. The visualization tool, which is used on https://db-benchmarks.com/ , is also open source and can be found at https://github.com/db-benchmarks/ui.
 
 Here's how you can save the results:
 
