@@ -1,0 +1,111 @@
+#!/usr/bin/env php
+<?php
+
+include('helpers.php');
+
+class Init
+{
+    use Helpers;
+
+    private string $testName;
+    private string $engineName;
+    private string $type;
+
+    public function __construct(
+        string $testName,
+        string $engineName,
+        string $type
+    ) {
+        $this->testName = $testName;
+        $this->engineName = $engineName;
+        $this->type = $type;
+
+        if ($this->isNeedToRebuild()) {
+            $this->start();
+            $this->inflateStep();
+        }
+    }
+
+
+    public function isNeedToRebuild(): bool
+    {
+        exec("type=$this->type $this->engineName/rebuild_check", $output,
+            $resultCode);
+
+        self::log(implode("\n", $output), 2, 'bright_black');
+        if ($resultCode === 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public function start()
+    {
+        $t = microtime(true);
+
+        $exitCodeFile = '/tmp/process_exit_code.log';
+        $command
+            = "test=$this->testName type=$this->type ./$this->engineName/start > /tmp/init.output 2>&1 & pid=$(echo $!); echo $? > $exitCodeFile; echo \$pid";
+        exec($command, $output, $resultCode);
+
+        $pid = $output[0];
+
+        // todo check status somehow
+        $output = $this->waitUntilPidFinished((int)$pid, $t);
+        self::log($output, 2, 'bright_black');
+
+        $resultCode = $this->getExitCode($pid);
+
+        if ($resultCode === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function inflateStep()
+    {
+    }
+
+    private function waitUntilPidFinished(int $pid, float $startTime)
+    {
+        while (posix_kill($pid, 0)) {
+            if (microtime(true) - $startTime > 30) {
+                posix_kill($pid, 9);
+                $this->removeInitOutput();
+                self::die("ERROR: Pid $pid execution exceeded timeout", 1,
+                    'red');
+            }
+            sleep(1);
+        }
+        $output = file_get_contents('/tmp/init.output');
+        $this->removeInitOutput();
+        return $output;
+    }
+
+    private function getExitCode(int $pid): int
+    {
+        $command = "wait $pid; echo $?";
+        exec($command, $output, $resultCode);
+        return (int)$output[0];
+    }
+
+    private function removeInitOutput(): void
+    {
+        unlink('/tmp/init.output');
+    }
+}
+
+$arguments = Init::getopt([
+    "test:",
+    "engine:",
+    "type:"
+]);
+
+foreach (['engine', 'test'] as $argument) {
+    if (!isset($arguments[$argument])) {
+        Init::die("Argument $argument is mandatory", 1);
+    }
+}
+
+
+new Init($arguments['test'], $arguments['engine'], $arguments['type'] ?? "");

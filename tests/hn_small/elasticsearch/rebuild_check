@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+[ ! -z "$type" ] && suffix="_$type" || suffix="";
+echo -e "Elasticsearch (type $type):"
+if [ "$(ls elasticsearch/idx$suffix)" ]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 0
+fi
+
+exit 1
