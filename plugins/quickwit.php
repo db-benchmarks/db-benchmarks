@@ -11,20 +11,22 @@
 class quickwit extends engine {
 
     private $port = 7280;
-    private $curl = null; // curl connection
+    private CurlHandle|false $curl = false; // curl connection
+    private ?array $resultsMapping = null;
 
-    private $selectFields = [];
-
-    protected function url() {
+    protected function url(): string
+    {
         return "https://quickwit.io/";
     }
 
-    protected function description() {
+    protected function description(): string
+    {
         return "Sub-second search & analytics engine on cloud storage";
     }
 
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    protected function getInfo(): array
+    {
         $ret = [];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/api/v1/version");
@@ -38,11 +40,13 @@ class quickwit extends engine {
         return $ret;
     }
 
-    protected function appendType($info) {
+    protected function appendType($info): string
+    {
         return "";
     }
 
-    protected function canConnect() {
+    protected function canConnect(): bool
+    {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/health/livez");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -55,7 +59,8 @@ class quickwit extends engine {
         return $query;
     }
 
-    protected function beforeQuery() {
+    protected function beforeQuery(): void
+    {
         sleep(1);
         $this->curl = curl_init();
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, [
@@ -75,8 +80,8 @@ class quickwit extends engine {
         }
         assert(is_array($query));
 
-        $this->selectFields = $query[1];
-        return $this->sendRequest($query[0], $query[2]);
+        $this->resultsMapping = $query['mapping'] ;
+        return $this->sendRequest($query['path'], $query['query']);
     }
 
     // To collect query stats after the query
@@ -85,7 +90,8 @@ class quickwit extends engine {
     }
 
     // parses query result and returns it in the format that should be common across all engines
-    protected function parseResult($curlResult) {
+    protected function parseResult($curlResult): array
+    {
 
         $curlResult = json_decode($curlResult, true);
         return match (true) {
@@ -114,39 +120,69 @@ class quickwit extends engine {
             )];
         }
 
-        // For aggregation, we name keys as "key_name_aggType", so here we can understand how to parse keys
 
-        $firstKey = array_key_first($aggregations);
-        $parsedFirstKey = explode('_', $firstKey);
-        $aggregationType = array_pop($parsedFirstKey);
-        $desiredField = implode("_", $parsedFirstKey);
-
-        if ($aggregationType === 'avg') {
-            return array_map(
-                function ($row) use ($desiredField) {
-                    return [
-                        'avg' => round($row['avg_field']['value'], 4),
-                        $desiredField => $row['key']
-                    ];
-                }, $aggregations[$firstKey]['buckets'],
-            );
+        if ($this->resultsMapping){
+            return $this->extractValues($aggregations);
         }
-
-        if ($aggregationType === 'count') {
-            return array_map(
-                function ($row) use ($desiredField) {
-                    $result = [
-                        $desiredField => $row['key'],
-                        'count(*)' => $row['doc_count'],
-                    ];
-                    ksort($result);
-                    return $result;
-                }, $aggregations[$firstKey]['buckets'],
-            );
-        }
-
 
         return $aggregations;
+    }
+
+
+    private function extractValues($data): array
+    {
+        $results = [];
+        $this->extractRecursive($data, $this->resultsMapping, $results);
+        return $this->sortResults($results);
+    }
+
+    private function sortResults($results): array
+    {
+        return array_map(
+            function ($row) {
+                ksort($row, SORT_STRING);
+                return $row;
+            }, $results
+        );
+    }
+
+    private function extractRecursive($data, $structure, &$results, &$currentResult = null): void
+    {
+        if ($currentResult === null) {
+            $currentResult = [];
+        }
+
+        foreach ($structure as $key => $value) {
+            if ($key === "[]") {
+                if (is_array($data)) {
+                    foreach ($data as $item) {
+                        $subResult = [];
+                        $this->extractRecursive($item, $value, $results, $subResult);
+                        $results[] = $subResult;
+                    }
+                }
+            } elseif (is_array($value)) {
+                if (array_key_exists($key, $data)) {
+                    $this->extractRecursive($data[$key], $value, $results, $currentResult);
+                }
+            } else {
+
+                if (array_key_exists($key, $data)) {
+                    $fieldInfo = explode(':', $value);
+                    $fieldName = $fieldInfo[0];
+                    $fieldType = isset($fieldInfo[1]) ? trim($fieldInfo[1]) : null;
+
+                    $fieldValue = $data[$key];
+                    if ($fieldType === 'float') {
+                        $currentResult[$fieldName] = round((float)$fieldValue, 4);
+                    } elseif ($fieldType === 'int') {
+                        $currentResult[$fieldName] = (int)$fieldValue;
+                    } else {
+                        $currentResult[$fieldName] = $fieldValue;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -167,9 +203,6 @@ class quickwit extends engine {
                     continue;
                 } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
 
-                if ($this->selectFields !== [] && !in_array($k, $this->selectFields)){
-                    continue;
-                }
                 if (is_numeric($v) && strpos($v, '.')) {
                     $v = round($v, 4);
                 } // this is a workaround against different floating point calculations in different engines
