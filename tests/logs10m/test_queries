@@ -29,6 +29,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": {
         "status_avg": {
           "buckets": {
@@ -79,6 +80,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": {
         "request_path_count": {
           "buckets": {
@@ -115,6 +117,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": null
     }
   },
@@ -150,6 +153,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": {
         "status_count_avg_runtime": {
           "buckets": {
@@ -248,6 +252,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": {
         "status_count": {
           "buckets": {
@@ -290,6 +295,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": {
         "status_count_sum_runtime": {
           "buckets": {
@@ -344,6 +350,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": {
         "request_path_aggregation": {
           "buckets": {
@@ -402,6 +409,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": {
         "request_path_aggregation": {
           "buckets": {

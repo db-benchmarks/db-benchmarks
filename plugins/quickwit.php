@@ -13,6 +13,7 @@ class quickwit extends engine {
     private $port = 7280;
     private CurlHandle|false $curl = false; // curl connection
     private ?array $resultsMapping = null;
+    private ?array $retrieveFields = null;
 
     protected function url(): string
     {
@@ -80,6 +81,7 @@ class quickwit extends engine {
         }
         assert(is_array($query));
 
+        $this->retrieveFields = $query['retrieve'];
         $this->resultsMapping = $query['mapping'] ;
         return $this->sendRequest($query['path'], $query['query']);
     }
@@ -202,6 +204,10 @@ class quickwit extends engine {
                 if ($k === 'id') {
                     continue;
                 } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
+
+                if (!empty($this->retrieveFields) && !in_array($k, $this->retrieveFields)){
+                    continue;
+                }
 
                 if (is_numeric($v) && strpos($v, '.')) {
                     $v = round($v, 4);

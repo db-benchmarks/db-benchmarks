@@ -10,10 +10,9 @@
       [],
       false
     ],
-    "quickwit": [
-      "/api/v1/hn_small/search/",
-      [],
-      {
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
         "query": "*",
         "max_hits": 0,
         "aggs": {
@@ -23,8 +22,10 @@
             }
           }
         }
-      }
-    ]
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   "doc": {
     "default": "select * from hn_small limit 1",
@@ -40,13 +41,14 @@
       },
       false
     ],
-    "quickwit": [
-      "/api/v1/hn_small/search/",
-      [],
-      {
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
         "query": "*",
         "max_hits": 1
-      }
-    ]
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   }
 }
