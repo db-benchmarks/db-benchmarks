@@ -18,6 +18,7 @@
           }
         }
       },
+      "retrieve": null,
       "mapping": null
     }
   },
@@ -33,6 +34,7 @@
         "query": "*",
         "max_hits": 1
       },
+      "retrieve": null,
       "mapping": null
     }
   }
