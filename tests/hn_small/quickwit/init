@@ -5,15 +5,16 @@ echo -e "\tStarting Quickwit ($cmd)"
 eval "$cmd"
 
 if timeout 10 docker logs -f quickwit_engine | grep -qm1 'REST server is ready'; then
-  echo 'accepting connections'
+  echo -e "\tQuickwit ready to accept connections"
 else
-  echo 'Quickwit timeout failed'
+  echo -e "\tQuickwit timeout failed"
   exit 1
 fi
 
 export HOST='http://localhost:7280'
 
-if [[ $(find ./quickwit/data/indexes/${test}/*.split | wc -l) -eq 0 ]]; then
+if [[ ! $(find ./quickwit/data/indexes/${test}/*.split > /dev/null 2>&1) ]]; then
+  echo -e "\tStart building quickwit_engine"
 
   curl -s -XPOST "${HOST}/api/v1/indexes" \
     --header "content-type: application/yaml" \
@@ -21,26 +22,26 @@ if [[ $(find ./quickwit/data/indexes/${test}/*.split | wc -l) -eq 0 ]]; then
 
   if [ ! -f data/data.jsonl ]; then
     php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
-
-    split -l 10000 ./data/data.jsonl ./data/data_splitted.
-
-    echo -en "\tStarting loading at "
-    date
-    for f in ./data/data_splitted.*; do
-      echo "\tUpload chunk $f"
-
-      # Index our 10k documents.
-      curl -s -XPOST "${HOST}/api/v1/${test}/ingest?commit=force" --data-binary @$f >/dev/null
-
-      rm $f
-    done
-    echo -en "\tFinished loading to index at "
-    date
-
-    rm ./data/data.jsonl
-    echo -en "\tFinished"
   fi
 
+  split -l 10000 ./data/data.jsonl ./data/data_splitted.
+
+  echo -en "\tStarting loading at "
+  date
+  for f in ./data/data_splitted.*; do
+    echo -e "\t\tUpload chunk $f"
+
+      # Index our 10k documents.
+    curl -s -XPOST "${HOST}/api/v1/${test}/ingest?commit=force" --data-binary @$f >/dev/null
+
+    rm $f
+  done
+  echo -en "\tFinished loading to index at "
+  date
+
+  rm ./data/data.jsonl
+
+  echo -e "\tFinished"
 else
 
   echo -e "\tNo need to rebuild"
