@@ -171,7 +171,7 @@ class quickwit extends engine {
 
                 if (array_key_exists($key, $data)) {
                     $fieldInfo = explode(':', $value);
-                    $fieldName = $fieldInfo[0];
+                    $fieldName = trim($fieldInfo[0]);
                     $fieldType = isset($fieldInfo[1]) ? trim($fieldInfo[1]) : null;
 
                     $fieldValue = $data[$key];
