@@ -13,7 +13,7 @@ fi
 
 export HOST='http://localhost:7280'
 
-if [[ $(find -f ./quickwit/data/indexes/${test}/*.split | wc -l) -eq 0 ]]; then
+if [[ $(find ./quickwit/data/indexes/${test}/*.split | wc -l) -eq 0 ]]; then
 
   curl -s -XPOST "${HOST}/api/v1/indexes" \
     --header "content-type: application/yaml" \
