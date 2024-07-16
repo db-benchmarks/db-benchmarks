@@ -13,7 +13,7 @@ fi
 
 export HOST='http://localhost:7280'
 
-if [[ ! $(find ./quickwit/data/indexes/${test}/*.split > /dev/null 2>&1) ]]; then
+if ! find ./quickwit/data/indexes/${test}/*.split > /dev/null 2>&1; then
   echo -e "\tStart building quickwit_engine"
 
   curl -s -XPOST "${HOST}/api/v1/indexes" \

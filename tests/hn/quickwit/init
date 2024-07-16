@@ -13,7 +13,7 @@ fi
 
 export HOST='http://localhost:7280'
 
-if [[ ! $(find ./quickwit/data/indexes/hn_full/*.split > /dev/null 2>&1) ]]; then
+if ! find ./quickwit/data/indexes/hn_full/*.split > /dev/null 2>&1; then
   echo -e "\tStart building quickwit_engine"
 
   curl -s -XPOST "${HOST}/api/v1/indexes" \
@@ -24,7 +24,7 @@ if [[ ! $(find ./quickwit/data/indexes/hn_full/*.split > /dev/null 2>&1) ]]; the
     php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
   fi
 
-  split -l 10000 ./data/data.jsonl ./data/data_splitted.
+  split -l 10000 -a 5 ./data/data.jsonl ./data/data_splitted.
 
   echo -en "\tStarting loading at "
   date
