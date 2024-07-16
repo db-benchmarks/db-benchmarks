@@ -21,7 +21,9 @@ if ! find ./quickwit/data/indexes/hn_full/*.split > /dev/null 2>&1; then
     --data-binary @./quickwit/index-config.yaml >/dev/null
 
   if [ ! -f data/data.jsonl ]; then
+    echo -e "\tConvert CSV to JSONL. The current operation might take time. You can check progress by 'cat ./data/data.jsonl | wc -l'"
     php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
+    echo -e "\tEnd converting"
   fi
 
   split -l 10000 -a 5 ./data/data.jsonl ./data/data_splitted.
@@ -38,8 +40,6 @@ if ! find ./quickwit/data/indexes/hn_full/*.split > /dev/null 2>&1; then
   done
   echo -en "\tFinished loading to index at "
   date
-
-  rm ./data/data.jsonl
 
   echo -e "\tFinished"
 else

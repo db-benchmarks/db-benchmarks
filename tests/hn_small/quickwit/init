@@ -39,8 +39,6 @@ if ! find ./quickwit/data/indexes/${test}/*.split > /dev/null 2>&1; then
   echo -en "\tFinished loading to index at "
   date
 
-  rm ./data/data.jsonl
-
   echo -e "\tFinished"
 else
 
