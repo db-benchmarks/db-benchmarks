@@ -22,7 +22,7 @@ if ! find ./quickwit/data/indexes/${test}/*.split > /dev/null 2>&1; then
 
   if [ ! -f data/data.jsonl ]; then
     echo -e "\tConvert CSV to JSONL. The current operation might take time. You can check progress by 'cat ./data/data.jsonl | wc -l'"
-    php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
+    php ./quickwit/csv_jsonl.php ./data/data.csv ./data/data.jsonl
     echo -e "\tEnd converting"
   fi
 
