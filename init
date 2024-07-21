@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 include('helpers.php');
 
 class Init
@@ -10,95 +12,212 @@ class Init
     private string $testName;
     private string $engineName;
     private string $type;
+    private string $suffix;
+    private string $measuresLogPath;
+
 
     public function __construct(
         string $testName,
         string $engineName,
-        string $type
+        string $type,
+        bool $force = false
     ) {
         $this->testName = $testName;
         $this->engineName = $engineName;
         $this->type = $type;
 
-        if ($this->isNeedToRebuild()) {
-            $this->start();
-            $this->inflateStep();
+        $this->getSuffix();
+        $this->measuresLogPath = "/tmp/inflate_$this->engineName.txt";
+
+        $this->calculateStats();
+
+        if ($force) {
+            $this->inflateHook();
+        } else {
+            $this->preHook() && $this->inflateHook() && $this->postHook();
         }
     }
 
-
-    public function isNeedToRebuild(): bool
+    private function getSuffix(): void
     {
-        exec("type=$this->type $this->engineName/rebuild_check", $output,
-            $resultCode);
+        $this->suffix = ($this->type === "")
+            ? ""
+            : "_$this->type";
+    }
 
-        self::log(implode("\n", $output), 2, 'bright_black');
-        if ($resultCode === 0) {
+    public function preHook(): bool
+    {
+        $preHookPath
+            = "test=$this->testName suffix=$this->suffix $this->engineName/pre_hook";
+        $exitCode = $this->runScript($preHookPath);
+        if ($exitCode === 10) {
+            // If we don't need to rebuild this engine pre_hook should return us exit code 10
             return false;
+        } elseif ($exitCode === 0) {
+            return true;
         }
+
+        throw new RuntimeException("Pre hook unexpected exit");
+    }
+
+    public function inflateHook(): bool
+    {
+        $scriptPath = "suffix=$this->suffix $this->engineName/inflate";
+
+        $pid = pcntl_fork();
+        if ($pid == -1) {
+            die('Could not fork process');
+        } else {
+            if ($pid) {
+                $exitCode = $this->runScript($scriptPath);
+
+                posix_kill($pid, SIGTERM);
+
+                pcntl_wait($status);
+
+                if ($exitCode === 0) {
+                    return true;
+                }
+
+                throw new RuntimeException("Inflate hook unexpected exit");
+            } else {
+                $this->measureStats();
+            }
+        }
+    }
+
+    public function postHook(): bool
+    {
         return true;
     }
 
-    public function start()
+    private function runScript($scriptPath): ?int
     {
-        $t = microtime(true);
+        $descriptors = [
+            0 => ["pipe", "r"],  // stdin
+            1 => ["pipe", "w"],  // stdout
+            2 => ["pipe", "w"]   // stderr
+        ];
 
-        $exitCodeFile = '/tmp/process_exit_code.log';
-        $command
-            = "test=$this->testName type=$this->type ./$this->engineName/start > /tmp/init.output 2>&1 & pid=$(echo $!); echo $? > $exitCodeFile; echo \$pid";
-        exec($command, $output, $resultCode);
+        $process = proc_open($scriptPath, $descriptors, $pipes);
+        $exitCode = null;
 
-        $pid = $output[0];
+        if (is_resource($process)) {
+            while ($line = fgets($pipes[1])) {
+                echo $line;
+            }
 
-        // todo check status somehow
-        $output = $this->waitUntilPidFinished((int)$pid, $t);
-        self::log($output, 2, 'bright_black');
-
-        $resultCode = $this->getExitCode($pid);
-
-        if ($resultCode === 0) {
-            return true;
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $exitCode = proc_close($process);
         }
-        return false;
+
+        return $exitCode;
     }
 
-    public function inflateStep()
+    #[NoReturn]
+    private function measureStats(): void
     {
-    }
+        declare(ticks=1);
 
-    private function waitUntilPidFinished(int $pid, float $startTime)
-    {
-        while (posix_kill($pid, 0)) {
-            if (microtime(true) - $startTime > 30) {
-                posix_kill($pid, 9);
-                $this->removeInitOutput();
-                self::die("ERROR: Pid $pid execution exceeded timeout", 1,
-                    'red');
+        pcntl_signal(SIGTERM, function () {
+            exit(0);
+        });
+
+        if (file_exists($this->measuresLogPath)) {
+            unlink($this->measuresLogPath);
+        }
+        if (!$fp = fopen($this->measuresLogPath, 'w')) {
+            echo "Cannot open file ($this->measuresLogPath)";
+            exit(1);
+        }
+
+        while (true) {
+            $dockerStats
+                = shell_exec("docker stats --no-stream | grep $this->engineName");
+
+            if (fwrite($fp, "$dockerStats") === false) {
+                echo "Cannot write to file ($this->measuresLogPath)";
+                exit(1);
             }
             sleep(1);
         }
-        $output = file_get_contents('/tmp/init.output');
-        $this->removeInitOutput();
-        return $output;
     }
 
-    private function getExitCode(int $pid): int
+
+    public function calculateStats()
     {
-        $command = "wait $pid; echo $?";
-        exec($command, $output, $resultCode);
-        return (int)$output[0];
+        $cpu = [];
+        $ram = [];
+        $disc = [];
+
+        $content = file_get_contents($this->measuresLogPath);
+        //CONTAINER ID   NAME                   CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O        PIDS
+        $content = explode("\n", $content);
+
+        foreach ($content as $row) {
+            if ($row === '') {
+                continue;
+            }
+
+            $parts = array_values(array_filter(explode(' ', $row), 'strlen'));
+
+            $cpu[] = (float) $parts[2];
+            $ram[] = (float) $parts[3];
+            $disc[] = (float) $parts[10] + (float) $parts[12];
+        }
+
+        unset($content);
+
+        $results = [];
+        foreach (['cpu', 'ram', 'disc'] as $measureType) {
+            $results[$measureType]['average']
+                = round($this->calculateAverage($$measureType), 4);
+
+            sort($$measureType);
+
+            $results[$measureType]['median']
+                = round($this->calculateMedian($$measureType), 4);
+
+            $results[$measureType]['95p']
+                = round($this->calculate95Percentile($$measureType), 4);
+        }
+
+        $results['cpu']['average'] = round($results['cpu']['average'] / 100, 4);
+        $results['cpu']['median'] = round($results['cpu']['median'] / 100, 4);
+        $results['cpu']['95p'] = round($results['cpu']['95p'] / 100, 4);
+
+        return $results;
     }
 
-    private function removeInitOutput(): void
+
+    private function calculateAverage(array $values): float|int
     {
-        unlink('/tmp/init.output');
+        return array_sum($values) / count($values);
+    }
+
+    private function calculateMedian(array $sortedValues): float|int
+    {
+        $middleKey = (int) (sizeof($sortedValues) / 2);
+
+        $lowerBound = $sortedValues[$middleKey - 1];
+        $higherBound = $sortedValues[$middleKey + 1];
+
+        return ($lowerBound + $higherBound) / 2;
+    }
+
+    private function calculate95Percentile(array $sortedValues): float|int
+    {
+        $p95key = (int) (sizeof($sortedValues) * 0.95);
+        return $sortedValues[$p95key];
     }
 }
 
 $arguments = Init::getopt([
     "test:",
     "engine:",
-    "type:"
+    "type:",
+    "force:"
 ]);
 
 foreach (['engine', 'test'] as $argument) {
@@ -108,4 +227,5 @@ foreach (['engine', 'test'] as $argument) {
 }
 
 
-new Init($arguments['test'], $arguments['engine'], $arguments['type'] ?? "");
+new Init($arguments['test'], $arguments['engine'], $arguments['type'] ?? "",
+    isset($arguments['force']));

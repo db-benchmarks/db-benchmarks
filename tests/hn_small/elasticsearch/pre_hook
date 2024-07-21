@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-[ ! -z "$type" ] && suffix="_$type" || suffix=""
-
-sleep 10
-exit 111
+echo -e "Elasticsearch (type $suffix):"
+if [ "$(ls elasticsearch/idx$suffix)" ]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
 
 docker-compose -f ../../docker-compose.yml --env-file ../../.env stop elasticsearch
 docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f elasticsearch
@@ -15,5 +16,3 @@ echo -e "\tStarting elasticsearch ($cmd)"
 eval "$cmd"
 echo -e "\tWaiting for elasticsearch to come up"
 while ! nc -z localhost 9200; do sleep 1; done
-echo -en "\tStarting loading at "
-date

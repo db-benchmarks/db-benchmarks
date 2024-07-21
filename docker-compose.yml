@@ -23,8 +23,8 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true # as said on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping it needs to be done for performance
     volumes:
-      - ./tests/${test}/es/idx${suffix}:/usr/share/elasticsearch/data
-      - ./tests/${test}/es/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./tests/${test}/elasticsearch/idx${suffix}:/usr/share/elasticsearch/data
+      - ./tests/${test}/elasticsearch/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
 
   clickhouse:
     image: yandex/clickhouse-server:21.8.11.4
