@@ -104,7 +104,8 @@ abstract class engine {
         return str_replace($search, $replace, $value);
     }
 
-    private static function saveToDB($results) {
+    private static function saveToDB($results): bool
+    {
         self::log("Saving results for {$results['engine']}", 2);
         if (@$results['formatVersion'] != self::$formatVersion) self::die("ERROR: can't save to db (unsupported format)", 3);
         $queries = $results['queries'];
@@ -115,7 +116,36 @@ abstract class engine {
         curl_setopt($curl, CURLOPT_USERPWD, self::$commandLineArguments['username'] . ":" . self::$commandLineArguments['password']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        $query = "create table if not exists results(test_name string, memory int, test_info text, test_time timestamp, server_id string, server_info string stored, format_version int, engine_name string engine='rowwise', type string engine='rowwise', info json, avg float, cv float, avg_fastest float, cv_avg_fastest float, cold bigint, fastest bigint, slowest bigint, times json, times_count int, original_query text indexed attribute, modified_query text indexed attribute, result string, stats text stored, checksum int, warmup_time bigint, query_timeout int, error json, retest bool) min_word_len = '1' min_infix_len = '2' engine='columnar'";
+        $query = "create table if not exists results (".
+            "test_name string, ".
+            "memory int, ".
+            "test_info text, ".
+            "test_time timestamp, ".
+            "server_id string, ".
+            "server_info string stored, ".
+            "format_version int, ".
+            "engine_name string engine='rowwise', ".
+            "type string engine='rowwise', ".
+            "info json, ".
+            "avg float, ".
+            "cv float, ".
+            "avg_fastest float, ".
+            "cv_avg_fastest float, ".
+            "cold bigint, ".
+            "fastest bigint, ".
+            "slowest bigint, ".
+            "times json, ".
+            "times_count int, ".
+            "original_query text indexed attribute, ".
+            "modified_query text indexed attribute, ".
+            "result string, ".
+            "stats text stored, ".
+            "checksum int, ".
+            "warmup_time bigint, ".
+            "query_timeout int, ".
+            "error json, ".
+            "retest bool".
+            ") min_word_len = '1' min_infix_len = '2' engine='columnar'";
 
         curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
         $curlResult = curl_exec($curl);

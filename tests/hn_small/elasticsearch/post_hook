@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading at "; date
+echo -en "Count of inserted documents: "
+curl -s -X GET "localhost:9200/hn_small/_count" | jq .count

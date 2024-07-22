@@ -19,8 +19,7 @@ class Init
     public function __construct(
         string $testName,
         string $engineName,
-        string $type,
-        bool $force = false
+        string $type
     ) {
         $this->testName = $testName;
         $this->engineName = $engineName;
@@ -29,13 +28,9 @@ class Init
         $this->getSuffix();
         $this->measuresLogPath = "/tmp/inflate_$this->engineName.txt";
 
-        $this->calculateStats();
-
-        if ($force) {
-            $this->inflateHook();
-        } else {
-            $this->preHook() && $this->inflateHook() && $this->postHook();
-        }
+        $this->preHook()
+        && $this->inflateHook()
+        && $this->postHook();
     }
 
     private function getSuffix(): void
@@ -47,17 +42,7 @@ class Init
 
     public function preHook(): bool
     {
-        $preHookPath
-            = "test=$this->testName suffix=$this->suffix $this->engineName/pre_hook";
-        $exitCode = $this->runScript($preHookPath);
-        if ($exitCode === 10) {
-            // If we don't need to rebuild this engine pre_hook should return us exit code 10
-            return false;
-        } elseif ($exitCode === 0) {
-            return true;
-        }
-
-        throw new RuntimeException("Pre hook unexpected exit");
+        return $this->processHook("pre_hook", "Pre hook");
     }
 
     public function inflateHook(): bool
@@ -69,6 +54,7 @@ class Init
             die('Could not fork process');
         } else {
             if ($pid) {
+                $startTime = microtime(true);
                 $exitCode = $this->runScript($scriptPath);
 
                 posix_kill($pid, SIGTERM);
@@ -76,6 +62,7 @@ class Init
                 pcntl_wait($status);
 
                 if ($exitCode === 0) {
+                    $this->saveStats($startTime);
                     return true;
                 }
 
@@ -88,7 +75,7 @@ class Init
 
     public function postHook(): bool
     {
-        return true;
+        return $this->processHook("post_hook", "Post hook");
     }
 
     private function runScript($scriptPath): ?int
@@ -145,7 +132,7 @@ class Init
     }
 
 
-    public function calculateStats()
+    public function calculateStats(): array
     {
         $cpu = [];
         $ram = [];
@@ -190,6 +177,31 @@ class Init
         return $results;
     }
 
+    private function saveStats(float $startTime): void
+    {
+        $elapsed = microtime(true) - $startTime;
+
+        $date = date('ymd_his');
+        $folderPath = "../../results/$this->testName/$this->engineName/$date/";
+        $fileName = $this->testName."_".$this->engineName."__init";
+
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath);
+        }
+
+        file_put_contents(
+            $folderPath.$fileName,
+            serialize([
+                'elapsed_time' => $elapsed,
+                'metrics' => $this->calculateStats(),
+                'engine' => $this->engineName,
+                'test' => $this->testName,
+                'type' => $this->type
+            ]));
+
+        unlink($this->measuresLogPath);
+    }
+
 
     private function calculateAverage(array $values): float|int
     {
@@ -211,13 +223,30 @@ class Init
         $p95key = (int) (sizeof($sortedValues) * 0.95);
         return $sortedValues[$p95key];
     }
+
+
+    private function processHook(string $command, string $hookName): bool
+    {
+        $hookPath
+            = "test=$this->testName suffix=$this->suffix $this->engineName/"
+            .$command;
+        $exitCode = $this->runScript($hookPath);
+        if ($exitCode === 10) {
+            // If we don't need to rebuild this engine
+            // pre_hook should return us exit code 10
+            return false;
+        } elseif ($exitCode === 0) {
+            return true;
+        }
+
+        throw new RuntimeException("$hookName unexpected exit");
+    }
 }
 
 $arguments = Init::getopt([
     "test:",
     "engine:",
-    "type:",
-    "force:"
+    "type:"
 ]);
 
 foreach (['engine', 'test'] as $argument) {
@@ -227,5 +256,4 @@ foreach (['engine', 'test'] as $argument) {
 }
 
 
-new Init($arguments['test'], $arguments['engine'], $arguments['type'] ?? "",
-    isset($arguments['force']));
+new Init($arguments['test'], $arguments['engine'], $arguments['type'] ?? "");
