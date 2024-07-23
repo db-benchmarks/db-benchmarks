@@ -25,12 +25,28 @@ class Init
         $this->engineName = $engineName;
         $this->type = $type;
 
+        $this->checkHooksExist();
         $this->getSuffix();
         $this->measuresLogPath = "/tmp/inflate_$this->engineName.txt";
 
         $this->preHook()
         && $this->inflateHook()
         && $this->postHook();
+    }
+
+    private function checkHooksExist(): void
+    {
+        if (!file_exists("$this->engineName/pre_hook")) {
+            self::die("Can't find pre hook for $this->engineName", 1);
+        }
+
+        if (!file_exists("$this->engineName/inflate_hook")) {
+            self::die("Can't find inflate hook for $this->engineName", 1);
+        }
+
+        if (!file_exists("$this->engineName/post_hook")) {
+            self::die("Can't find post hook for $this->engineName", 1);
+        }
     }
 
     private function getSuffix(): void
@@ -47,7 +63,8 @@ class Init
 
     public function inflateHook(): bool
     {
-        $scriptPath = "suffix=$this->suffix $this->engineName/inflate";
+        $scriptPath
+            = "test=$this->testName suffix=$this->suffix $this->engineName/inflate_hook";
 
         $pid = pcntl_fork();
         if ($pid == -1) {
@@ -228,8 +245,13 @@ class Init
     {
         $middleKey = (int) (sizeof($sortedValues) / 2);
 
-        $lowerBound = $sortedValues[$middleKey - 1];
-        $higherBound = $sortedValues[$middleKey + 1];
+        if ($middleKey > 1) {
+            $lowerBound = $sortedValues[$middleKey - 1];
+            $higherBound = $sortedValues[$middleKey + 1];
+        } else {
+            $lowerBound = min($sortedValues);
+            $higherBound = max($sortedValues);
+        }
 
         return ($lowerBound + $higherBound) / 2;
     }
@@ -237,6 +259,10 @@ class Init
     private function calculate95Percentile(array $sortedValues): float|int
     {
         $p95key = (int) (sizeof($sortedValues) * 0.95);
+
+        if (!isset($sortedValues[$p95key])) {
+            return max($sortedValues);
+        }
         return $sortedValues[$p95key];
     }
 
@@ -255,7 +281,7 @@ class Init
             return true;
         }
 
-        throw new RuntimeException("$hookName unexpected exit");
+        throw new RuntimeException("$hookName unexpected exit: $exitCode");
     }
 }
 
