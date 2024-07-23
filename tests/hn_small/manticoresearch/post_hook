@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading to index at "
+date
+echo -en "Count of inserted documents: "
+docker exec manticoresearch_engine mysql -h0 -P9306 -e "SELECT count(*) FROM $test\G" | grep count | cut -d" " -f2
