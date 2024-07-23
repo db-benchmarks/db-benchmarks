@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading to index at "
+date
+echo -en "Count of inserted documents: "
+curl -s http://localhost:7700/indexes/$test/stats | jq .numberOfDocuments

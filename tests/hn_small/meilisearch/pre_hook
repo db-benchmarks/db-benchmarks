@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+echo -e "Meilisearch (type $suffix):"
+
+test="$test" suffix="" docker-compose -f "../../docker-compose.yml" --env-file ../../.env stop meilisearch
+test="$test" suffix="" docker-compose -f "../../docker-compose.yml" --env-file ../../.env rm -f meilisearch
+test="$test" suffix="" docker-compose -f "../../docker-compose.yml" --env-file ../../.env up -d meilisearch
+
+sleep 5
