@@ -3,7 +3,7 @@
 
 use JetBrains\PhpStorm\NoReturn;
 
-include('helpers.php');
+require_once('core/helpers.php');
 
 class Init
 {
@@ -192,14 +192,30 @@ class Init
         file_put_contents(
             $folderPath.$fileName,
             serialize([
-                'elapsed_time' => $elapsed,
+                'stage' => 'init',
+                'elapsedTime' => $elapsed,
                 'metrics' => $this->calculateStats(),
                 'engine' => $this->engineName,
                 'test' => $this->testName,
-                'type' => $this->type
+                'type' => $this->type,
+                'formatVersion' => 1,
+                'version' => $this->getVersion()
             ]));
 
         unlink($this->measuresLogPath);
+    }
+
+
+    private function getVersion(): string
+    {
+        include_once("../../core/engine.php");
+        include_once("../../plugins/$this->engineName.php");
+
+        $engineClassName = $this->engineName;
+        /** @var engine $engine */
+        $engine = new $engineClassName($this->type);
+        $info = $engine->getInfo();
+        return $info['version'];
     }
 
 

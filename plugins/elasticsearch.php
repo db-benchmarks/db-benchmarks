@@ -22,7 +22,7 @@ class elasticsearch extends engine {
     }
     
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    public function getInfo() {
         $ret = [];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/_cluster/health?level=indices");

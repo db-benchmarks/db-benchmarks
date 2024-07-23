@@ -24,7 +24,7 @@ class manticoresearch extends engine {
     }
     
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    public function getInfo() {
         $m = new mysqli();
         @$m->real_connect('127.0.0.1', '', '', '', $this->mysqlPort);
         if ($m->connect_error) return false;
