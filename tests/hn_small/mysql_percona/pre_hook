@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo -e "Mysql (type $suffix):"
+echo -e "Mysql percona (type $suffix):"
 if [[ -a mysql_percona/data$suffix/default/$test.ibd ]]; then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
   exit 10
