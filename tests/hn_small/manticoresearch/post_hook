@@ -2,5 +2,11 @@
 
 echo -en "\tFinished loading to index at "
 date
-echo -en "Count of inserted documents: "
-docker exec manticoresearch_engine mysql -h0 -P9306 -e "SELECT count(*) FROM $test\G" | grep count | cut -d" " -f2
+
+inserted=$(docker exec manticoresearch_engine mysql -h0 -P9306 -e "SELECT count(*) FROM $test\G" | grep count | cut -d" " -f2)
+echo -en "Count of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 1165439 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi
