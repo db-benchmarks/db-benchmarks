@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+echo -e "Mysql (type $suffix):"
+if [[ -a mysql_percona/data$suffix/default/$test.ibd ]]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
+
+docker-compose -f ../../docker-compose.yml --env-file ../../.env stop mysql_percona
+docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql_percona
+
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql_percona"
+echo -e "\tStarting mysql_percona ($cmd)"
+eval "$cmd"
+while ! nc -z localhost 3306; do sleep 1; done
+sleep 5
+while ! nc -z localhost 3306; do sleep 1; done
+sleep 5
+docker exec mysql_percona_engine mysql -uroot -h0 -e "SHOW DATABASES"
