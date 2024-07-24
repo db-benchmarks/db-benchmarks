@@ -226,7 +226,12 @@ class Init
     private function getVersion(): string
     {
         include_once("../../core/engine.php");
+
+        if ($this->engineName === 'mysql_percona') {
+            include_once("../../plugins/mysql.php");
+        }
         include_once("../../plugins/$this->engineName.php");
+
 
         $engineClassName = $this->engineName;
         /** @var engine $engine */
