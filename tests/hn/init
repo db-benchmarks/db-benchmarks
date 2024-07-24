@@ -20,28 +20,15 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-. typesense/init
-
-# Elasticsearch
-. es/init
-
-# Clickhouse
-. ch/init
-
-# Manticore Search
-. manticore/init
-
-# MySQL
-. mysql/init
-
-# Postgres
-. postgres/init
+../../init --engine=typesense
+../../init --engine=elasticsearch
+../../init --engine=clickhouse
+../../init --engine=manticoresearch
+../../init --engine=meilisearch
+../../init --engine=mysql
+../../init --engine=postgres
 
 # MySQL Percona
-if [[ -d mysql_percona ]]; then 
-  . mysql_percona/init
+if [[ -d mysql_percona ]]; then
+  ../../init --engine=mysql_percona
 fi
-
-# Meilisearch never finishes ingesting the data, hence commented out
-# Meilisearch
-# . meilisearch/init
