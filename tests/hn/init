@@ -20,13 +20,13 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-../../init --engine=typesense
-../../init --engine=elasticsearch
 ../../init --engine=clickhouse
+../../init --engine=elasticsearch
 ../../init --engine=manticoresearch
 ../../init --engine=meilisearch
 ../../init --engine=mysql
 ../../init --engine=postgres
+../../init --engine=typesense
 
 # MySQL Percona
 if [[ -d mysql_percona ]]; then

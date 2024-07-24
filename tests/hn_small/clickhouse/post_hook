@@ -4,7 +4,7 @@ echo -en "\tFinished loading to index at "
 date
 
 inserted=$(docker exec clickhouse_engine clickhouse-client --query="SELECT count(*) FROM default.$test")
-echo -en "Count of inserted documents: $inserted"
+echo -e "Count of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 1165439 ]]; then
   echo "Inserted count mismatch"
