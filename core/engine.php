@@ -273,7 +273,10 @@ abstract class engine {
                     (int) $query['retest']
                 ];
 
-                $fields = implode(',', $fields);
+                if (is_array($fields)){
+                    $fields = implode(',', $fields);
+                }
+
                 $values = implode(',', $values);
                 $query
                     /** @lang manticore */
