@@ -130,11 +130,11 @@ indexer:
 # -------------------------------- Searcher settings --------------------------------
 #
 searcher:
-#   fast_field_cache_capacity: 1G
-#   split_footer_cache_capacity: 500M
-#   max_num_concurrent_split_streams: 100
+  fast_field_cache_capacity: 0
+  split_footer_cache_capacity: 500M
+  max_num_concurrent_split_streams: 100
   partial_request_cache_capacity: 0
-#   max_num_concurrent_split_searches: 100
+  max_num_concurrent_split_searches: 100
 #
 # -------------------------------- Jaeger settings --------------------------------
 
