@@ -206,6 +206,7 @@ services:
         hard: 262144
     volumes:
       - ./tests/${test}/quickwit/data${suffix}:/quickwit/qwdata
+      - ./tests/${test}/quickwit/quickwit.yaml:/quickwit/config/quickwit.yaml
 
   meilisearch:
     image: getmeili/meilisearch:v1.1.1
