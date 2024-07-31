@@ -1,0 +1,86 @@
+#
+# Index config file for stackoverflow dataset.
+#
+version: 0.7
+
+index_id: logs10m
+
+doc_mapping:
+  field_mappings:
+
+    - name: id
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: remote_addr
+      type: text
+      fast: true
+      tokenizer: default
+      record: position
+      stored: true
+    - name: remote_user
+      type: text
+      fast: true
+      tokenizer: default
+      record: position
+      stored: true
+    - name: runtime
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: time_local
+      type: datetime
+      input_formats:
+        - unix_timestamp
+      output_format: unix_timestamp_secs
+      fast_precision: seconds
+      fast: true
+    - name: request_type
+      type: text
+      fast: true
+      tokenizer: default
+      record: position
+      stored: true
+    - name: request_path
+      type: text
+      fast: true
+      tokenizer: default
+      record: position
+      stored: true
+    - name: request_protocol
+      type: text
+      fast: true
+      tokenizer: default
+      record: position
+      stored: true
+    - name: status
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: size
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: referer
+      type: text
+      fast: true
+      tokenizer: default
+      record: position
+      stored: true
+    - name: usearagent
+      type: text
+      fast: true
+      tokenizer: default
+      record: position
+      stored: true
+
+
+search_settings:
+  default_search_fields: [request_path]
+
+indexing_settings:
+  commit_timeout_secs: 30

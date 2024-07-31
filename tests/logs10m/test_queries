@@ -1,52 +1,431 @@
 [
-"select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
-{
-  "manticoresearch": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where match('@request_path settings logo') order by cnt desc limit 20",
-  "elasticsearch": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where query('request_path settings logo') order by cnt desc limit 20",
-  "clickhouse": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where (match(request_path, '(?i)(\\W|\\A)settings\\Wlogo(\\W|\\z)') or match(request_path, '(?i)(\\W|\\A)logo\\Wsettings(\\W|\\z)')) limit 20 FORMAT JSON",
-  "meilisearch": "-"
-},
-{
-  "default": "select count(*) from logs10m",
-  "meilisearch": [
-    "/indexes/logs10m/stats",
-    []
-  ]
-},
-"select count(*), avg(runtime) from logs10m group by status limit 20",
-"select count(distinct request_path) cnt_distinct, status from logs10m group by status order by cnt_distinct desc limit 20",
-"select min(size) min_size, status from logs10m group by status order by min_size desc, status desc limit 20",
-{
-  "default": "select request_path, runtime, status, size from logs10m where size > 0 order by runtime desc, size asc limit 20",
-  "meilisearch": [
-    "/indexes/logs10m/search",
-    {
-      "attributesToRetrieve": ["request_path", "runtime", "status", "size"],
-      "filter": "size > 0" ,
-      "sort": [
-        "runtime:desc",
-        "size:asc"
-      ],
-      "limit": 20
+  {
+    "default": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "manticoresearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "elasticsearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "clickhouse": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "meilisearch": "-",
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "status_avg": {
+            "terms": {
+              "field": "status",
+              "size": 20,
+              "order": {
+                "avg_field": "desc"
+              }
+            },
+            "aggs": {
+              "avg_field": {
+                "avg": {
+                  "field": "size"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "status_avg": {
+          "buckets": {
+            "[]": {
+              "avg_field": {
+                "value": "avg_size: float"
+              },
+              "key": "status: int"
+            }
+          }
+        }
+      }
     }
-  ]
-}, {
-  "default": "select request_path, runtime, status, size, time_local from logs10m order by runtime desc, size desc, time_local desc limit 20",
-  "meilisearch": [
-    "/indexes/logs10m/search",
-    {
-      "attributesToRetrieve": ["request_path", "runtime", "status", "size", "time_local"],
-      "sort": [
-        "runtime:desc",
-        "size:desc",
-        "time_local:desc"
-      ],
-      "limit": 20
+  },
+  {
+    "default": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where match('@request_path settings logo') order by cnt desc limit 20",
+    "manticoresearch": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where match('@request_path settings logo') order by cnt desc limit 20",
+    "elasticsearch": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where query('request_path settings logo') order by cnt desc limit 20",
+    "clickhouse": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where (match(request_path, '(?i)(\\W|\\A)settings\\Wlogo(\\W|\\z)') or match(request_path, '(?i)(\\W|\\A)logo\\Wsettings(\\W|\\z)')) limit 20 FORMAT JSON",
+    "meilisearch": "-",
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "settings logo",
+        "search_field": "request_path",
+        "max_hits": 0,
+        "aggs": {
+          "request_path_count": {
+            "terms": {
+              "field": "request_path",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            },
+            "aggs": {
+              "avg_runtime": {
+                "avg": {
+                  "field": "runtime"
+                }
+              },
+              "avg_size": {
+                "avg": {
+                  "field": "size"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "request_path_count": {
+          "buckets": {
+            "[]": {
+              "avg_runtime": {
+                "value": "avg(runtime) :float"
+              },
+              "avg_size": {
+                "value": "avg(size) :float"
+              },
+              "doc_count": "cnt :int"
+            }
+          }
+        }
+      }
     }
-  ]
-},
-"select status, count(*) from logs10m group by status order by count(*) desc limit 20",
-"select status, sum(runtime) from logs10m group by status order by count(*) desc limit 20",
-"select count(*) as cnt, request_path, avg(runtime), avg(size) from logs10m group by request_path order by cnt desc limit 20",
-"select request_path, count(*), avg(runtime) runtime_avg, avg(size) from logs10m group by request_path order by runtime_avg desc limit 20"
+  },
+  {
+    "default": "select count(*) from logs10m",
+    "meilisearch": [
+      "/indexes/logs10m/stats",
+      []
+    ],
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
+  },
+  {
+    "default": "select count(*), avg(runtime) from logs10m group by status limit 20",
+    "manticoresearch": "select count(*), avg(runtime) from logs10m group by status limit 20",
+    "elasticsearch": "select count(*), avg(runtime) from logs10m group by status limit 20",
+    "clickhouse": "select count(*), avg(runtime) from logs10m group by status limit 20",
+    "meilisearch": "-",
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "status_count_avg_runtime": {
+            "terms": {
+              "field": "status",
+              "size": 20
+            },
+            "aggs": {
+              "count": {
+                "value_count": {
+                  "field": "status"
+                }
+              },
+              "avg_runtime": {
+                "avg": {
+                  "field": "runtime"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "status_count_avg_runtime": {
+          "buckets": {
+            "[]": {
+              "avg_runtime": {
+                "value": "avg(runtime) :float"
+              },
+              "count": {
+                "value": "count(*) :int"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "default": "select count(distinct request_path) cnt_distinct, status from logs10m group by status order by cnt_distinct desc limit 20",
+    "manticoresearch": "select count(distinct request_path) cnt_distinct, status from logs10m group by status order by cnt_distinct desc limit 20",
+    "elasticsearch": "select count(distinct request_path) cnt_distinct, status from logs10m group by status order by cnt_distinct desc limit 20",
+    "clickhouse": "select count(distinct request_path) cnt_distinct, status from logs10m group by status order by cnt_distinct desc limit 20",
+    "meilisearch": "-",
+    "quickwit": "-"
+  },
+  {
+    "default": "select min(size) min_size, status from logs10m group by status order by min_size desc, status desc limit 20",
+    "manticoresearch": "select min(size) min_size, status from logs10m group by status order by min_size desc, status desc limit 20",
+    "elasticsearch": "select min(size) min_size, status from logs10m group by status order by min_size desc, status desc limit 20",
+    "clickhouse": "select min(size) min_size, status from logs10m group by status order by min_size desc, status desc limit 20",
+    "meilisearch": "-",
+    "quickwit": "-"
+  },
+  {
+    "default": "select request_path, runtime, status, size from logs10m where size > 0 order by runtime desc, size asc limit 20",
+    "meilisearch": [
+      "/indexes/logs10m/search",
+      {
+        "attributesToRetrieve": [
+          "request_path",
+          "runtime",
+          "status",
+          "size"
+        ],
+        "filter": "size > 0",
+        "sort": [
+          "runtime:desc",
+          "size:asc"
+        ],
+        "limit": 20
+      }
+    ],
+    "quickwit": "-"
+  },
+  {
+    "default": "select request_path, runtime, status, size, time_local from logs10m order by runtime desc, size desc, time_local desc limit 20",
+    "meilisearch": [
+      "/indexes/logs10m/search",
+      {
+        "attributesToRetrieve": [
+          "request_path",
+          "runtime",
+          "status",
+          "size",
+          "time_local"
+        ],
+        "sort": [
+          "runtime:desc",
+          "size:desc",
+          "time_local:desc"
+        ],
+        "limit": 20
+      }
+    ],
+    "quickwit": "-"
+  },
+  {
+    "default": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
+    "manticoresearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "elasticsearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "clickhouse": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "meilisearch": "-",
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "status_count": {
+            "terms": {
+              "field": "status",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "status_count": {
+          "buckets": {
+            "[]": {
+              "doc_count": "count(*) :int",
+              "key": "status :int"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "default": "select status, sum(runtime) from logs10m group by status order by count(*) desc limit 20",
+    "manticoresearch": "select status, sum(runtime) from logs10m group by status order by count(*) desc limit 20",
+    "elasticsearch": "select status, sum(runtime) from logs10m group by status order by count(*) desc limit 20",
+    "clickhouse": "select status, sum(runtime) from logs10m group by status order by count(*) desc limit 20",
+    "meilisearch": "-",
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "status_count_sum_runtime": {
+            "terms": {
+              "field": "status",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            },
+            "aggs": {
+              "runtime_sum": {
+                "sum": {
+                  "field": "runtime"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "status_count_sum_runtime": {
+          "buckets": {
+            "[]": {
+              "runtime_sum": {
+                "value": "sum(runtime) :int"
+              },
+              "key": "status :int"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "default": "select count(*) as cnt, request_path, avg(runtime), avg(size) from logs10m group by request_path order by cnt desc limit 20",
+    "manticoresearch": "select count(*) as cnt, request_path, avg(runtime), avg(size) from logs10m group by request_path order by cnt desc limit 20",
+    "elasticsearch": "select count(*) as cnt, request_path, avg(runtime), avg(size) from logs10m group by request_path order by cnt desc limit 20",
+    "clickhouse": "select count(*) as cnt, request_path, avg(runtime), avg(size) from logs10m group by request_path order by cnt desc limit 20",
+    "meilisearch": "-",
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "request_path_aggregation": {
+            "terms": {
+              "field": "request_path",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            },
+            "aggs": {
+              "count": {
+                "value_count": {
+                  "field": "request_path"
+                }
+              },
+              "avg_runtime": {
+                "avg": {
+                  "field": "runtime"
+                }
+              },
+              "avg_size": {
+                "avg": {
+                  "field": "size"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "request_path_aggregation": {
+          "buckets": {
+            "[]": {
+              "avg_runtime": {
+                "value": "avg(runtime) :float"
+              },
+              "avg_size": {
+                "value": "avg(size) :float"
+              },
+              "doc_count": "cnt :int",
+              "key": "request_path"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "default": "select request_path, count(*), avg(runtime) runtime_avg, avg(size) from logs10m group by request_path order by runtime_avg desc limit 20",
+    "manticoresearch": "select request_path, count(*), avg(runtime) runtime_avg, avg(size) from logs10m group by request_path order by runtime_avg desc limit 20",
+    "elasticsearch": "select request_path, count(*), avg(runtime) runtime_avg, avg(size) from logs10m group by request_path order by runtime_avg desc limit 20",
+    "clickhouse": "select request_path, count(*), avg(runtime) runtime_avg, avg(size) from logs10m group by request_path order by runtime_avg desc limit 20",
+    "meilisearch": "-",
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "request_path_aggregation": {
+            "terms": {
+              "field": "request_path",
+              "size": 20,
+              "order": {
+                "avg_runtime": "desc"
+              }
+            },
+            "aggs": {
+              "count": {
+                "value_count": {
+                  "field": "request_path"
+                }
+              },
+              "avg_runtime": {
+                "avg": {
+                  "field": "runtime"
+                }
+              },
+              "avg_size": {
+                "avg": {
+                  "field": "size"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "request_path_aggregation": {
+          "buckets": {
+            "[]": {
+              "avg_runtime": {
+                "value": "runtime_avg :int"
+              },
+              "avg_size": {
+                "value": "avg(size) :int"
+              },
+              "doc_count": "count(*) :int",
+              "key": "request_path"
+            }
+          }
+        }
+      }
+    }
+  }
 ]

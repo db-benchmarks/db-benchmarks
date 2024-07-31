@@ -9,7 +9,23 @@
       "/collections/hn_small",
       [],
       false
-    ]
+    ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   "doc": {
     "default": "select * from hn_small limit 1",
@@ -22,7 +38,17 @@
       {
         "per_page": 1,
         "q": "*"
-      }, false
-    ]
+      },
+      false
+    ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 1
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   }
 }
