@@ -2,6 +2,4 @@
 
 echo -en "\tStarting loading at "
 date
-suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env run manticoresearch indexer --all
-suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
-while ! nc -z localhost 9308; do sleep 1; done
+suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env exec manticoresearch indexer --all

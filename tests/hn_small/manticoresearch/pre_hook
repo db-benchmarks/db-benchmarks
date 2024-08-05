@@ -11,3 +11,5 @@ docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticore
 php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
 mkdir -p manticoresearch/idx$suffix/data/binlog
 chmod 777 manticoresearch/idx$suffix/data/binlog
+suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
+while ! nc -z localhost 9308; do sleep 1; done
