@@ -12,8 +12,8 @@ docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql
 cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql"
 echo -e "\tStarting mysql ($cmd)"
 eval "$cmd"
+
+timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_engine 2>&1)
 while ! nc -z localhost 3306; do sleep 1; done
-sleep 5
-while ! nc -z localhost 3306; do sleep 1; done
-sleep 5
+
 docker exec mysql_engine mysql -e "SHOW DATABASES"

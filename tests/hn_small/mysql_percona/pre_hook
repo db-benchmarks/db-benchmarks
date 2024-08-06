@@ -12,8 +12,8 @@ docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql_per
 cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql_percona"
 echo -e "\tStarting mysql_percona ($cmd)"
 eval "$cmd"
+
+timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_percona_engine 2>&1)
 while ! nc -z localhost 3307; do sleep 1; done
-sleep 7
-while ! nc -z localhost 3307; do sleep 1; done
-sleep 7
+
 docker exec mysql_percona_engine mysql -uroot -h0 -e "SHOW DATABASES"
