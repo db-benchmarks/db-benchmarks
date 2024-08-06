@@ -72,18 +72,19 @@ class Init
         } else {
             if ($pid) {
                 $startTime = microtime(true);
-                $exitCode = $this->runScript($scriptPath);
+                $runStatus = $this->runScript($scriptPath);
 
                 posix_kill($pid, SIGTERM);
 
                 pcntl_wait($status);
 
-                if ($exitCode === 0) {
+                if ($runStatus['code'] === 0) {
                     $this->saveStats($startTime);
                     return true;
                 }
 
-                throw new RuntimeException("Inflate hook unexpected exit");
+                throw new RuntimeException("Inflate hook unexpected exit. "
+                    . $runStatus['error']);
             } else {
                 $this->measureStats();
             }
@@ -95,7 +96,7 @@ class Init
         return $this->processHook("post_hook", "Post hook");
     }
 
-    private function runScript($scriptPath): ?int
+    private function runScript($scriptPath): array
     {
         $descriptors = [
             0 => ["pipe", "r"],  // stdin
@@ -106,17 +107,22 @@ class Init
         $process = proc_open($scriptPath, $descriptors, $pipes);
         $exitCode = null;
 
+        $errors = null;
         if (is_resource($process)) {
             while ($line = fgets($pipes[1])) {
                 echo $line;
             }
 
             fclose($pipes[1]);
+
+            while ($errorLine = fgets($pipes[2])) {
+                $errors .= $errorLine;
+            }
             fclose($pipes[2]);
             $exitCode = proc_close($process);
         }
 
-        return $exitCode;
+        return ['code' => $exitCode, 'error' => $errors];
     }
 
     private function getStatsCommands(): array
@@ -371,16 +377,22 @@ class Init
         $hookPath
             = "test=$this->testName suffix=$this->suffix $this->engineName/"
             . $command;
-        $exitCode = $this->runScript($hookPath);
-        if ($exitCode === 10) {
+        $runStatus = $this->runScript($hookPath);
+        if ($runStatus['code'] === 10) {
             // If we don't need to rebuild this engine
             // pre_hook should return us exit code 10
             return false;
-        } elseif ($exitCode === 0) {
+        } elseif ($runStatus['code'] === 0) {
             return true;
         }
 
-        throw new RuntimeException("$hookName unexpected exit: $exitCode");
+        $redColor = "\033[31m";
+        $resetColor = "\033[0m";
+
+        echo $redColor . "$hookName unexpected exit: "
+            . $runStatus['code'] . "\n" . $runStatus['error'] . $resetColor;
+
+        exit(1);
     }
 }
 
