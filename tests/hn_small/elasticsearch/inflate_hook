@@ -2,12 +2,13 @@
 
 workers=$(nproc)
 path=$(pwd)
+network_name=$(docker compose -f ../../docker-compose.yml --env-file ../../.env config --format=json | jq .networks.default.name)
 
 docker run -e PIPELINE_BATCH_SIZE=10000 \
     --env-file ../../.env \
     -e XPACK_MONITORING_ENABLED=false \
     -e PIPELINE_WORKERS=$workers \
-    --network=db-benchmarks_default --rm \
+    --network=$network_name --rm \
     -v $path/data/:/data/ \
     -v $path/elasticsearch/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
     -v $path/elasticsearch/logstash$suffix/template.json:/template.json \
