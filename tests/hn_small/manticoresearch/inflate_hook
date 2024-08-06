@@ -2,4 +2,4 @@
 
 echo -en "\tStarting loading at "
 date
-suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env exec manticoresearch indexer --all
+docker exec manticoresearch_engine indexer --all
