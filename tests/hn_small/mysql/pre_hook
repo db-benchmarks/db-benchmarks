@@ -16,7 +16,7 @@ eval "$cmd"
 echo -e "\tWaiting for MySQL service to be available on localhost:3306"
 timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_engine 2>&1) > /dev/null
 
-local dot_count=0
+dot_count=0
 while ! nc -z localhost 3306; do
   if [ $dot_count -ge 4 ]; then
     printf "\r    \r" # Clear the line with four dots
@@ -31,3 +31,4 @@ echo -e "\tService is available!"
 
 echo -e "\tGet databases list"
 echo -e "$(docker exec mysql_engine mysql -e "SHOW DATABASES" | awk '{printf "\t\t%s\n", $0}')"
+echo -e "\tOK"

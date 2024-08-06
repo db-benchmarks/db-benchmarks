@@ -58,11 +58,15 @@ class Init
 
     public function preHook(): bool
     {
-        return $this->processHook("pre_hook", "Pre hook");
+        echo "Run Pre Hook $this->engineName\n";
+        $result = $this->processHook("pre_hook", "Pre hook");
+        echo "End Pre Hook $this->engineName\n";
+        return $result;
     }
 
     public function inflateHook(): bool
     {
+        echo "Run Inflate Hook $this->engineName\n";
         $scriptPath
             = "test=$this->testName suffix=$this->suffix $this->engineName/inflate_hook";
 
@@ -73,7 +77,7 @@ class Init
             if ($pid) {
                 $startTime = microtime(true);
                 $runStatus = $this->runScript($scriptPath);
-
+                echo "End Inflate Hook $this->engineName\n";
                 posix_kill($pid, SIGTERM);
 
                 pcntl_wait($status);
@@ -93,7 +97,10 @@ class Init
 
     public function postHook(): bool
     {
-        return $this->processHook("post_hook", "Post hook");
+        echo "Run Post Hook $this->engineName\n";
+        $result = $this->processHook("post_hook", "Post hook");
+        echo "End Post Hook $this->engineName\n";
+        return $result;
     }
 
     private function runScript($scriptPath): array
@@ -109,16 +116,34 @@ class Init
 
         $errors = null;
         if (is_resource($process)) {
-            while ($line = fgets($pipes[1])) {
-                echo $line;
-            }
+            stream_set_blocking($pipes[1],
+                false);  // Set stdout to non-blocking mode
+            stream_set_blocking($pipes[2],
+                false);  // Set stderr to non-blocking mode
 
+            // Read from stdout
+            while (!feof($pipes[1])) {
+                $line = fgets($pipes[1]);
+                if ($line !== false) {
+                    echo "\t" . $line;
+                }
+            }
             fclose($pipes[1]);
 
-            while ($errorLine = fgets($pipes[2])) {
-                $errors .= $errorLine;
+            $i = 0;
+            while (!feof($pipes[2])) {
+                $errorLine = fgets($pipes[2]);
+                if ($errorLine !== false) {
+                    $errors .= $errorLine;
+                } else {
+                    $i++;
+                }
+                if ($i > 10) {
+                    break;
+                }
             }
             fclose($pipes[2]);
+
             $exitCode = proc_close($process);
         }
 

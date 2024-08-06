@@ -16,7 +16,7 @@ echo -e "\tStarting elasticsearch ($cmd)"
 eval "$cmd"
 echo -e "\tWaiting for elasticsearch to come up"
 
-local dot_count=0
+dot_count=0
 while ! nc -z localhost 9200; do
   if [ $dot_count -ge 4 ]; then
     printf "\r    \r" # Clear the line with four dots

@@ -16,4 +16,4 @@ if ((count > 0)); then
   exit 10
 fi
 
-docker exec meilisearch_engine apk add coreutils
+docker exec meilisearch_engine apk add coreutils > /dev/null
