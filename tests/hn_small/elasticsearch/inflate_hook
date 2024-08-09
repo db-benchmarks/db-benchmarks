@@ -3,12 +3,13 @@
 workers=$(nproc)
 path=$(pwd)
 network_name=$(docker compose -f ../../docker-compose.yml --env-file ../../.env config --format=json | jq .networks.default.name)
+network_id=$(docker network ls | grep "$network_name" | cut -d " " -f1)
 
 docker run -e PIPELINE_BATCH_SIZE=10000 \
     --env-file ../../.env \
     -e XPACK_MONITORING_ENABLED=false \
-    -e PIPELINE_WORKERS=$workers \
-    --network=$network_name --rm \
+    -e PIPELINE_WORKERS="$workers" \
+    --network="$network_id" --rm \
     -v $path/data/:/data/ \
     -v $path/elasticsearch/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
     -v $path/elasticsearch/logstash$suffix/template.json:/template.json \
