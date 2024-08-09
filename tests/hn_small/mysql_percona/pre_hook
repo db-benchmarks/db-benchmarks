@@ -8,6 +8,7 @@ fi
 
 docker-compose -f ../../docker-compose.yml --env-file ../../.env stop mysql_percona
 docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql_percona
+mkdir mysql_percona/data$suffix/
 chmod 0777 -R mysql_percona/data$suffix/
 
 cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql_percona"
