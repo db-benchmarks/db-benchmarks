@@ -244,8 +244,8 @@ class Init
 
 
             $pattern
-                = '/cpu=(?<cpu>\d*) mem=(?<mem>\d*) disc=(?<disc>\d*)' .
-                ' timestamp=(?<timestamp>\d*)/usi';
+                = '/cpu=(?<cpu>\d*) mem=(?<mem>\d*)'.
+                ' disc=(?<disc>[0-9.e+-]*) timestamp=(?<timestamp>\d*)/usi';
             preg_match($pattern, $row, $parts);
 
             if ($usageUsecStart === 0) {
