@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+. "../../misc/func.sh"
+
+echo -en "\tStarting loading at "
+date
+
+header="id:number,story_id:number,story_text,story_author,comment_id:number,comment_text,comment_author,comment_ranking:number,author_comment_count:number,story_comment_count:number"
+
+echo -e "Creating an index"
+curl -s \
+  -X POST "http://localhost:7700/indexes" \
+  -H 'Content-Type: application/json' \
+  --data-binary "{
+      \"uid\": \"$test\",
+      \"primaryKey\": \"id\"
+    }" | jq .
+
+sleep 5
+
+# maxTotalHits is overrided since otherwise a query like "select count(*) from hn_small where comment_ranking > 300 and comment_ranking < 500" returns 1000 at max
+echo -e "Patching the index"
+curl -s \
+  -X PATCH "http://localhost:7700/indexes/$test/settings" \
+  -H 'Content-Type: application/json' \
+  --data-binary '{
+      "pagination": {
+        "maxTotalHits": 2000
+      },
+      "searchableAttributes": [
+        "story_text",
+        "comment_text",
+	"story_author",
+	"comment_author"
+      ],
+      "filterableAttributes": [
+        "comment_ranking",
+	"story_author"
+      ],
+      "sortableAttributes": [
+        "comment_ranking",
+        "author_comment_count",
+        "story_id",
+        "comment_id"
+      ],
+      "typoTolerance": {"enabled": false}
+    }'
+
+sleep 5
+echo -e "Index settings:"
+curl -s "http://localhost:7700/indexes/$test/settings" | jq .
+init_meilisearch "$test" "$header" "100000" || exit 1

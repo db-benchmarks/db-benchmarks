@@ -21,10 +21,11 @@ if [ $? -ne 0 ]; then
 fi
 
 ../../init --engine=clickhouse
-../../init --engine=elasticsearch
-../../init --engine=manticoresearch
+../../init --engine=elasticsearch --type=tuned
+../../init --engine=manticoresearch --type=rowwise
+../../init --engine=manticoresearch --type=columnar
 ../../init --engine=meilisearch
-../../init --engine=mysql
+../../init --engine=mysql --type=tuned
 ../../init --engine=postgres
 ../../init --engine=typesense
 

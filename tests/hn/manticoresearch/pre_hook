@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+echo -e "Manticore Search (type $suffix):"
+if [ -f manticoresearch/idx$suffix/$test.*sph ]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
+
+docker-compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
+docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
+php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
+mkdir -p manticoresearch/idx$suffix/data/binlog
+chmod 777 manticoresearch/idx$suffix/data/binlog
+suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
+while ! nc -z localhost 9308; do sleep 1; done

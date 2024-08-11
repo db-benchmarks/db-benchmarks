@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+echo -e "Elasticsearch (type $suffix):"
+if [ "$(ls elasticsearch/idx$suffix)" ]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
+
+docker-compose -f ../../docker-compose.yml --env-file ../../.env stop elasticsearch
+docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f elasticsearch
+mkdir -p elasticsearch/idx$suffix
+chmod -R 777 elasticsearch/idx$suffix # otherwise elasticsearch in docker won't start
+chmod -R 777 data          # otherwise logstash may not be able to read the files
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d elasticsearch"
+echo -e "\tStarting elasticsearch ($cmd)"
+eval "$cmd"
+echo -e "\tWaiting for elasticsearch to come up"
+
+dot_count=0
+while ! nc -z localhost 9200; do
+  if [ $dot_count -ge 4 ]; then
+    printf "\r    \r" # Clear the line with four dots
+    dot_count=0
+  fi
+  printf "."
+  dot_count=$((dot_count + 1))
+  sleep 1
+done

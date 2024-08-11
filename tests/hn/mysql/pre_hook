@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+echo -e "Mysql (type $suffix):"
+if [[ -e mysql/data$suffix/default/$test.ibd ]]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
+
+docker-compose -f ../../docker-compose.yml --env-file ../../.env stop mysql
+docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql
+mkdir mysql/data$suffix/
+chmod 0777 -R mysql/data$suffix/
+
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql"
+echo -e "\tStarting mysql ($cmd)"
+eval "$cmd"
+
+echo -e "\tWaiting for MySQL service to be available on localhost:3306"
+timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_engine 2>&1) > /dev/null
+
+dot_count=0
+while ! [[ $(docker exec mysql_engine mysql -uroot -h0 -e "SHOW DATABASES like 'default'" | wc -l) -eq 2 ]]; do
+  if [ $dot_count -ge 4 ]; then
+    printf "\r    \r" # Clear the line with four dots
+    dot_count=0
+  fi
+  printf "."
+  dot_count=$((dot_count + 1))
+  sleep 1
+done
+printf "\r    \r" # Clear the line after completion
+echo -e "\tService is available!"
