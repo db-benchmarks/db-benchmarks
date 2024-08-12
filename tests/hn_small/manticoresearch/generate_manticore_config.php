@@ -1,0 +1,1 @@
+../../hn/manticoresearch/generate_manticore_config.php
