@@ -22,7 +22,7 @@ fi
 
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch
-../../init --engine=manticoresearch --type=rowwise
+../../init --engine=manticoresearch
 ../../init --engine=meilisearch
 ../../init --engine=mysql
 ../../init --engine=postgres
