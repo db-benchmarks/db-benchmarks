@@ -24,10 +24,8 @@ fi
 ../../init --engine=elasticsearch --type=tuned
 ../../init --engine=manticoresearch --type=rowwise
 ../../init --engine=manticoresearch --type=columnar
-../../init --engine=meilisearch
 ../../init --engine=mysql --type=tuned
-../../init --engine=postgres
-../../init --engine=typesense
+
 
 # MySQL Percona
 if [[ -d mysql_percona ]]; then
