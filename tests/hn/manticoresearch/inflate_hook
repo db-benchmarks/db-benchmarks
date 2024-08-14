@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+docker logs manticoresearch_engine
 echo -en "\tStarting loading at "
 date
 docker exec manticoresearch_engine indexer --all
