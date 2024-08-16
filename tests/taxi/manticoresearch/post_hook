@@ -15,7 +15,7 @@ fi
 inserted=$(docker exec manticoresearch_engine mysql -h0 -P9306 -e "SELECT count(*) FROM $test\G" | grep count | cut -d" " -f2)
 echo -e "\tCount of inserted documents: $inserted"
 
-if [[ ! $inserted -eq 10365132 ]]; then
+if [[ ! $inserted -eq 1732817071 ]]; then
   echo "Inserted count mismatch"
   exit 1
 fi

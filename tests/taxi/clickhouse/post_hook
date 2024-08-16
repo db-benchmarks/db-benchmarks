@@ -8,7 +8,7 @@ date
 inserted=$(docker exec clickhouse_engine clickhouse-client --query="SELECT count(*) FROM default.$test")
 echo -e "Count of inserted documents: $inserted"
 
-if [[ ! $inserted -eq 10365132 ]]; then
+if [[ ! $inserted -eq 1732817071 ]]; then
   echo "Inserted count mismatch"
   exit 1
 fi
