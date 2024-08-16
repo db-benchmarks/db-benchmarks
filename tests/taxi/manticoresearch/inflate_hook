@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+echo -en "\tStarting loading at "
+date
+
+proc=32
+docker exec -e proc=$proc manticoresearch bash -c \
+'for n in `seq 1 $proc`; do (indexer --noprogress -c /etc/manticoresearch/manticore.conf taxi$n|tee /tmp/taxi$n) & pids[${n}]=$!; done; for pid in ${pids[*]}; do wait $pid; done';
