@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading to index at "
+date
+
+suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env restart manticoresearch
+while ! nc -z localhost 9308; do sleep 1; done
+sleep 5
+inserted=$(docker exec manticoresearch_engine mysql -h0 -P9306 -e "SELECT count(*) FROM $test\G" | grep count | cut -d" " -f2)
+echo -e "\tCount of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 10365132 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi
