@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo -e "Manticore Search (type $suffix):"
-if [ -f manticoresearch/idx$suffix/$test.*sph ]; then
+if [ -f manticoresearch/idx$suffix/${test}1.*sph ]; then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
   exit 10
 fi
