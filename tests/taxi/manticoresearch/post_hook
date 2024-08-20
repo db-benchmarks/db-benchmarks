@@ -5,7 +5,7 @@ date
 
 suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env restart manticoresearch
 
-if timeout 60 grep -qm2 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
+if timeout 60 grep -m2 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
   echo 'Accepting connections';
 else
   echo 'Manticore failed to start properly in 60 seconds';
