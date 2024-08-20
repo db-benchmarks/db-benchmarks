@@ -3,8 +3,6 @@
 echo -en "\tFinished loading to index at "
 date
 
-docker exec clickhouse_engine clickhouse-client --query="OPTIMIZE TABLE default.$test"
-
 inserted=$(docker exec clickhouse_engine clickhouse-client --query="SELECT count(*) FROM default.$test")
 echo -e "Count of inserted documents: $inserted"
 
