@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading to index at "
+date
+
+inserted=$(docker exec postgres_engine psql -h0 -U postgres -c "select count(*) from $test" | tail -n3 | head -n1)
+echo -e "\tCount of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 116543900 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi

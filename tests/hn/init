@@ -25,6 +25,8 @@ fi
 ../../init --engine=manticoresearch --type=rowwise
 ../../init --engine=manticoresearch --type=columnar
 ../../init --engine=mysql --type=tuned
+../../init --engine=postgres
+../../init --engine=meiliesearch
 
 
 # MySQL Percona
