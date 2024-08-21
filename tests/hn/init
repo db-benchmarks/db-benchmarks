@@ -25,9 +25,19 @@ fi
 ../../init --engine=manticoresearch --type=rowwise
 ../../init --engine=manticoresearch --type=columnar
 ../../init --engine=mysql --type=tuned
-../../init --engine=postgres
-../../init --engine=meilisearch
 
+
+
+../../init --engine=postgres
+
+# We excluded this engine cause it has limitations and we can upload only 9000000 documents.
+# Relay to docker stats it just reach memory limit and after that stops indexing 125GiB from 125GiB.
+
+# thread 'indexing-thread:20' panicked at 'the allocator is unable to allocate that
+# much memory (41666672 bytes requested)',
+# /usr/local/cargo/registry/src/github.com-1ecc6299db9ec823/grenad-0.4.4/src/sorter.rs:350:9
+
+# ../../init --engine=meilisearch
 
 
 # MySQL Percona

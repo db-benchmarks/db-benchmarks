@@ -849,7 +849,7 @@ Environment vairables:
     // checks that it's ok to run the test
     public static function sanitize() {
         if (self::$mode == 'test') {
-            $file = dirname(__FILE__) . '/tests/' . self::$commandLineArguments['test'] . '/description';
+            $file = dirname(__FILE__) . '/../tests/' . self::$commandLineArguments['test'] . '/description';
             if (!file_exists($file)) self::die("ERROR: Test description is not found in $file", 1);
         }
     }
