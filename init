@@ -248,6 +248,10 @@ class Init
                 ' disc=(?<disc>[0-9.e+-]*) timestamp=(?<timestamp>\d*)/usi';
             preg_match($pattern, $row, $parts);
 
+            if (empty($parts['timestamp'])){
+                continue;
+            }
+
             if ($usageUsecStart === 0) {
                 $usageUsecStart = $parts['cpu'];
                 $initialTime = $parts['timestamp'];
