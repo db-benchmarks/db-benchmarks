@@ -26,6 +26,7 @@ class manticoresearch extends engine {
     // attempts to fetch info about engine and return it
     public function getInfo() {
         $m = new mysqli();
+        mysqli_report(MYSQLI_REPORT_OFF);
         @$m->real_connect('127.0.0.1', '', '', '', $this->mysqlPort);
         if ($m->connect_error) return false;
         $res = $m->query("show status like '%version%'");
@@ -61,6 +62,8 @@ class manticoresearch extends engine {
 
     private function canConnectMysql() {
         $m = new mysqli();
+        mysqli_report(MYSQLI_REPORT_OFF); // Set MySQLi to throw exceptions
+
         @$m->real_connect('127.0.0.1', '', '', '', $this->mysqlPort);
         if (!@$m->connect_error) {
             $res = @$m->query("show status");
@@ -87,6 +90,7 @@ class manticoresearch extends engine {
 
     private function beforeMysql() {
         $this->mysql = new mysqli();
+        mysqli_report(MYSQLI_REPORT_OFF);
         $this->mysql->options(MYSQL_OPT_READ_TIMEOUT, self::$commandLineArguments['query_timeout']);
         ini_set('mysqlnd.net_read_timeout', self::$commandLineArguments['query_timeout']);
         @$this->mysql->real_connect('127.0.0.1', '', '', '', $this->mysqlPort);
@@ -163,9 +167,25 @@ class manticoresearch extends engine {
         if ($result and $result->num_rows > 0) {
             while ($hit = $result->fetch_assoc()) {
                 $ar = [];
-                foreach ($hit as $k=>$v) {
-                    if ($k == 'id') continue; // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
-                    if (is_float($v)) $v = round($v, 4); // this is a workaround against different floating point calculations in different engines
+                foreach ($hit as $k => $v) {
+                    // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
+                    if ($k == 'id') {
+                        continue;
+                    }
+
+                    // Detecting type, cause Manticore can send you float like 76.00000 as string, and we should convert it properly
+                    if (is_numeric($v)) {
+                        if (strpos($v, '.')) {
+                            $v = explode('.', $v);
+                            if ((int) $v[1] === 0) {
+                                $v = (int) $v[0];
+                            } else {
+                                $v = round((float) $v[0].'.'.$v[1], 4);
+                            }
+                        } else {
+                            $v = (int) $v;
+                        }
+                    }
                     $ar[$k] = $v;
                 }
                 ksort($ar);
