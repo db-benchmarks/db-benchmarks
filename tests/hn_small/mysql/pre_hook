@@ -19,6 +19,7 @@ echo -e "\tWaiting for MySQL service to be available on localhost:3306"
 timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_engine 2>&1) > /dev/null
 
 dot_count=0
+attempts=0
 while ! [[ $(docker exec mysql_engine mysql -uroot -h0 -e "SHOW DATABASES like 'default'" | wc -l) -eq 2 ]]; do
   if [ $dot_count -ge 4 ]; then
     printf "\r    \r" # Clear the line with four dots
@@ -27,6 +28,13 @@ while ! [[ $(docker exec mysql_engine mysql -uroot -h0 -e "SHOW DATABASES like '
   printf "."
   dot_count=$((dot_count + 1))
   sleep 1
+
+  attempts=$((attempts + 1))
+
+  if [[ $attempts -ge 60 ]]; then
+    echo -e "\tTimeout reached. Engine did not become available."
+    exit 1
+  fi
 done
 printf "\r    \r" # Clear the line after completion
 echo -e "\tService is available!"

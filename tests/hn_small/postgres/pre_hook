@@ -9,17 +9,28 @@ cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-
 echo -e "\tStarting postgres ($cmd)"
 eval "$cmd"
 
+dot_count=0
+attempts=0
 until docker exec postgres_engine psql -h0 -U postgres default -w &>/dev/null
 do
+  if [ $dot_count -ge 4 ]; then
+    printf "\r    \r" # Clear the line with four dots
+    dot_count=0
+  fi
+  printf "."
+  dot_count=$((dot_count + 1))
+
   sleep 1
 
   attempts=$((attempts + 1))
 
   if [[ $attempts -ge 60 ]]; then
-    echo -e "\tTimeout reached. ClickHouse did not become available."
+    echo -e "\tTimeout reached. Engine did not become available."
     exit 1
   fi
 done
+printf "\r    \r" # Clear the line after completion
+echo -e "\tService is available!"
 
 
 if [[ $(docker exec postgres_engine psql -h0 -U postgres -c "select count(*) from $test;") ]]; then
