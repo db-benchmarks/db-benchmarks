@@ -27,10 +27,11 @@ fi
 ../../init --engine=mysql --type=tuned
 
 
+# We excluded Postgres cause it's to slow. It process some basic queries more than the five hours.
+# It's impossible even to get test results on HN dataset, cause performing of that test will spend a month
+# ../../init --engine=postgres
 
-../../init --engine=postgres
-
-# We excluded this engine cause it has limitations and we can upload only 9000000 documents.
+# We excluded Meilisearch engine cause it has limitations and we can upload only 9000000 documents.
 # Relay to docker stats it just reach memory limit and after that stops indexing 125GiB from 125GiB.
 
 # thread 'indexing-thread:20' panicked at 'the allocator is unable to allocate that
