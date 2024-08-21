@@ -425,7 +425,7 @@ abstract class engine {
                 self::log(ob_get_clean(), 3);
                 if (is_array($info) and !empty($info)) {
                     $enginesInfo[$engineOptions['engine']][$engineOptions['type']] = $info;
-                    $file = __DIR__ . '/tests/' . self::$commandLineArguments['test'] . '/test_info_queries';
+                    $file = __DIR__ . '/../tests/' . self::$commandLineArguments['test'] . '/test_info_queries';
                     if (!file_exists($file)) self::die("ERROR: cannot get engine info, $file is not accessible", 3);
                     $json = @json_decode(file_get_contents($file), true);
                     if (!$json) self::die("ERROR: cannot get engine info, $file is not JSON", 3);
