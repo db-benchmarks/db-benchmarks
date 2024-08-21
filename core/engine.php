@@ -592,7 +592,7 @@ abstract class engine {
             'serverInfo' => $serverInfo
         ];
 
-        $final['testInfo'] = file_get_contents('tests/' . self::$commandLineArguments['test'] . '/description');
+        $final['testInfo'] = file_get_contents('../tests/' . self::$commandLineArguments['test'] . '/description');
 
         foreach ($queryTimes as $result) {
             $out = [];
@@ -799,11 +799,11 @@ Environment vairables:
             if (!isset(self::$commandLineArguments['start_timeout'])) self::$commandLineArguments['start_timeout'] = 120;
             if (!isset(self::$commandLineArguments['warmup_timeout'])) self::$commandLineArguments['warmup_timeout'] = 300;
             if (!isset(self::$commandLineArguments['info_timeout'])) self::$commandLineArguments['info_timeout'] = 60;
-            if (!isset(self::$commandLineArguments['queries'])) self::$commandLineArguments['queries'] = 'tests/' . self::$commandLineArguments['test'] . '/test_queries';
+            if (!isset(self::$commandLineArguments['queries'])) self::$commandLineArguments['queries'] = '../tests/' . self::$commandLineArguments['test'] . '/test_queries';
             if (!isset(self::$commandLineArguments['dataset'])) self::$commandLineArguments['dataset'] = self::$commandLineArguments['test'];
             if (!isset(self::$commandLineArguments['times'])) self::$commandLineArguments['times'] = 100;
 
-            if (!isset(self::$commandLineArguments['dir'])) self::$commandLineArguments['dir'] = dirname(__FILE__) . '/results/';
+            if (!isset(self::$commandLineArguments['dir'])) self::$commandLineArguments['dir'] = dirname(__FILE__) . '/../results/';
             if (self::$commandLineArguments['dir'][0] != "/") self::$commandLineArguments['dir'] = self::$cwd . "/" . self::$commandLineArguments['dir'];
             $exists = file_exists(self::$commandLineArguments['dir']);
             if (!$exists and !@mkdir(self::$commandLineArguments['dir'], 0777, true)) self::die("ERROR: --dir " . self::$commandLineArguments['dir'] . " doesn't exist or can't be created", 1, 'red', true);
