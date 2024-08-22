@@ -2,7 +2,7 @@
 
 workers=$(nproc)
 path=$(pwd)
-network_name=$(docker compose -f ../../docker-compose.yml --env-file ../../.env config --format=json | jq .networks.default.name)
+network_name=$(docker-compose -f ../../docker-compose.yml --env-file ../../.env config --format=json | jq .networks.default.name)
 
 cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
          --env-file ../../.env \

@@ -3,7 +3,7 @@
 echo -en "\tFinished loading at "
 date
 
-inserted=$(curl -s -X GET "localhost:9200/hn/_count" | jq .count)
+inserted=$(curl -s -X GET "localhost:9200/$test/_count" | jq .count)
 echo -e "\tCount of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 116543900 ]]; then
