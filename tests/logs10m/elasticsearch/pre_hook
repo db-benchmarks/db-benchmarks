@@ -16,13 +16,11 @@ echo -e "\tStarting elasticsearch ($cmd)"
 eval "$cmd"
 echo -e "\tWaiting for elasticsearch to come up"
 
-dot_count=0
-while ! nc -z localhost 9200; do
-  if [ $dot_count -ge 4 ]; then
-    printf "\r    \r" # Clear the line with four dots
-    dot_count=0
-  fi
-  printf "."
-  dot_count=$((dot_count + 1))
-  sleep 1
-done
+if timeout 60 grep -qm1 'Cluster health status changed from \[YELLOW\] to \[GREEN\]' <(docker logs -f elasticsearch_engine); then
+  echo -e '\tAccepting connections';
+else
+  echo -e '\tElasticsearch failed to start properly in 60 seconds';
+  exit 1
+fi
+
+
