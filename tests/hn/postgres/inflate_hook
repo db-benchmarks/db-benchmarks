@@ -20,6 +20,9 @@ docker exec postgres_engine psql -h0 -U postgres \
     story_author_ts tsvector GENERATED ALWAYS AS (to_tsvector('english', story_author)) STORED,
     comment_text_ts tsvector GENERATED ALWAYS AS (to_tsvector('english', comment_text)) STORED,
     comment_author_ts tsvector GENERATED ALWAYS AS (to_tsvector('english', comment_author)) STORED);
-    CREATE INDEX ts_idx ON $test USING GIN (story_text_ts, story_author_ts, comment_text_ts, comment_author_ts);"
+    CREATE INDEX ts_idx ON $test USING GIN (story_text_ts, story_author_ts, comment_text_ts, comment_author_ts);
+    CREATE INDEX comment_ranking_idx ON $test USING B-Tree (comment_ranking);
+    CREATE INDEX author_comment_count_idx ON $test USING B-Tree (author_comment_count);
+    CREATE INDEX story_comment_count_idx ON $test USING B-Tree (story_comment_count);"
 
 docker exec postgres_engine psql -h0 -U postgres -c "COPY $test FROM '/input/data.csv' WITH (FORMAT csv);"
