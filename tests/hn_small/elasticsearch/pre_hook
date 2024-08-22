@@ -17,9 +17,9 @@ eval "$cmd"
 echo -e "\tWaiting for elasticsearch to come up"
 
 if timeout 60 grep -qm1 'Cluster health status changed from \[YELLOW\] to \[GREEN\]' <(docker logs -f elasticsearch_engine); then
-  echo 'Accepting connections';
+  echo -e '\tAccepting connections';
 else
-  echo 'Elasticsearch failed to start properly in 60 seconds';
+  echo -e '\tElasticsearch failed to start properly in 60 seconds';
   exit 1
 fi
 

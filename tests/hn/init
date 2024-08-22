@@ -29,6 +29,7 @@ fi
 
 # We excluded Postgres cause it's to slow. It process some basic queries more than the five hours.
 # It's impossible even to get test results on HN dataset, cause performing of that test will spend a month
+# Todo try to add indexes
 # ../../init --engine=postgres
 
 # We excluded Meilisearch engine cause it has limitations and we can upload only 9000000 documents.
