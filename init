@@ -156,7 +156,7 @@ class Init
             = '$(cat /sys/fs/cgroup/cpu.stat | grep usage_usec | cut -d" " -f2)';
         $memoryStatCommand = '$(cat /sys/fs/cgroup/memory.current)';
         $ioStatCommand
-            = '$(awk \'\\\'\'{sum += substr($2, index($2, "=") + 1) + substr($3, index($3, "=") + 1)} END {print sum}\'\\\'\' /sys/fs/cgroup/io.stat)';
+            = '$(awk \'\\\'\'{for(i=1;i<=NF;i++) if($i ~ /rbytes=/) {split($i, a, "="); total_rbytes += a[2]} else if($i ~ /wbytes=/) {split($i, b, "="); total_wbytes += b[2]}} END {print total_rbytes "/" total_wbytes}\'\\\'\' /sys/fs/cgroup/io.stat)';
         $timestamp
             = 'date +%s%N | awk \'\\\'\'{print substr($0, 1, length($0)-3)}\'\\\'\'';
 
@@ -229,7 +229,10 @@ class Init
     {
         $cpu = [];
         $ram = [];
-        $disc = [];
+        $disc = [
+            'read' => [],
+            'write' => []
+        ];
 
         $content = file_get_contents($this->measuresLogPath);
         //CPU_LOAD MEMORY DISC MICROTIME
@@ -244,11 +247,11 @@ class Init
 
 
             $pattern
-                = '/cpu=(?<cpu>\d*) mem=(?<mem>\d*)'.
-                ' disc=(?<disc>[0-9.e+-]*) timestamp=(?<timestamp>\d*)/usi';
+                = '/cpu=(?<cpu>\d*) mem=(?<mem>\d*)' .
+                ' disc=(?<disc>[0-9\/.e+-]*) timestamp=(?<timestamp>\d*)/usi';
             preg_match($pattern, $row, $parts);
 
-            if (empty($parts['timestamp'])){
+            if (empty($parts['timestamp'])) {
                 continue;
             }
 
@@ -267,29 +270,35 @@ class Init
 
             $ram[] = (float) $parts['mem'] / 1024 / 1024;
 
-            if (!empty($parts['disc'])) {
-                $disc[] = (float) $parts['disc'];
+            if ($parts['disc'] !== '/') {
+                $io = explode('/', $parts['disc']);
+                $disc['read'][] = $io[0];
+                $disc['write'][] = $io[1];
             }
         }
 
         unset($content);
 
-        if ($disc === []) {
+        if ($disc['read'] === []) {
             $commands = $this->getStatsCommands();
             $command = 'docker exec ' . $this->engineName . '_engine sh -c ' .
                 '\'echo ' . $commands['io'] . '\'';
 
             for ($i = 0; $i < 60; $i++) {
                 $ioStats = trim(shell_exec($command));
-                if (!empty($ioStats)) {
-                    $disc[] = $ioStats;
+                if ($ioStats !== '/') {
+                    $io = explode('/', $ioStats);
+                    $disc['read'][] = $io[0];
+                    $disc['write'][] = $io[1];
                     break;
                 }
                 sleep(1);
             }
         }
 
-        $disc = max($disc);
+        $discRead = max($disc['read']);
+        $discWrite = max($disc['write']);
+        unset($disc);
 
         $results = [];
         foreach (['cpu', 'ram'] as $measureType) {
@@ -308,7 +317,8 @@ class Init
         $results['cpu']['average'] = round($results['cpu']['average'] / 100, 4);
         $results['cpu']['median'] = round($results['cpu']['median'] / 100, 4);
         $results['cpu']['95p'] = round($results['cpu']['95p'] / 100, 4);
-        $results['disc']['total'] = round($disc / 1024 / 1024, 4);
+        $results['disc']['read']['total'] = round($discRead / 1024 / 1024, 4);
+        $results['disc']['write']['total'] = round($discWrite / 1024 / 1024, 4);
         return $results;
     }
 
