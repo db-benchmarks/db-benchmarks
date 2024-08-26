@@ -1,0 +1,298 @@
+#
+# Index config file for stackoverflow dataset.
+#
+version: 0.7
+
+index_id: taxi
+
+doc_mapping:
+  field_mappings:
+
+    - name: id
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: vendor_id
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_datetime
+      type: datetime
+      input_formats:
+        - unix_timestamp
+      output_format: unix_timestamp_secs
+      fast_precision: seconds
+      fast: true
+    - name: dropoff_datetime
+      type: datetime
+      input_formats:
+        - unix_timestamp
+      output_format: unix_timestamp_secs
+      fast_precision: seconds
+      fast: true
+    - name: store_and_fwd_flag
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: rate_code_id
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: pickup_longitude
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: pickup_latitude
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: dropoff_longitude
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: dropoff_latitude
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: passenger_count
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: trip_distance
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: fare_amount
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: extra
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: mta_tax
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: tip_amount
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: tolls_amount
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: ehail_fee
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: improvement_surcharge
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: total_amount
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: payment_type
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: trip_type
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: pickup
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: cab_type
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: rain
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: snow_depth
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: snowfall
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: max_temp
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: min_temp
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: wind
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: pickup_nyct2010_gid
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: pickup_ctlabel
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_borocode
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: pickup_boroname
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_ct2010
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_boroct2010
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_cdeligibil
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_ntacode
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_ntaname
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: pickup_puma
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_nyct2010_gid
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: dropoff_ctlabel
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_borocode
+      type: u64
+      stored: true
+      indexed: true
+      fast: true
+    - name: dropoff_boroname
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_ct2010
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_boroct2010
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_cdeligibil
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_ntacode
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_ntaname
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+    - name: dropoff_puma
+      type: text
+      tokenizer: default
+      record: position
+      fast: true
+      stored: true
+
+
+search_settings:
+  default_search_fields: [pickup_ntaname, dropoff_ntaname]
+
+indexing_settings:
+  commit_timeout_secs: 30
