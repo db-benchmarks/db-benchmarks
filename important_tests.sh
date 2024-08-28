@@ -34,3 +34,12 @@
 ./test --test=logs10m --engines=manticoresearch:columnar --memory=110000 --dir=results/logs10m/manticoresearch --query_timeout=600
 ./test --test=logs10m --engines=manticoresearch:rowwise --memory=110000 --dir=results/logs10m/manticoresearch --query_timeout=600
 ./test --test=logs10m --engines=meilisearch --memory=110000 --dir=results/logs10m/meilisearch --query_timeout=600
+
+# hn_small + 1GB RAM + 1 physical (2 virtual) CPU core
+./test --test=hn_small --engines=elasticsearch --memory=1024 --limited --dir=results/hn_small/elasticsearch
+./test --test=hn_small --engines=clickhouse --memory=1024 --limited --dir=results/hn_small/clickhouse
+./test --test=hn_small --engines=manticoresearch --memory=1024 --limited --dir=results/hn_small/manticoresearch
+./test --test=hn_small --engines=mysql --memory=1024 --limited --dir=results/hn_small/mysql
+./test --test=hn_small --engines=mysql_percona --memory=1024 --limited --dir=results/hn_small/mysql_percona
+./test --test=hn_small --engines=meilisearch --memory=1024 --limited --dir=results/hn_small/meilisearch
+./test --test=hn_small --engines=postgres --memory=1024 --limited --dir=results/hn_small/postgres
