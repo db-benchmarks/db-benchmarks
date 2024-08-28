@@ -43,3 +43,4 @@
 ./test --test=hn_small --engines=mysql_percona --memory=1024 --limited --dir=results/hn_small/mysql_percona
 ./test --test=hn_small --engines=meilisearch --memory=1024 --limited --dir=results/hn_small/meilisearch
 ./test --test=hn_small --engines=postgres --memory=1024 --limited --dir=results/hn_small/postgres
+./test --test=hn_small --engines=typesense --memory=1024 --limited --dir=results/hn_small/typesense
