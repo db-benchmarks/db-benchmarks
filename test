@@ -136,7 +136,9 @@ abstract class engine {
 
     private static function saveToDB($results) {
         self::log("Saving results for {$results['engine']}", 2);
-        if (@$results['formatVersion'] != self::$formatVersion) self::die("ERROR: can't save to db (unsupported format)", 3);
+	if (@$results['formatVersion'] != self::$formatVersion) self::die("ERROR: can't save to db (unsupported format)", 3);
+	if (@$results['limited']) $results['engine'] .= '_1_core';
+
         $queries = $results['queries'];
         unset($results['queries']);
 
@@ -222,7 +224,7 @@ abstract class engine {
 
         // let's first start all engines one by one with no constraint even if they were set just to figure out their info
         self::log("Getting info about engines", 1, 'cyan');
-        foreach (self::$commandLineArguments['engines'] as $engine) {
+	foreach (self::$commandLineArguments['engines'] as $engine) {
             $engineOptions = self::parseEngineName($engine);
             /** @var engine $engine */
             $engine = new $engineOptions['engine']($engineOptions['type']);
@@ -292,14 +294,17 @@ abstract class engine {
         self::readQueries();
         if (!self::$queries) self::die("ERROR: empty queries", 1);
 
+	$limited = isset(self::$commandLineArguments['limited']);
         // let's test in all memory modes
         self::log('Starting testing', 1, 'cyan');
         foreach (self::$commandLineArguments['memory'] as $mem) {
             self::log("Memory: {$mem}m", 1);
-            foreach (self::$commandLineArguments['engines'] as $engine) {
+	    foreach (self::$commandLineArguments['engines'] as $engine) {
                 $engineOptions = self::parseEngineName($engine);
-                self::log("Engine: " . $engineOptions['engine'] . ", type: " . $engineOptions['type'], 2);
-                $engine = new $engineOptions['engine']($engineOptions['type']);
+		self::log("Engine: " . $engineOptions['engine'] . ", type: " . $engineOptions['type'], 2);
+		if (@$engineOptions['limited']) $limited = true;
+		if ($limited) self::log("CPU: limited (1 physical core)", 2);
+		$engine = new $engineOptions['engine']($engineOptions['type']);
                 for ($attempt = 0; $attempt <= 1; $attempt++) {
                     $queryTimes = [];
                     foreach (self::$queries as $qn => $query) {
@@ -322,7 +327,7 @@ abstract class engine {
                         // starting Engine
                         ob_start();
                         self::dropIOCache();
-                        $warmupTime = $engine->start($mem);
+                        $warmupTime = $engine->start($mem, $limited);
                         if ($warmupTime === true or $warmupTime === false) $warmupTime = -1;
                         self::log(ob_get_clean(), 4, false, true, true);
                         self::log(ob_get_clean(), 4);
@@ -401,8 +406,7 @@ abstract class engine {
             return false;
         }
 
-        $limited = (@self::$commandLineArguments['limited'] or $engineOptions['limited']);
-
+	$limited = (isset(self::$commandLineArguments['limited']) or $engineOptions['limited']);
         $fileName = self::$commandLineArguments['test'] . "_{$engine}_{$this->type}_{$memory}" . ($retest ? '_retest' : '');
 
         $final = [
@@ -645,7 +649,7 @@ Environment vairables:
                 "rm::",
                 "skip_inaccuracy::"
             ]);
-        if (@self::$commandLineArguments['test'] and @self::$commandLineArguments['engines']) {
+	if (@self::$commandLineArguments['test'] and @self::$commandLineArguments['engines']) {
             self::$mode = 'test';
 
             self::$commandLineArguments['engines'] = explode(',', self::$commandLineArguments['engines']);
