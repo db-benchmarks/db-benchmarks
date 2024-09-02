@@ -76,7 +76,45 @@
     }
   },
   {
-    "default": "SELECT passenger_count, avg(total_amount) a FROM taxi GROUP BY passenger_count order by a desc LIMIT 20"
+    "default": "SELECT passenger_count, avg(total_amount) a FROM taxi GROUP BY passenger_count order by a desc LIMIT 20",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "passenger_count_aggregation": {
+            "terms": {
+              "field": "passenger_count",
+              "size": 20,
+              "order": {
+                "avg_total_amount": "desc"
+              }
+            },
+            "aggs": {
+              "avg_total_amount": {
+                "avg": {
+                  "field": "total_amount"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "passenger_count_aggregation": {
+          "buckets": {
+            "[]": {
+              "avg_total_amount": {
+                "value": "a: float"
+              },
+              "doc_count": "passenger_count: int"
+            }
+          }
+        }
+      }
+    }
   },
   {
     "default": "SELECT count(*) FROM taxi WHERE tip_amount > 1.5"
