@@ -300,21 +300,142 @@
     }
   },
   {
-    "default": "select passenger_count, count(*) c from taxi group by passenger_count order by c desc limit 20"
+    "default": "select passenger_count, count(*) c from taxi group by passenger_count order by c desc limit 20",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "passenger_count_aggregation": {
+            "terms": {
+              "field": "passenger_count",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "passenger_count_aggregation": {
+          "buckets": {
+            "[]": {
+              "doc_count": "c: int",
+              "key": "passenger_count"
+            }
+          }
+        }
+      }
+    }
   },
   {
-    "default": "select rain, count(*) c from taxi group by rain order by c desc limit 20"
+    "default": "select rain, count(*) c from taxi group by rain order by c desc limit 20",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "rain_aggregation": {
+            "terms": {
+              "field": "rain",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "rain_aggregation": {
+          "buckets": {
+            "[]": {
+              "doc_count": "c: int",
+              "key": "rain"
+            }
+          }
+        }
+      }
+    }
   },
   {
-    "default": "SELECT count(*) from taxi where pickup_ntaname='Upper West Side'"
+    "default": "SELECT count(*) from taxi where pickup_ntaname='Upper West Side'",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "pickup_ntaname:\"Upper West Side\"",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   {
-    "default": "SELECT * from taxi limit 5"
+    "default": "SELECT * from taxi limit 5",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 5
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   {
-    "default": "SELECT count(*) FROM taxi WHERE tip_amount = 5"
+    "default": "SELECT count(*) FROM taxi WHERE tip_amount = 5",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "tip_amount:5",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   {
-    "default": "SELECT avg(total_amount) FROM taxi"
+    "default": "SELECT avg(total_amount) FROM taxi",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "avg_total_amount": {
+            "avg": {
+              "field": "total_amount"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "single_value": {
+          "avg_total_amount": {
+            "value": "avg(total_amount): float"
+          }
+        }
+      }
+    }
   }
 ]
