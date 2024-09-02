@@ -8,7 +8,8 @@
  * https://www.gnu.org/licenses/agpl-3.0.txt
  */
 
-class quickwit extends engine {
+class quickwit extends engine
+{
 
     private $port = 7280;
     private CurlHandle|false $curl = false; // curl connection
@@ -30,7 +31,8 @@ class quickwit extends engine {
     {
         $ret = [];
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/api/v1/version");
+        curl_setopt($curl, CURLOPT_URL,
+            "http://localhost:{$this->port}/api/v1/version");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         $o = curl_exec($curl);
@@ -49,14 +51,16 @@ class quickwit extends engine {
     protected function canConnect(): bool
     {
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/health/livez");
+        curl_setopt($curl, CURLOPT_URL,
+            "http://localhost:{$this->port}/health/livez");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $o = curl_exec($curl);
         return ($o and $o === 'true');
     }
 
     // ? Hmm, what should it do
-    protected function prepareQuery($query) {
+    protected function prepareQuery($query)
+    {
         return $query;
     }
 
@@ -69,61 +73,71 @@ class quickwit extends engine {
             'Accept: application/json',
         ]);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->curl, CURLOPT_TIMEOUT, self::$commandLineArguments['query_timeout']);
+        curl_setopt($this->curl, CURLOPT_TIMEOUT,
+            self::$commandLineArguments['query_timeout']);
     }
 
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query) {
+    protected function testOnce($query)
+    {
         if (is_string($query)) {
             return ['timeout' => true];
         }
         assert(is_array($query));
 
         $this->retrieveFields = $query['retrieve'];
-        $this->resultsMapping = $query['mapping'] ;
+        $this->resultsMapping = $query['mapping'];
         return $this->sendRequest($query['path'], $query['query']);
     }
 
     // To collect query stats after the query
-    protected function afterQuery() {
+    protected function afterQuery()
+    {
         return '';
     }
 
     // parses query result and returns it in the format that should be common across all engines
     protected function parseResult($curlResult): array
     {
-
         $curlResult = json_decode($curlResult, true);
         return match (true) {
-            isset($curlResult['hits']) &&
-            $curlResult['hits'] === [] &&
-            isset($curlResult['aggregations']) => self::parseAggregations($curlResult['aggregations']),
+            isset($curlResult['hits']) && $curlResult['hits'] === []
+            && isset($curlResult['aggregations'])
+            => self::parseAggregations($curlResult['aggregations']),
 
             // If elastic compatibility request
-            isset($curlResult['hits']['hits']) => self::filterResults($curlResult['hits']['hits'], true),
+            isset($curlResult['hits']['hits'])
+            => self::filterResults($curlResult['hits']['hits'],
+                true),
             // Quickwit regular request
             !empty($curlResult['hits']) => self::filterResults($curlResult['hits']),
             default => [],
         };
     }
 
-    private function parseAggregations($aggregations): array {
+    private function parseAggregations($aggregations): array
+    {
         if (isset($aggregations['count(*)']['value'])) {
-            return [['count(*)' => (int)$aggregations['count(*)']['value']]];
+            return [['count(*)' => (int) $aggregations['count(*)']['value']]];
         }
 
         if (isset($aggregations['count(*)']['buckets'])) {
-            return [array_map(
-                function ($row) {
-                    return ['count(*)' => $row['doc_count'], 'story_author' => $row['key']];
-                }, $aggregations['count(*)']['buckets']
-            )];
+            return [
+                array_map(
+                    function ($row) {
+                        return [
+                            'count(*)' => $row['doc_count'],
+                            'story_author' => $row['key']
+                        ];
+                    }, $aggregations['count(*)']['buckets']
+                )
+            ];
         }
 
 
-        if ($this->resultsMapping){
+        if ($this->resultsMapping) {
             return $this->extractValues($aggregations);
         }
 
@@ -148,8 +162,12 @@ class quickwit extends engine {
         );
     }
 
-    private function extractRecursive($data, $structure, &$results, &$currentResult = null): void
-    {
+    private function extractRecursive(
+        $data,
+        $structure,
+        &$results,
+        &$currentResult = null
+    ): void {
         if ($currentResult === null) {
             $currentResult = [];
         }
@@ -159,30 +177,36 @@ class quickwit extends engine {
                 if (is_array($data)) {
                     foreach ($data as $item) {
                         $subResult = [];
-                        $this->extractRecursive($item, $value, $results, $subResult);
+                        $this->extractRecursive($item, $value, $results,
+                            $subResult);
                         $results[] = $subResult;
                     }
                 }
-            }elseif ($key === "single_value"){
+            } elseif ($key === "single_value") {
                 $subResult = [];
-                $this->extractRecursive($data, $value, $results, $subResult);
+                $this->extractRecursive(
+                    $data, $value, $results, $subResult
+                );
                 $results[] = $subResult;
             } elseif (is_array($value)) {
                 if (array_key_exists($key, $data)) {
-                    $this->extractRecursive($data[$key], $value, $results, $currentResult);
+                    $this->extractRecursive(
+                        $data[$key], $value, $results, $currentResult
+                    );
                 }
             } else {
-
                 if (array_key_exists($key, $data)) {
                     $fieldInfo = explode(':', $value);
                     $fieldName = trim($fieldInfo[0]);
-                    $fieldType = isset($fieldInfo[1]) ? trim($fieldInfo[1]) : null;
+                    $fieldType = isset($fieldInfo[1]) ? trim($fieldInfo[1])
+                        : null;
 
                     $fieldValue = $data[$key];
                     if ($fieldType === 'float') {
-                        $currentResult[$fieldName] = round((float)$fieldValue, 4);
+                        $currentResult[$fieldName] = round((float) $fieldValue,
+                            4);
                     } elseif ($fieldType === 'int') {
-                        $currentResult[$fieldName] = (int)$fieldValue;
+                        $currentResult[$fieldName] = (int) $fieldValue;
                     } else {
                         $currentResult[$fieldName] = $fieldValue;
                     }
@@ -193,14 +217,18 @@ class quickwit extends engine {
 
     /**
      * @param array<string,mixed> $results
+     *
      * @return array<string,mixed>
      */
-    protected function filterResults(array $results, $elasticStyle = false): array {
+    protected function filterResults(
+        array $results,
+        $elasticStyle = false
+    ): array {
         $filtered = [];
         foreach ($results as $row) {
             $ar = [];
 
-            if ($elasticStyle){
+            if ($elasticStyle) {
                 $row = $row['_source'];
             }
 
@@ -209,7 +237,9 @@ class quickwit extends engine {
                     continue;
                 } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
 
-                if (!empty($this->retrieveFields) && !in_array($k, $this->retrieveFields)){
+                if (!empty($this->retrieveFields)
+                    && !in_array($k, $this->retrieveFields)
+                ) {
                     continue;
                 }
 
@@ -226,11 +256,13 @@ class quickwit extends engine {
     }
 
     // sends a command to engine to drop its caches
-    protected function dropEngineCache() {
+    protected function dropEngineCache()
+    {
         // ? Do nothing due no information available
     }
 
-    protected function sendRequest(string $path, $payload): string {
+    protected function sendRequest(string $path, $payload): string
+    {
         $query = "http://localhost:{$this->port}{$path}";
         curl_setopt($this->curl, CURLOPT_POST, !!$payload);
         if ($payload) {
@@ -243,7 +275,11 @@ class quickwit extends engine {
         $curlError = curl_error($this->curl);
         if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
             $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
-            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/', $curlError)) $out['timeout'] = true;
+            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/',
+                    $curlError)
+            ) {
+                $out['timeout'] = true;
+            }
             return json_encode($out);
         }
         return $curlResult;
