@@ -168,21 +168,136 @@
     }
   },
   {
-    "default": "SELECT rain, avg(trip_distance) a FROM taxi GROUP BY rain order by a desc LIMIT 20"
+    "default": "SELECT rain, avg(trip_distance) a FROM taxi GROUP BY rain order by a desc LIMIT 20",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "rain_aggregation": {
+            "terms": {
+              "field": "rain",
+              "size": 20,
+              "order": {
+                "avg_trip_distance": "desc"
+              }
+            },
+            "aggs": {
+              "avg_trip_distance": {
+                "avg": {
+                  "field": "trip_distance"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "rain_aggregation": {
+          "buckets": {
+            "[]": {
+              "avg_trip_distance": {
+                "value": "a: float"
+              },
+              "key": "rain"
+            }
+          }
+        }
+      }
+    }
   },
   {
     "manticoresearch": "SELECT * FROM taxi where match('harlem east') LIMIT 20",
     "clickhouse": "SELECT * FROM taxi where match(dropoff_ntaname, '(?i)\\WHarlem\\WEast\\W') or match(pickup_ntaname, '(?i)\\WHarlem\\WEast\\W') LIMIT 20",
-    "elasticsearch": "SELECT * FROM taxi where query('harlem east') LIMIT 20"
+    "elasticsearch": "SELECT * FROM taxi where query('harlem east') LIMIT 20",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "harlem east",
+        "max_hits": 20
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   {
-    "default": "SELECT avg(total_amount) FROM taxi WHERE trip_distance = 5"
+    "default": "SELECT avg(total_amount) FROM taxi WHERE trip_distance = 5",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "trip_distance:5",
+        "max_hits": 0,
+        "aggs": {
+          "avg_total_amount": {
+            "avg": {
+              "field": "total_amount"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "single_value": {
+          "avg_total_amount": {
+            "value": "avg(total_amount): float"
+          }
+        }
+      }
+    }
   },
   {
-    "default": "SELECT avg(total_amount), count(*) FROM taxi WHERE trip_distance > 0 AND trip_distance < 5"
+    "default": "SELECT avg(total_amount), count(*) FROM taxi WHERE trip_distance > 0 AND trip_distance < 5",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "trip_distance:>0 AND trip_distance:<5",
+        "max_hits": 0,
+        "aggs": {
+          "avg_total_amount": {
+            "avg": {
+              "field": "total_amount"
+            }
+          },
+          "count_documents": {
+            "value_count": {
+              "field": "trip_distance"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "single_value": {
+          "avg_total_amount": {
+            "value": "avg(total_amount): float"
+          },
+          "count_documents": {
+            "value": "count(*): int"
+          }
+        }
+      }
+    }
   },
   {
-    "default": "SELECT count(*) FROM taxi where pickup_ntaname != '0'"
+    "default": "SELECT count(*) FROM taxi where pickup_ntaname != '0'",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "-pickup_ntaname:\"0\"",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   {
     "default": "select passenger_count, count(*) c from taxi group by passenger_count order by c desc limit 20"
