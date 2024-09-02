@@ -44,7 +44,36 @@
     }
   },
   {
-    "default": "SELECT cab_type, count(*) c FROM taxi GROUP BY cab_type order by c desc LIMIT 20"
+    "default": "SELECT cab_type, count(*) c FROM taxi GROUP BY cab_type order by c desc LIMIT 20",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "cab_type_aggregation": {
+            "terms": {
+              "field": "cab_type",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "cab_type_aggregation": {
+          "buckets": {
+            "[]": {
+              "doc_count": "c: int",
+              "key": "cab_type"
+            }
+          }
+        }
+      }
+    }
   },
   {
     "default": "SELECT passenger_count, avg(total_amount) a FROM taxi GROUP BY passenger_count order by a desc LIMIT 20"
