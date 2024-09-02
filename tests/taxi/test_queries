@@ -5,7 +5,14 @@
       "path": "/api/v1/taxi/search/",
       "query": {
         "query": "pickup_ntaname:\"0\"",
-        "max_hits": 0
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
       },
       "retrieve": null,
       "mapping": null
@@ -117,7 +124,23 @@
     }
   },
   {
-    "default": "SELECT count(*) FROM taxi WHERE tip_amount > 1.5"
+    "default": "SELECT count(*) FROM taxi WHERE tip_amount > 1.5",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "tip_amount:>1.5",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   {
     "default": "SELECT avg(tip_amount) FROM taxi WHERE tip_amount > 1.5 AND tip_amount < 5"
