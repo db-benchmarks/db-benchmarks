@@ -1,23 +1,93 @@
 [
-"SELECT count(*) FROM taxi where pickup_ntaname = '0'",
-"SELECT pickup_ntaname, count(*) c FROM taxi GROUP BY pickup_ntaname ORDER BY c desc limit 20",
-"SELECT cab_type, count(*) c FROM taxi GROUP BY cab_type order by c desc LIMIT 20",
-"SELECT passenger_count, avg(total_amount) a FROM taxi GROUP BY passenger_count order by a desc LIMIT 20",
-"SELECT count(*) FROM taxi WHERE tip_amount > 1.5",
-"SELECT avg(tip_amount) FROM taxi WHERE tip_amount > 1.5 AND tip_amount < 5",
-"SELECT rain, avg(trip_distance) a FROM taxi GROUP BY rain order by a desc LIMIT 20",
-{
-  "manticoresearch": "SELECT * FROM taxi where match('harlem east') LIMIT 20",
-  "clickhouse": "SELECT * FROM taxi where match(dropoff_ntaname, '(?i)\\WHarlem\\WEast\\W') or match(pickup_ntaname, '(?i)\\WHarlem\\WEast\\W') LIMIT 20",
-  "elasticsearch": "SELECT * FROM taxi where query('harlem east') LIMIT 20"
-},
-"SELECT avg(total_amount) FROM taxi WHERE trip_distance = 5",
-"SELECT avg(total_amount), count(*) FROM taxi WHERE trip_distance > 0 AND trip_distance < 5",
-"SELECT count(*) FROM taxi where pickup_ntaname != '0'",
-"select passenger_count, count(*) c from taxi group by passenger_count order by c desc limit 20",
-"select rain, count(*) c from taxi group by rain order by c desc limit 20",
-"SELECT count(*) from taxi where pickup_ntaname='Upper West Side'",
-"SELECT * from taxi limit 5",
-"SELECT count(*) FROM taxi WHERE tip_amount = 5",
-"SELECT avg(total_amount) FROM taxi"
+  {
+    "default": "SELECT count(*) FROM taxi where pickup_ntaname = '0'",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "pickup_ntaname:\"0\"",
+        "max_hits": 0
+      },
+      "retrieve": null,
+      "mapping": null
+    }
+  },
+  {
+    "default": "SELECT pickup_ntaname, count(*) c FROM taxi GROUP BY pickup_ntaname ORDER BY c desc limit 20",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "pickup_ntaname_aggregation": {
+            "terms": {
+              "field": "pickup_ntaname",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "pickup_ntaname_aggregation": {
+          "buckets": {
+            "[]": {
+              "doc_count": "c: int",
+              "key": "pickup_ntaname"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "default": "SELECT cab_type, count(*) c FROM taxi GROUP BY cab_type order by c desc LIMIT 20"
+  },
+  {
+    "default": "SELECT passenger_count, avg(total_amount) a FROM taxi GROUP BY passenger_count order by a desc LIMIT 20"
+  },
+  {
+    "default": "SELECT count(*) FROM taxi WHERE tip_amount > 1.5"
+  },
+  {
+    "default": "SELECT avg(tip_amount) FROM taxi WHERE tip_amount > 1.5 AND tip_amount < 5"
+  },
+  {
+    "default": "SELECT rain, avg(trip_distance) a FROM taxi GROUP BY rain order by a desc LIMIT 20"
+  },
+  {
+    "manticoresearch": "SELECT * FROM taxi where match('harlem east') LIMIT 20",
+    "clickhouse": "SELECT * FROM taxi where match(dropoff_ntaname, '(?i)\\WHarlem\\WEast\\W') or match(pickup_ntaname, '(?i)\\WHarlem\\WEast\\W') LIMIT 20",
+    "elasticsearch": "SELECT * FROM taxi where query('harlem east') LIMIT 20"
+  },
+  {
+    "default": "SELECT avg(total_amount) FROM taxi WHERE trip_distance = 5"
+  },
+  {
+    "default": "SELECT avg(total_amount), count(*) FROM taxi WHERE trip_distance > 0 AND trip_distance < 5"
+  },
+  {
+    "default": "SELECT count(*) FROM taxi where pickup_ntaname != '0'"
+  },
+  {
+    "default": "select passenger_count, count(*) c from taxi group by passenger_count order by c desc limit 20"
+  },
+  {
+    "default": "select rain, count(*) c from taxi group by rain order by c desc limit 20"
+  },
+  {
+    "default": "SELECT count(*) from taxi where pickup_ntaname='Upper West Side'"
+  },
+  {
+    "default": "SELECT * from taxi limit 5"
+  },
+  {
+    "default": "SELECT count(*) FROM taxi WHERE tip_amount = 5"
+  },
+  {
+    "default": "SELECT avg(total_amount) FROM taxi"
+  }
 ]

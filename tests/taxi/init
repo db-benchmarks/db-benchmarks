@@ -7,6 +7,9 @@ export test="$current_dir"
 docker-compose -f ../../docker-compose.yml --env-file ../../.env down
 docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 
+# Quickwit
+. quickwit/init
+
 # Manticore Search
 . manticore/init
 
