@@ -163,6 +163,10 @@ class quickwit extends engine {
                         $results[] = $subResult;
                     }
                 }
+            }elseif ($key === "single_value"){
+                $subResult = [];
+                $this->extractRecursive($data, $value, $results, $subResult);
+                $results[] = $subResult;
             } elseif (is_array($value)) {
                 if (array_key_exists($key, $data)) {
                     $this->extractRecursive($data[$key], $value, $results, $currentResult);

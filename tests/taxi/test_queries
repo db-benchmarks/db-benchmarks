@@ -143,7 +143,29 @@
     }
   },
   {
-    "default": "SELECT avg(tip_amount) FROM taxi WHERE tip_amount > 1.5 AND tip_amount < 5"
+    "default": "SELECT avg(tip_amount) FROM taxi WHERE tip_amount > 1.5 AND tip_amount < 5",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "tip_amount:>1.5 AND tip_amount:<5",
+        "max_hits": 0,
+        "aggs": {
+          "avg_tip_amount": {
+            "avg": {
+              "field": "tip_amount"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "single_value": {
+          "avg_tip_amount": {
+            "value": "avg(tip_amount): float"
+          }
+        }
+      }
+    }
   },
   {
     "default": "SELECT rain, avg(trip_distance) a FROM taxi GROUP BY rain order by a desc LIMIT 20"
