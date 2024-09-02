@@ -45,22 +45,22 @@ doc_mapping:
       indexed: true
       fast: true
     - name: pickup_longitude
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: pickup_latitude
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: dropoff_longitude
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: dropoff_latitude
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
@@ -70,47 +70,47 @@ doc_mapping:
       indexed: true
       fast: true
     - name: trip_distance
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: fare_amount
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: extra
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: mta_tax
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: tip_amount
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: tolls_amount
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: ehail_fee
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: improvement_surcharge
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: total_amount
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
@@ -144,17 +144,17 @@ doc_mapping:
       fast: true
       stored: true
     - name: rain
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: snow_depth
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
     - name: snowfall
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true
@@ -169,7 +169,7 @@ doc_mapping:
       indexed: true
       fast: true
     - name: wind
-      type: u64
+      type: f64
       stored: true
       indexed: true
       fast: true

@@ -122,9 +122,8 @@ if (($handle = fopen($source, "r")) !== false) {
                 $field = (int) $field;
             } elseif (in_array($fields[$k], $floatFields)) {
                 $field = (float) $field;
-            } else {
-                $result[$fields[$k]] = $field;
             }
+            $result[$fields[$k]] = $field;
         }
 
         if (fwrite($fp, json_encode($result) . "\n") === false) {
