@@ -21,14 +21,26 @@ if ! find ./quickwit/data/indexes/taxi/*.split > /dev/null 2>&1; then
     --data-binary @./quickwit/index-config.yaml >/dev/null
 
 
-
   if [ ! -f ./quickwit/data_formatted/0.splitted.aaaaaaaaaa ]; then
     i=0
+
+    allCount=$(ls -la ../data/trips.csv.* | wc -l)
+
+    echo -e "\t\tStart preparing chunks"
+
     for f in ./data/trips.csv.*; do
+
+      echo -e "\t\t\tProcessing chunk ($i/$allCount)"
+
+      echo -e "\t\t\t\t Morph CSV to JSONL"
       php ./quickwit/csv_jsonl.php "$f" "./quickwit/data_formatted/$i.jsonl"
 
+      echo -e "\t\t\t\t Split chunk to 10k lines sub chunks"
       split -l 10000 -a 10 ./quickwit/data_formatted/$i.jsonl ./quickwit/data_formatted/$i.splitted.
+
       rm "./quickwit/data_formatted/$i.jsonl"
+      echo -e "\t\t\t\tFinish Processing"
+
       ((i++))
     done
   fi
