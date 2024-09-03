@@ -24,7 +24,7 @@ if ! find ./quickwit/data/indexes/taxi/*.split > /dev/null 2>&1; then
   if [ ! -f ./quickwit/data_formatted/0.splitted.aaaaaaaaaa ]; then
     i=0
 
-    allCount=$(ls -la ../data/trips.csv.* | wc -l)
+    allCount=$(ls -la ./data/trips.csv.* | wc -l)
 
     echo -e "\t\tStart preparing chunks"
 
