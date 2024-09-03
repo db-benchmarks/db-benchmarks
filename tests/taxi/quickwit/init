@@ -32,7 +32,7 @@ if ! find ./quickwit/data/indexes/taxi/*.split > /dev/null 2>&1; then
 
       echo -e "\t\t\tProcessing chunk ($i/$allCount)"
 
-      echo -e "\t\t\t\t Morph CSV to JSONL"
+      echo -e "\t\t\t\t Morph CSV to JSONL $f -> ./quickwit/data_formatted/$i.jsonl"
       php ./quickwit/csv_jsonl.php "$f" "./quickwit/data_formatted/$i.jsonl"
 
       echo -e "\t\t\t\t Split chunk to 10k lines sub chunks"

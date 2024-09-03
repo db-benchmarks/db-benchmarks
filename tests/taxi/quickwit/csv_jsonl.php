@@ -1,24 +1,24 @@
 <?php
 
 if (!isset($argv[1], $argv[2])) {
-    echo "You should pass source file in first argument and destination in second";
+    echo "You should pass source file in first argument and destination in second\n";
     exit(1);
 }
 
 $source = $argv[1];
 $destination = $argv[2];
 if (!in_array(mime_content_type($source), ['text/csv', 'application/csv'])) {
-    echo "Source file isn't CSV";
+    echo "Source file isn't CSV\n";
     exit(1);
 }
 
 if (file_exists($destination)) {
-    echo "Destination file already exist";
+    echo "Destination file already exist\n";
     exit(1);
 }
 
 if (!$fp = fopen($destination, 'w')) {
-    echo "Cannot open file ($destination)";
+    echo "Cannot open file ($destination)\n";
     exit(1);
 }
 
