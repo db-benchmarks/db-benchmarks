@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+
+# Expected count 1 732 817 071
+
+# curl -H "Content-type: application/json" -X POST \
+# http://localhost:7280/api/v1/taxi/search/ \
+# -d '{"query":"*","max_hits":0,"aggs":{"count(*)":{"value_count":{"field":"id"}}}}'
+
 cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d quickwit"
 echo -e "\tStarting Quickwit ($cmd)"
 eval "$cmd"
@@ -36,7 +43,7 @@ if ! find ./quickwit/data/indexes/taxi/*.split > /dev/null 2>&1; then
       php ./quickwit/csv_jsonl.php "$f" "./quickwit/data_formatted/$i.jsonl"
 
       echo -e "\t\t\t\t Split chunk to 10k lines sub chunks"
-      split -l 10000 -a 10 ./quickwit/data_formatted/$i.jsonl ./quickwit/data_formatted/$i.splitted.
+      split -l 10000 -a 5 ./quickwit/data_formatted/$i.jsonl ./quickwit/data_formatted/$i.splitted.
 
       rm "./quickwit/data_formatted/$i.jsonl"
       echo -e "\t\t\t\tFinish Processing"
@@ -52,9 +59,9 @@ if ! find ./quickwit/data/indexes/taxi/*.split > /dev/null 2>&1; then
     echo -e "\t\tUpload chunk $f"
 
       # Index our 10k documents.
-    curl -s -XPOST "${HOST}/api/v1/taxi/ingest?commit=force" --data-binary @$f >/dev/null
+    curl -s -XPOST "${HOST}/api/v1/taxi/ingest?commit=force" --data-binary @$f
 
-    rm $f
+#    rm $f
   done
   echo -en "\tFinished loading to index at "
   date
