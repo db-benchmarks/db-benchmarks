@@ -59,9 +59,9 @@ if ! find ./quickwit/data/indexes/taxi/*.split > /dev/null 2>&1; then
     echo -e "\t\tUpload chunk $f"
 
       # Index our 10k documents.
-    curl -s -XPOST "${HOST}/api/v1/taxi/ingest?commit=force" --data-binary @$f
+    curl -s -XPOST "${HOST}/api/v1/taxi/ingest?commit=force" --data-binary @$f >/dev/null
 
-#    rm $f
+    rm $f
   done
   echo -en "\tFinished loading to index at "
   date
