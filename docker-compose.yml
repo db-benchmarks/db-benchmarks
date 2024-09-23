@@ -215,6 +215,31 @@ services:
       - --no-analytics
       - --max-indexing-memory=2Gb
       - --max-indexing-threads=24
+
+  zincsearch:
+    image: public.ecr.aws/zinclabs/zincsearch:0.4.10
+    networks:
+      - default
+    container_name: "zincsearch_engine"
+    mem_limit: ${mem}m # used for testing with limited capabilities, e.g. RAM capped at 256MB
+    cpuset: "${cpuset}" # used for testing with limited capabilities, e.g. single physical core
+    privileged: true # we give containers all privileges since otherwise (as previous tests showed) in-docker and on-host performances can differe significantly
+    mem_swappiness: 0 # we disable swappiness since it can lower test results quality
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "127.0.0.1:4080:4080"
+    environment:
+      - ZINC_FIRST_ADMIN_USER=admin
+      - ZINC_FIRST_ADMIN_PASSWORD=dbbenchmarks
+    volumes:
+      - ./tests/${test}/zincsearch/idx${suffix}:/data:rw
 networks:
   default:
     driver: bridge

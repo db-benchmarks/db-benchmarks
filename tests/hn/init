@@ -20,6 +20,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Zincsearch
+. zincsearch/init
+
+# Typesense
 . typesense/init
 
 # Elasticsearch
