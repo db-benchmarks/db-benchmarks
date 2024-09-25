@@ -58,11 +58,12 @@ if ! find ./quickwit/data/indexes/taxi/*.split > /dev/null 2>&1; then
   for f in ./quickwit/data_formatted/*.splitted.*; do
     echo -e "\t\tUpload chunk $f"
 
-      # Index our 10k documents.
+    # Index our 7k documents.
     curl -s -XPOST "${HOST}/api/v1/taxi/ingest?commit=force" --data-binary @$f 2>&1 \
     | jq -r tostring | grep -v '{"num_docs_for_processing":7000}'
 
-    rm $f
+# TODO uncomment after tests will fixed
+#    rm $f
   done
   echo -en "\tFinished loading to index at "
   date
