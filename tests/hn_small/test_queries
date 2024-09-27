@@ -115,32 +115,38 @@
   {
     "default": "select story_author, count(*) from hn_small group by story_author order by count(*) desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "default": "select story_author, avg(comment_ranking) avg from hn_small group by story_author order by avg desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, count(*) from hn_small group by comment_ranking order by count(*) desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where comment_ranking < 10 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -150,7 +156,8 @@
     "mysql_percona": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -160,7 +167,8 @@
     "mysql_percona": "select comment_ranking, avg(author_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -170,7 +178,8 @@
     "mysql_percona": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match(story_text,story_author,comment_text,comment_author) against ('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "postgres": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
-    "typesense": "-"
+    "typesense": "-",
+    "zincsearch": "-"
   },
   {
     "manticoresearch": "select * from hn_small where match('abc') limit 20",
