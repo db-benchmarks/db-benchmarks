@@ -29,9 +29,13 @@ class Init
         $this->getSuffix();
         $this->measuresLogPath = "/tmp/inflate_$this->engineName.txt";
 
-        $this->preHook()
-        && $this->inflateHook()
-        && $this->postHook();
+        try {
+            $this->preHook()
+            && $this->inflateHook()
+            && $this->postHook();
+        } catch (Exception $exception) {
+            self::die(1, $exception->getMessage());
+        }
     }
 
     private function checkHooksExist(): void
@@ -72,7 +76,7 @@ class Init
 
         $pid = pcntl_fork();
         if ($pid == -1) {
-            die('Could not fork process');
+            self::die(1, 'Could not fork process');
         } else {
             if ($pid) {
                 $startTime = microtime(true);
