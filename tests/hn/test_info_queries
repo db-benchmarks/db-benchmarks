@@ -9,7 +9,14 @@
       "/collections/hn",
       [],
       false
-    ]
+    ],
+    "zincsearch": {
+      "payload": {
+        "search_type": "alldocuments",
+        "max_results": 0
+      },
+      "getCountFromRequest": true
+    }
   },
   "doc": {
     "default": "select * from hn limit 1",
@@ -24,6 +31,13 @@
         "q": "*"
       },
       false
-    ]
+    ],
+    "zincsearch": {
+      "payload": {
+        "search_type": "alldocuments",
+        "max_results": 1
+      },
+      "getCountFromRequest": false
+    }
   }
 }
