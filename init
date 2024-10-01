@@ -48,7 +48,7 @@ class Init
     private function checkHooksExist(): void
     {
         if (!file_exists("$this->engineName/pre_hook")) {
-            self::die("Can't find pre hook for $this->engineName", 1);
+            self::die("Can't find pre-hook for $this->engineName", 1);
         }
 
         if (!file_exists("$this->engineName/inflate_hook")) {
