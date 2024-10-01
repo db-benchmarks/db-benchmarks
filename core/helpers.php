@@ -47,7 +47,7 @@ trait Helpers
         }
         $opts = getopt($short, $ar);
         foreach ($opts as $k => $v) {
-            if (isset($out[$k])) self::die("ERROR: environment variable \"$k\" conflicts with command line argument", 1);
+            if (isset($out[$k])) self::die("ERROR: environment variable \"$k\" conflicts with the command line argument", 1);
             $out[$k] = $v;
         }
         return $out;
