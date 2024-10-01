@@ -413,7 +413,7 @@ class Init
 
     private function calculate95Percentile(array $sortedValues): float|int
     {
-        $p95key = (int) (sizeof($sortedValues) * 0.95);
+    $p95key = (int) ceil(sizeof($sortedValues) * 0.95) - 1; // Adjust for 0-based index
 
         if (!isset($sortedValues[$p95key])) {
             return max($sortedValues);
