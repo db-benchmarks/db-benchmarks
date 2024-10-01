@@ -285,54 +285,70 @@ We will then:
 
 ```
 .
-  |-.env                                    <- you need to update "mem" here
-  |-test                                    <- the executable file which you need to run to test or save test results
-  |-plugins                                 <- plugins directory: if you decide to extend the framework by adding one more database / search engine to test you need to put it into this directory
-  |  |-elasticsearch.php                    <- Elasticsearch plugin
-  |  |-manticoresearch.php                  <- Manticore Search plugin
-  |  |-clickhouse.php                       <- ClickHouse plugin
-  |  |-mysql.php                            <- MySQL plugin
-  |-README.md                               <- you are reading this file
-  |-tests                                   <- tests directory
-  |  |-hn                                   <- Hackernews test
-  |  |  |-prepare_csv                       <- Here we prepare the data collection, it's done in ./tests/hn/init
-  |  |  |-description                       <- Test description which is included into test results and then is to be used when the results are visualized
-  |  |  |-manticore                         <- In this dir happens everything related to testing Manticore Search WRT the current test (Hackernews)
-  |  |  |  |-init                           <- This is a common script which should be in every <test>/<database> directory which is responsible for generating all for the <database>
-  |  |  |-ch                                <- "Hackernews test -> ClickHouse" directory
-  |  |  |  |-data_limited                   <- This will be mounted to ClickHouse Docker if the docker-compose is run with env. var. suffix=_limited 
-  |  |  |  |-post_load_limited.sh           <- This is a hook which is triggered after the data load, called by ./init in the same directory
-                                               Note, there's no post_load.sh (with no suffix), which means that no hook will be called in this case.
-  |  |  |  |-data                           <- This is another ClickHouse directory, no suffix means the docker-compose should be run with suffix= (empty value)
-  |  |  |  |-init                           <- ClickHouse's init script
-  |  |  |-es                                <- "Hackernews test -> Elasticsearch" directory
-  |  |  |  |-logstash_limited               <- Logstash config dir for type "limited", hence suffix "_limited"
-  |  |  |  |  |-post_load.sh                
-  |  |  |  |  |-logstash.conf               <- Logstash config
-  |  |  |  |  |-template.json               <- Logstash template
-  |  |  |  |  |-jvm.options                 <- Logstash jvm options
-  |  |  |  |-elasticsearch_limited.yml      <- Elasticsearch config for type "limited"
-  |  |  |  |-logstash                       <- Logstash config dir for the default type
-  |  |  |  |  |-logstash.conf               
-  |  |  |  |  |-template.json
-  |  |  |  |  |-jvm.options
-  |  |  |  |-logstash_tuned                 <- Logstash config dir for type "tuned"
-  |  |  |  |  |-post_load.sh
+  |-core                                    <- Core directory, contains base files required for tests.
+  |  |-engine.php                           <- Abstract class Engine. Manages test execution, result saving, and parsing of test attributes.
+  |  |-helpers.php                          <- Helper file with logging functions, attribute parsing, exit functions, etc.
+  |-misc                                    <- Miscellaneous directory, intended for storing files useful during the initialization step.
+  |  |-func.sh                              <- Meilisearch initialization helper script.
+  |-plugins                                 <- Plugins directory: if you want to extend the framework by adding another database or search engine for testing, place it here.
+  |  |-elasticsearch.php                    <- Elasticsearch plugin.
+  |  |-manticoresearch.php                  <- Manticore Search plugin.
+  |  |-clickhouse.php                       <- ClickHouse plugin.
+  |  |-mysql.php                            <- MySQL plugin.
+  |  |-meilisearch.php                      <- Meilisearch plugin.
+  |  |-mysql_percona.php                    <- MySQL (Percona) plugin.
+  |  |-postgres.php                         <- Postgres plugin.
+  |  |-typesense.php                        <- Typesense plugin.
+  |-results                                 <- Test results directory. The results shown on https://db-benchmarks.com/ are found here. You can also use `./test --save` to visualize them locally.
+  |-tests                                   <- Directory containing test suites.
+  |  |-hn                                   <- Hackernews test suite.
+  |  |  |-clickhouse                        <- Directory for "Hackernews test -> ClickHouse".
+  |  |  |  |-inflate_hook                   <- Engine initialization script. Handles data ingestion into the database.
+  |  |  |  |-post_hook                      <- Engine verification script. Ensures the correct number of documents have been ingested and verifies data consistency.
+  |  |  |  |-pre_hook                       <- Engine pre-check script. Determines if tables need to be rebuilt, starts the engine, and ensures availability.
+  |  |  |-data                              <- Prepared data collection for the tests.
+  |  |  |-elasticsearch                     <- Directory for "Hackernews test -> Elasticsearch".
+  |  |  |  |-logstash_tuned                 <- Logstash configuration directory for the "tuned" type.
   |  |  |  |  |-logstash.conf
   |  |  |  |  |-template.json
-  |  |  |  |  |-jvm.options
-  |  |  |  |-elasticsearch.yml
   |  |  |  |-elasticsearch_tuned.yml
-  |  |  |  |-init
-  |  |  |-test_queries                      <- All test queries for the current test are here
-  |  |  |-test_info_queries                 <- And here should be those queries that are called to get info about the data collection
-  |  |  |-data                              <- Prepared data collection here
-  |  |  |-init                              <- Main initialization script for the test
-  |  |-taxi                                 <- Another test: Taxi rides, similar structure
-  |  |-hn_small                             <- Another test: non-multiplied Hackernews dataset, similar structure
-  |  |-logs10m                              <- Another test: Nginx logs, similar structure
-  |-docker-compose.yml                      <- docker-compose config: responsible for starting / stopping the databases / search engines
-  |-results                                 <- test results, the results you see on https://db-benchmarks.com/ can be found here and you can use ./test --save to visualize them yourself
+  |  |  |  |-inflate_hook                   <- Engine initialization script for data ingestion.
+  |  |  |  |-post_hook                      <- Verifies document count and data consistency.
+  |  |  |  |-pre_hook                       <- Pre-check script for table rebuilding and engine initialization.
+  |  |  |-manticoresearch                   <- Directory for testing Manticore Search in the Hackernews test suite.
+  |  |  |  |-generate_manticore_config.php  <- Script for dynamically generating Manticore Search configuration.
+  |  |  |  |-inflate_hook                   <- Data ingestion script.
+  |  |  |  |-post_hook                      <- Verifies document count and consistency.
+  |  |  |  |-pre_hook                       <- Pre-check for table rebuilds and engine availability.
+  |  |  |-meilisearch                       <- Directory for "Hackernews test -> Meilisearch".
+  |  |  |  |-inflate_hook                   <- Data ingestion script.
+  |  |  |  |-post_hook                      <- Ensures correct document count and data consistency.
+  |  |  |  |-pre_hook                       <- Pre-check for table rebuilds and engine start.
+  |  |  |-mysql                             <- Directory for "Hackernews test -> MySQL".
+  |  |  |  |-inflate_hook                   <- Data ingestion script.
+  |  |  |  |-post_hook                      <- Ensures document count and consistency.
+  |  |  |  |-pre_hook                       <- Pre-check for table rebuilds and engine start.
+  |  |  |-postgres                          <- Directory for "Hackernews test -> Postgres".
+  |  |  |  |-inflate_hook                   <- Data ingestion script.
+  |  |  |  |-post_hook                      <- Verifies document count and data consistency.
+  |  |  |  |-pre_hook                       <- Pre-check for table rebuilds and engine availability.
+  |  |  |-prepare_csv                       <- Prepares the data collection, handled in `./tests/hn/init`.
+  |  |  |-description                       <- Test description, included in test results and used during result visualization.
+  |  |  |-init                              <- Main initialization script for the test.
+  |  |  |-test_info_queries                 <- Contains queries to retrieve information about the data collection.
+  |  |  |-test_queries                      <- Contains all test queries for the current test.
+  |  |-taxi                                 <- Taxi rides test suite, with a similar structure.
+  |  |-hn_small                             <- Test for a smaller, non-multiplied Hackernews dataset, similar structure.
+  |  |-logs10m                              <- Test for Nginx logs, similar structure.
+  |-.env.example                            <- Example environment file. Update the "mem" and "cpuset" values as needed.
+  |-LICENSE                                 <- License file.
+  |-NOTICE                                  <- Notice file.
+  |-README.md                               <- You're reading this file.
+  |-docker-compose.yml                      <- Docker Compose configuration for starting and stopping databases and search engines.
+  |-important_tests.sh
+  |-init                                    <- Initialization script. Handles data ingestion and tracks the time taken.
+  |-logo.svg                                <- Logo file.
+  |-test                                    <- The executable file to run and save test results.
 ```
 
 ## How to start a particular database / search engine with a particular dataset
