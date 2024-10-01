@@ -71,7 +71,7 @@ class Init
     {
         echo "Run Pre-hook $this->engineName\n";
         $result = $this->processHook("pre_hook", "Pre-hook");
-        echo "End Pre Hook $this->engineName\n";
+        echo "End Pre-hook $this->engineName\n";
         return $result;
     }
 
