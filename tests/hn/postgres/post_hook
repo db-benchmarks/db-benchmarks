@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo -en "\tFinished loading to index at "
+echo -en "\tFinished loading to table at "
 date
 
 inserted=$(docker exec postgres_engine psql -h0 -U postgres -c "select count(*) from $test" | tail -n3 | head -n1)
