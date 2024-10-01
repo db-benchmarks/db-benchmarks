@@ -398,17 +398,16 @@ class Init
 
     private function calculateMedian(array $sortedValues): float|int
     {
-        $middleKey = (int) (sizeof($sortedValues) / 2);
+        $count = count($sortedValues);
+        $middleKey = (int) ($count / 2);
 
-        if ($middleKey > 1) {
-            $lowerBound = $sortedValues[$middleKey - 1];
-            $higherBound = $sortedValues[$middleKey + 1];
+        if ($count % 2 === 0) {
+            // If even, return the average of the two middle values
+            return ($sortedValues[$middleKey - 1] + $sortedValues[$middleKey]) / 2;
         } else {
-            $lowerBound = min($sortedValues);
-            $higherBound = max($sortedValues);
+            // If odd, return the middle value
+            return $sortedValues[$middleKey];
         }
-
-        return ($lowerBound + $higherBound) / 2;
     }
 
     private function calculate95Percentile(array $sortedValues): float|int
