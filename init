@@ -20,7 +20,7 @@ class Init
     private string $engineName;
     private string $type;
     private string $suffix;
-    private string $measuresLogPath;
+    private string $measurementsLogPath;
 
 
     public function __construct(
@@ -34,7 +34,7 @@ class Init
 
         $this->checkHooksExist();
         $this->getSuffix();
-        $this->measuresLogPath = "/tmp/inflate_$this->engineName.txt";
+        $this->measurementsLogPath = "/tmp/inflate_$this->engineName.txt";
 
         try {
             $this->preHook()
@@ -188,13 +188,13 @@ class Init
             exit(0);
         });
 
-        if (file_exists($this->measuresLogPath)) {
-            unlink($this->measuresLogPath);
+        if (file_exists($this->measurementsLogPath)) {
+            unlink($this->measurementsLogPath);
         }
 
-        $fp = fopen($this->measuresLogPath, 'w');
+        $fp = fopen($this->measurementsLogPath, 'w');
         if (!$fp) {
-            echo "Cannot open file ($this->measuresLogPath)";
+            echo "Cannot open file ($this->measurementsLogPath)";
             exit(1);
         }
 
@@ -245,7 +245,7 @@ class Init
             'write' => []
         ];
 
-        $content = file_get_contents($this->measuresLogPath);
+        $content = file_get_contents($this->measurementsLogPath);
         //CPU_LOAD MEMORY DISC MICROTIME
         $content = explode("\n", $content);
 
@@ -369,7 +369,7 @@ class Init
                 'version' => $this->getVersion()
             ]));
 
-        unlink($this->measuresLogPath);
+        unlink($this->measurementsLogPath);
     }
 
 
