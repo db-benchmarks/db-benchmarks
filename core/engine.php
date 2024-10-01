@@ -1,4 +1,12 @@
 <?php
+/* Copyright (C) 2022-2024 Manticore Software Ltd
+ * You may use, distribute and modify this code under the
+ * terms of the AGPLv3 license.
+ *
+ * You can find a copy of the AGPLv3 license here
+ * https://www.gnu.org/licenses/agpl-3.0.txt
+ */
+
 
 abstract class engine {
 
