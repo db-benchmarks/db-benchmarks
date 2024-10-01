@@ -99,7 +99,7 @@ class typesense extends engine {
             isset($curlResult['num_documents']) => [
                 ['count(*)' => $curlResult['num_documents']],
             ],
-            $this->getCountFromRequest => [
+            $this->getCountFromRequest && isset($curlResult['found']) => [
                 ['count(*)' => $curlResult['found']],
             ],
             isset($curlResult['hits']) => self::filterResults($curlResult['hits']),
