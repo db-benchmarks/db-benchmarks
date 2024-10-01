@@ -163,6 +163,7 @@ Before you deploy the test framework, make sure you have the following:
 * `docker-compose`
 * `sensors` to control CPU temperature to prevent throttling
 * `dstat`
+* `cgroups v2`
 
 To install:
 
