@@ -69,7 +69,7 @@ class Init
 
     public function preHook(): bool
     {
-        echo "Run Pre Hook $this->engineName\n";
+        echo "Run Pre-hook $this->engineName\n";
         $result = $this->processHook("pre_hook", "Pre-hook");
         echo "End Pre Hook $this->engineName\n";
         return $result;
