@@ -108,7 +108,7 @@ class Init
 
     public function postHook(): bool
     {
-        echo "Run Post Hook $this->engineName\n";
+        echo "Run Post-hook $this->engineName\n";
         $result = $this->processHook("post_hook", "Post hook");
         echo "End Post Hook $this->engineName\n";
         return $result;
