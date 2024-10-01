@@ -48,7 +48,7 @@ date
 insertSize=$(cat data/data.jsonl | wc -l)
 
 sleep 5
-echo -e "\tWait until Typesense come available"
+echo -e "\tWait until Typesense becomes available"
 for i in $(seq 1 120); do
   if curl -s -I -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
     -X GET "${TYPESENSE_HOST}/collections/${test}" 2>&1 | grep "HTTP/1.1 200 OK" >/dev/null; then
