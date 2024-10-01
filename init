@@ -110,7 +110,7 @@ class Init
     {
         echo "Run Post-hook $this->engineName\n";
         $result = $this->processHook("post_hook", "Post hook");
-        echo "End Post Hook $this->engineName\n";
+        echo "End Post-hook $this->engineName\n";
         return $result;
     }
 
