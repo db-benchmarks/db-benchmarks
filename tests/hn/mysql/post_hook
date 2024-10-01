@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo -en "\tFinished loading to index at ";
+echo -en "\tFinished loading to table at ";
 date
 
 inserted=$(docker exec mysql_engine mysql -e "SELECT count(*) FROM default.$test" | tail -n1)
