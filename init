@@ -56,7 +56,7 @@ class Init
         }
 
         if (!file_exists("$this->engineName/post_hook")) {
-            self::die("Can't find post hook for $this->engineName", 1);
+            self::die("Can't find post-hook for $this->engineName", 1);
         }
     }
 
