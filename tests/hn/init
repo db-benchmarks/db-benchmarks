@@ -31,7 +31,7 @@ fi
 # ../../init --engine=postgres --type=tuned
 
 # We excluded Meilisearch engine cause it has limitations and we can upload only 9000000 documents.
-# Relay to docker stats it just reaches the memory limit and then stops indexing 125GiB from 125GiB.
+# According to docker stats it just reaches the memory limit and then stops indexing 125GiB from 125GiB.
 
 # thread 'indexing-thread:20' panicked at 'the allocator is unable to allocate that
 # much memory (41666672 bytes requested)',
