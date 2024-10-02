@@ -235,7 +235,7 @@ class quickwit extends engine
             foreach ($row as $k => $v) {
                 if ($k === 'id') {
                     continue;
-                } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
+                } // removing id from the output since Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
 
                 if (!empty($this->retrieveFields)
                     && !in_array($k, $this->retrieveFields)
