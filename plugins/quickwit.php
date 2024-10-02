@@ -258,7 +258,7 @@ class quickwit extends engine
     // sends a command to engine to drop its caches
     protected function dropEngineCache()
     {
-        // ? Do nothing due no information available
+        // Do nothing because no information is available
     }
 
     protected function sendRequest(string $path, $payload): string
