@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo -en "\tStarting loading at "
+date
+docker exec manticoresearch_engine indexer --all

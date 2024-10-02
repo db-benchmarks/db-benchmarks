@@ -43,7 +43,7 @@ class postgres extends engine
     }
 
     // attempts to fetch info about engine and return it
-    protected function getInfo()
+    public function getInfo()
     {
 
         $connection = $this->getConnection();

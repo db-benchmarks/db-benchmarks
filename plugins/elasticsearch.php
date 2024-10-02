@@ -22,7 +22,7 @@ class elasticsearch extends engine {
     }
     
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    public function getInfo() {
         $ret = [];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/_cluster/health?level=indices");
@@ -74,7 +74,7 @@ class elasticsearch extends engine {
         if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
             $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
             if ($curlErrorCode == 28 or preg_match('/timeout|timed out/', $curlError)) $out['timeout'] = true;
-            return $out;
+            return json_encode($out);
         }
         return $curlResult;
     }

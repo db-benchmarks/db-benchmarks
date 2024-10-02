@@ -24,7 +24,7 @@ class typesense extends engine {
     }
 
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    public function getInfo() {
         $ret = [];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/debug");
@@ -99,7 +99,7 @@ class typesense extends engine {
             isset($curlResult['num_documents']) => [
                 ['count(*)' => $curlResult['num_documents']],
             ],
-            $this->getCountFromRequest => [
+            $this->getCountFromRequest && isset($curlResult['found']) => [
                 ['count(*)' => $curlResult['found']],
             ],
             isset($curlResult['hits']) => self::filterResults($curlResult['hits']),

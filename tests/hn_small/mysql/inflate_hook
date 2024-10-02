@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+echo -en "\tStarting loading at "
+date
+
+docker exec mysql_engine mysql \
+  -e "DROP TABLE IF EXISTS default.$test;
+    CREATE TABLE default.$test(
+    id bigint,
+    story_id bigint,
+    story_text text,
+    story_author varchar(1024),
+    comment_id bigint,
+    comment_text text,
+    comment_author varchar(1024),
+    comment_ranking bigint unsigned,
+    author_comment_count bigint unsigned,
+    story_comment_count bigint unsigned,
+    FULLTEXT(story_text,story_author,comment_text,comment_author))"
+
+docker exec mysql_engine mysql \
+  -e "LOAD DATA INFILE '/input/data.csv'
+    INTO TABLE default.$test FIELDS TERMINATED BY ','
+    ENCLOSED BY '\"' ESCAPED BY '\"' LINES TERMINATED BY '\n'"

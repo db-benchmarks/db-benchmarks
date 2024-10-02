@@ -20,11 +20,12 @@ services:
     ports:
       - "127.0.0.1:9200:9200"
     environment:
+      - "ES_JAVA_OPTS=${ES_JAVA_OPTS}"
       - discovery.type=single-node
       - bootstrap.memory_lock=true # as said on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping it needs to be done for performance
     volumes:
-      - ./tests/${test}/es/idx${suffix}:/usr/share/elasticsearch/data
-      - ./tests/${test}/es/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./tests/${test}/elasticsearch/idx${suffix}:/usr/share/elasticsearch/data
+      - ./tests/${test}/elasticsearch/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
 
   clickhouse:
     image: yandex/clickhouse-server:21.8.11.4
@@ -47,7 +48,7 @@ services:
       - "127.0.0.1:8123:8123"
       - "127.0.0.1:9000:9000"
     volumes:
-      - ./tests/${test}/ch/data${suffix}:/var/lib/clickhouse
+      - ./tests/${test}/clickhouse/data${suffix}:/var/lib/clickhouse
 
   mysql:
     image: mysql:8.0.28
@@ -97,7 +98,7 @@ services:
         soft: 262144
         hard: 262144
     ports:
-      - "127.0.0.1:3306:3306"
+      - "127.0.0.1:3307:3306"
     volumes:
       - ./tests/${test}/mysql_percona/data${suffix}:/var/lib/mysql
       - ./tests/${test}/data:/input
@@ -130,9 +131,9 @@ services:
     environment:
       - EXTRA=1
     volumes:
-      - ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore
+      - ./tests/${test}/manticoresearch/idx${suffix}:/var/lib/manticore
       - ./tests/${test}/data:/input
-      - ./tests/${test}/manticore/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
+      - ./tests/${test}/manticoresearch/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
 
   postgres:
     image: postgres:15.2
