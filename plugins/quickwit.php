@@ -245,7 +245,7 @@ class quickwit extends engine
 
                 if (is_numeric($v) && strpos($v, '.')) {
                     $v = round($v, 4);
-                } // this is a workaround against different floating point calculations in different engines
+                } // This is a workaround for the differences in floating point calculation accuracy across different engines.
 
                 $ar[$k] = isset($v) ? $v : '';
             }
