@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading at "
+date
+
+inserted=$(curl -s -X GET "localhost:9200/logs10m/_count" | jq .count)
+echo -e "\tCount of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 10365132 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi

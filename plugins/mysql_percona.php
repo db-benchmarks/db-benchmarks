@@ -10,6 +10,7 @@
 
 class mysql_percona extends mysql {
 
+    protected $port = 3307;
     protected function url() {
         return "https://www.percona.com/software/mysql-database/percona-server";
     }

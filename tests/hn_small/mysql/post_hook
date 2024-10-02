@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading to index at ";
+date
+
+inserted=$(docker exec mysql_engine mysql -e "SELECT count(*) FROM default.$test" | tail -n1)
+echo -e "\tCount of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 1165439 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi

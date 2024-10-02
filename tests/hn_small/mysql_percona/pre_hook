@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+echo -e "Mysql percona (type $suffix):"
+if [[ -e mysql_percona/data$suffix/default/$test.ibd ]]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
+
+docker-compose -f ../../docker-compose.yml --env-file ../../.env stop mysql_percona
+docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql_percona
+mkdir mysql_percona/data$suffix/
+chmod 0777 -R mysql_percona/data$suffix/
+
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql_percona"
+echo -e "\tStarting mysql_percona ($cmd)"
+eval "$cmd"
+
+echo -e "\tWaiting for MySQL percona service to be available on localhost:3307"
+timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_percona_engine 2>&1) >/dev/null
+
+dot_count=0
+while ! [[ $(docker exec mysql_percona_engine mysql -uroot -h0 -e "SHOW DATABASES like 'default'" | wc -l) -eq 2 ]]; do
+  if [ $dot_count -ge 4 ]; then
+    printf "\r    \r" # Clear the line with four dots
+    dot_count=0
+  fi
+  printf "."
+  dot_count=$((dot_count + 1))
+  sleep 1
+done
+printf "\r    \r" # Clear the line after completion
+echo -e "\tService is available!"
