@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+export HOST='http://localhost:7280'
+
+echo -en "\tStarting loading at "
+date
+for f in ./data/data_splitted.*; do
+  echo -e "\t\tUpload chunk $f"
+
+  # Index our 10k documents.
+  curl -s -XPOST "${HOST}/api/v1/${test}/ingest?commit=force" --data-binary @$f >/dev/null
+
+  rm $f
+done
+echo -en "\tFinished loading to index at "
+date

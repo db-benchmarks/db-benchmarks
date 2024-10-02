@@ -185,6 +185,30 @@ services:
       - ./tests/${test}/typesense/data${suffix}:/data
       - ./tests/${test}/data:/input
 
+  quickwit:
+    image: quickwit/quickwit:0.8.1
+    container_name: "quickwit_engine"
+    networks:
+      - default
+    mem_limit: ${mem}m
+    cpuset: "${cpuset}"
+    privileged: true
+    mem_swappiness: 0
+    ports:
+      - "127.0.0.1:7280:7280"
+    command: 'run'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./tests/${test}/quickwit/data${suffix}:/quickwit/qwdata
+      - ./tests/${test}/quickwit/quickwit.yaml:/quickwit/config/quickwit.yaml
+
   meilisearch:
     image: getmeili/meilisearch:v1.1.1
     networks:

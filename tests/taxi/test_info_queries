@@ -1,4 +1,33 @@
 {
-  "count": "select count(*) from taxi",
-  "doc": "select * from taxi limit 1"
+  "count": {
+    "default": "select count(*) from taxi",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
+  },
+  "doc": {
+    "default": "select * from taxi limit 1",
+    "quickwit": {
+      "path": "/api/v1/taxi/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 1
+      },
+      "retrieve": null,
+      "mapping": null
+    }
+  }
 }

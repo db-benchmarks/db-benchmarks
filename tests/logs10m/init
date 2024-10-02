@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")
@@ -20,6 +19,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch
 ../../init --engine=elasticsearch --type=tuned

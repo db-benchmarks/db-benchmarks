@@ -4,13 +4,38 @@
     "meilisearch": [
       "/indexes/logs10m/stats",
       []
-    ]
+    ],
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   },
   "doc": {
     "default": "select * from logs10m limit 1",
     "meilisearch": [
       "/indexes/logs10m/documents?offset=0&limit=1",
       []
-    ]
+    ],
+    "quickwit": {
+      "path": "/api/v1/logs10m/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 1
+      },
+      "retrieve": null,
+      "mapping": null
+    }
   }
 }

@@ -13,6 +13,7 @@ NC='\033[0m' # No Color
 docker-compose -f ../../docker-compose.yml --env-file ../../.env down
 docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 
+../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch --type=tuned
 ../../init --engine=manticoresearch --type=columnar
