@@ -306,13 +306,31 @@ class Init
                 sleep(1);
             }
         }
+        if ($disc['read'] === []) {
+            $discRead = 0;
+        } else {
+            $discRead = max($disc['read']);
+        }
 
-        $discRead = max($disc['read']);
-        $discWrite = max($disc['write']);
+        if ($disc['write'] === []) {
+            $discWrite = 0;
+        } else {
+            $discWrite = max($disc['write']);
+        }
+
+
         unset($disc);
 
         $results = [];
         foreach (['cpu', 'ram'] as $measureType) {
+            if ($$measureType === []){
+                $results[$measureType]['average'] = 0;
+                $results[$measureType]['median'] = 0;
+                $results[$measureType]['95p'] = 0;
+
+                continue;
+            }
+
             $results[$measureType]['average']
                 = round($this->calculateAverage($$measureType), 4);
 
@@ -403,7 +421,8 @@ class Init
 
         if ($count % 2 === 0) {
             // If even, return the average of the two middle values
-            return ($sortedValues[$middleKey - 1] + $sortedValues[$middleKey]) / 2;
+            return ($sortedValues[$middleKey - 1]
+                    + $sortedValues[$middleKey]) / 2;
         } else {
             // If odd, return the middle value
             return $sortedValues[$middleKey];
@@ -412,7 +431,9 @@ class Init
 
     private function calculate95Percentile(array $sortedValues): float|int
     {
-    $p95key = (int) ceil(sizeof($sortedValues) * 0.95) - 1; // Adjust for 0-based index
+        $p95key = (int) ceil(
+                sizeof($sortedValues) * 0.95
+            ) - 1; // Adjust for 0-based index
 
         if (!isset($sortedValues[$p95key])) {
             return max($sortedValues);

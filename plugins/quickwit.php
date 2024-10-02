@@ -27,7 +27,7 @@ class quickwit extends engine
     }
 
     // attempts to fetch info about engine and return it
-    protected function getInfo(): array
+    public function getInfo(): array
     {
         $ret = [];
         $curl = curl_init();
