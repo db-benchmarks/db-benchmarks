@@ -294,7 +294,7 @@ abstract class engine {
         self::readQueries();
         if (!self::$queries) self::die("ERROR: empty queries", 1);
 
-	$limited = isset(self::$commandLineArguments['limited']);
+	$limited = isset(self::$commandLineArguments['limited']) && !empty(self::$commandLineArguments['limited']);
         // let's test in all memory modes
         self::log('Starting testing', 1, 'cyan');
         foreach (self::$commandLineArguments['memory'] as $mem) {
