@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+echo -e "Typesense (type $suffix):"
+
+docker-compose -f ../../docker-compose.yml --env-file ../../.env stop typesense
+docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f typesense
+
+
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d typesense"
+echo -e "\tStarting Typesense ($cmd)"
+eval "$cmd"
+
+
+
+# WAIT UNTIL TYPESENSE BECAME AVAILABLE
+
+temp_log_file=$(mktemp)
+timeout 300 docker logs -f typesense_engine >"$temp_log_file" 2>&1 &
+log_pid=$!
+
+while true; do
+  if grep 'Peer refresh succeeded' "$temp_log_file" > /dev/null; then
+    echo -e "\tAccepting connections"
+    kill $log_pid 2>/dev/null
+    rm "$temp_log_file"
+    break
+  fi
+
+  if ! kill -0 $log_pid 2>/dev/null; then
+    echo -e "\tTimeout failed"
+    rm "$temp_log_file"
+    exit 1
+  fi
+
+  sleep 1
+done
+
+export TYPESENSE_API_KEY='manticore'
+export TYPESENSE_HOST='http://localhost:8108'
+
+if ! curl -s ${TYPESENSE_HOST}/collections/${test} \
+       -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" 2>&1 | grep "Not Found" > /dev/null; then
+  echo -e "\tNo need to rebuild"
+  exit 10
+fi

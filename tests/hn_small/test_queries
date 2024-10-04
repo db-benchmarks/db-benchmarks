@@ -10,6 +10,22 @@
       [],
       true
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "search_type": "alldocuments",
@@ -36,6 +52,22 @@
       },
       true
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "comment_ranking:100",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "search_type": "term",
@@ -66,6 +98,22 @@
       },
       true
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "comment_ranking:500",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "search_type": "term",
@@ -96,6 +144,22 @@
       },
       true
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "comment_ranking:[301 TO 499]",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "query": {
@@ -116,36 +180,135 @@
     "default": "select story_author, count(*) from hn_small group by story_author order by count(*) desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "story_author_count": {
+            "terms": {
+              "field": "story_author",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "story_author_count": {
+          "buckets": {
+            "[]": {
+              "doc_count": "count(*) :int",
+              "key": "story_author"
+            }
+          }
+        }
+      }
+    },
     "zincsearch": "-"
   },
   {
     "default": "select story_author, avg(comment_ranking) avg from hn_small group by story_author order by avg desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "story_author_avg": {
+            "terms": {
+              "field": "story_author",
+              "size": 20,
+              "order": {
+                "avg_field": "desc"
+              }
+            },
+            "aggs": {
+              "avg_field": {
+                "avg": {
+                  "field": "comment_ranking"
+                }
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "story_author_avg": {
+          "buckets": {
+            "[]": {
+              "avg_field": {
+                "value": "avg :float"
+              },
+              "key": "story_author"
+            }
+          }
+        }
+      }
+    },
     "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, count(*) from hn_small group by comment_ranking order by count(*) desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "comment_ranking_count": {
+            "terms": {
+              "field": "comment_ranking",
+              "size": 20,
+              "order": {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": {
+        "comment_ranking_count": {
+          "buckets": {
+            "[]": {
+              "doc_count": "count(*) :int",
+              "key": "comment_ranking :int"
+            }
+          }
+        }
+      }
+    },
     "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": "-",
     "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": "-",
     "zincsearch": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where comment_ranking < 10 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": "-",
     "zincsearch": "-"
   },
   {
@@ -157,6 +320,7 @@
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": "-",
     "zincsearch": "-"
   },
   {
@@ -168,6 +332,7 @@
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": "-",
     "zincsearch": "-"
   },
   {
@@ -179,6 +344,7 @@
     "postgres": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
+    "quickwit": "-",
     "zincsearch": "-"
   },
   {
@@ -204,6 +370,15 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "abc",
+        "max_hits": 20
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "query": {
@@ -234,6 +409,15 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "abc -google",
+        "max_hits": 20
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "query": {
@@ -262,6 +446,15 @@
       }
     ],
     "typesense": "-",
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "\"elon musk\"",
+        "max_hits": 20
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "query": {
@@ -302,6 +495,26 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/_elastic/hn_small/_search",
+      "query": {
+        "query": {
+          "query_string": {
+            "query": "abc"
+          }
+        },
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "query": {
@@ -346,6 +559,7 @@
       },
       false
     ],
+    "quickwit": "-",
     "zincsearch": {
       "payload": {
         "query": {
@@ -387,6 +601,22 @@
       },
       true
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "google AND comment_ranking:>200",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "size": 0,
@@ -434,6 +664,28 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/_elastic/hn_small/_search",
+      "query": {
+        "query": {
+          "query_string": {
+            "query": "me"
+          }
+        },
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      },
+      "mapping": null,
+      "retrieve": {
+        "story_id": "story_id"
+      }
+    },
     "zincsearch": {
       "payload": {
         "_source": ["story_id"],
@@ -484,6 +736,27 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/_elastic/hn_small/_search",
+      "mapping": null,
+      "retrieve": [
+        "story_id",
+        "comment_id",
+        "comment_ranking",
+        "author_comment_count",
+        "story_comment_count",
+        "story_author",
+        "comment_author"
+      ],
+      "query": {
+        "query": {
+          "query_string": {
+            "query": "me"
+          }
+        },
+        "size": 20
+      }
+    },
     "zincsearch": {
       "payload": {
         "_source": [
@@ -526,6 +799,21 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/_elastic/hn_small/_search",
+      "query": {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "query": {
@@ -560,6 +848,21 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/_elastic/hn_small/_search",
+      "query": {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "query": {
@@ -595,6 +898,7 @@
       },
       false
     ],
+    "quickwit": "-",
     "zincsearch": {
       "payload": {
         "query": {
@@ -634,6 +938,23 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/_elastic/hn_small/_search",
+      "mapping": null,
+      "retrieve": [
+        "comment_ranking"
+      ],
+      "query": {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
+    },
     "zincsearch": {
       "payload": {
         "_source": ["comment_ranking"],
@@ -674,6 +995,24 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/_elastic/hn_small/_search",
+      "mapping": null,
+      "retrieve": [
+        "comment_ranking",
+        "story_text"
+      ],
+      "query": {
+        "size": 20,
+        "sort": [
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
+        ]
+      }
+    },
     "zincsearch": {
       "payload": {
         "_source": ["comment_ranking", "story_text"],
@@ -706,6 +1045,22 @@
       },
       true
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_small/search/",
+      "query": {
+        "query": "comment_ranking:100 OR comment_ranking:200",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload":{
         "query": {
@@ -735,6 +1090,7 @@
       }
     ],
     "typesense": "-",
+    "quickwit": "-",
     "zincsearch": {
       "payload":{
         "_source": ["story_id"],

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+. "../../misc/func.sh"
+
+echo -en "\tStarting loading at "
+date
+
+header="id:number,remote_addr,remote_user,runtime:number,time_local:number,request_type,request_path,request_protocol,status:number,size:number,referer,usearagent"
+
+echo -e "Creating an index"
+curl -s \
+  -X POST "http://localhost:7700/indexes" \
+  -H 'Content-Type: application/json' \
+  --data-binary "{
+      \"uid\": \"$test\",
+      \"primaryKey\": \"id\"
+    }" | jq .
+
+sleep 5
+
+echo -e "Patching the index"
+curl -s \
+  -X PATCH "http://localhost:7700/indexes/$test/settings" \
+  -H 'Content-Type: application/json' \
+  --data-binary '{
+      "searchableAttributes": [
+        "request_path",
+	      "useragent"
+      ],
+      "filterableAttributes": [
+        "size",
+	      "status"
+      ],
+      "sortableAttributes": [
+        "runtime",
+        "size",
+        "time_local"
+      ],
+      "typoTolerance": {"enabled": false}
+    }'
+
+sleep 5
+echo -e "Index settings:"
+curl -s "http://localhost:7700/indexes/$test/settings" | jq .
+init_meilisearch "$test" "$header"  || exit 1

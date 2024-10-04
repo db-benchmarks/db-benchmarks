@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+echo -e "Meilisearch (type $suffix):"
+
+test="$test" suffix="" docker-compose -f "../../docker-compose.yml" --env-file ../../.env stop meilisearch
+test="$test" suffix="" docker-compose -f "../../docker-compose.yml" --env-file ../../.env rm -f meilisearch
+test="$test" suffix="" docker-compose -f "../../docker-compose.yml" --env-file ../../.env up -d meilisearch
+
+sleep 5
+
+count=$(curl -s -X GET "http://localhost:7700/indexes/$test/stats" |
+  jq | grep numberOfDocuments | head -n 1 | cut -d':' -f2 | tr -d ' ,')
+
+if ((count > 0)); then
+  echo -e "\tNo need to rebuild"
+  exit 10
+fi
+
+docker exec meilisearch_engine apk add coreutils > /dev/null

@@ -24,7 +24,7 @@ class mysql extends engine {
     }
     
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    public function getInfo() {
         $m = new mysqli();
         @$m->real_connect('127.0.0.1', $this->user, '', $this->db, $this->port);
         if ($m->connect_error) return false;

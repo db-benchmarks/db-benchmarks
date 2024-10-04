@@ -20,30 +20,34 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Zincsearch
-. zincsearch/init
+../../init --engine=zincsearch
+../../init --engine=quickwit
+../../init --engine=clickhouse
+../../init --engine=elasticsearch --type=tuned
+../../init --engine=manticoresearch --type=rowwise
+../../init --engine=manticoresearch --type=columnar
+../../init --engine=mysql --type=tuned
 
-# Typesense
-. typesense/init
 
-# Elasticsearch
-. es/init
+# Can't process dataset this size
+# ../../init --engine=typesense
 
-# Clickhouse
-. ch/init
+# We excluded Postgres cause it's too slow
+# ../../init --engine=postgres --type=tuned
 
-# Manticore Search
-. manticore/init
+# We excluded Meilisearch engine cause it has limitations and we can upload only 9000000 documents.
+# According to docker stats it just reaches the memory limit and then stops indexing 125GiB from 125GiB.
 
-# MySQL
-. mysql/init
+# thread 'indexing-thread:20' panicked at 'the allocator is unable to allocate that
+# much memory (41666672 bytes requested)',
+# /usr/local/cargo/registry/src/github.com-1ecc6299db9ec823/grenad-0.4.4/src/sorter.rs:350:9
 
-# Postgres
-. postgres/init
+# ../../init --engine=meilisearch
+
 
 # MySQL Percona
-if [[ -d mysql_percona ]]; then 
-  . mysql_percona/init
+if [[ -d mysql_percona ]]; then
+  ../../init --engine=mysql_percona
 fi
 
 # Meilisearch never finishes ingesting the data, hence commented out

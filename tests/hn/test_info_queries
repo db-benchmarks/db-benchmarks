@@ -10,6 +10,22 @@
       [],
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_full/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 0,
+        "aggs": {
+          "count(*)": {
+            "value_count": {
+              "field": "id"
+            }
+          }
+        }
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "search_type": "alldocuments",
@@ -32,6 +48,15 @@
       },
       false
     ],
+    "quickwit": {
+      "path": "/api/v1/hn_full/search/",
+      "query": {
+        "query": "*",
+        "max_hits": 1
+      },
+      "retrieve": null,
+      "mapping": null
+    },
     "zincsearch": {
       "payload": {
         "search_type": "alldocuments",

@@ -1,35 +1,19 @@
-current_dir=`basename "$PWD"`
-test_dir=`realpath "$(dirname "$0")"`
+#!/usr/bin/env bash
+trap 'jobs -p | xargs -r kill' EXIT
+
+current_dir=$(basename "$PWD")
+test_dir=$(realpath "$(dirname "$0")")
 cd "$test_dir"
 
 export test="$current_dir"
 
+COLORED='\033[0;33m'``
+NC='\033[0m' # No Color
+
 docker-compose -f ../../docker-compose.yml --env-file ../../.env down
 docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 
-# Manticore Search
-. manticore/init
-
-# Elasticsearch
-. es/init
-
-echo -e "${COLORED}Clickhouse:${NC}"
-
-if [[ ! -d ch ]] || [[ -h ch/data/data/default/$test ]]; then
-  echo -e "${COLORED}\tNo need to rebuild${NC}"
-else
-  which clickhouse-client || {
-    echo -e "${COLORED}\tERROR: install clickhouse-client${NC}"
-    exit 1
-  }
-  mkdir -p ch/data
-  test=$test docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d clickhouse
-  while ! nc -z localhost 9000; do sleep 1; done
-  sleep 5
-  echo -e "${COLORED}\tClickhouse is up. Starting loading at `date`${NC}"
-  clickhouse-client --query="DROP TABLE IF EXISTS default.$test;"
-  clickhouse-client --query="CREATE TABLE default.$test (id UInt64, vendor_id String, pickup_datetime DateTime, dropoff_datetime DateTime, store_and_fwd_flag String, rate_code_id UInt32, pickup_longitude Float32, pickup_latitude Float32, dropoff_longitude Float32, dropoff_latitude Float32, passenger_count UInt32, trip_distance Float32, fare_amount Float32, extra Float32, mta_tax Float32, tip_amount Float32, tolls_amount Float32, ehail_fee Float32, improvement_surcharge Float32, total_amount Float32, payment_type String, trip_type UInt8, pickup String, dropoff String, cab_type String, rain Float32, snow_depth Float32, snowfall Float32, max_temp Int8, min_temp Int8, wind Float32, pickup_nyct2010_gid UInt32, pickup_ctlabel String, pickup_borocode Int8, pickup_boroname String, pickup_ct2010 String, pickup_boroct2010 String, pickup_cdeligibil String, pickup_ntacode String, pickup_ntaname String, pickup_puma String, dropoff_nyct2010_gid UInt32, dropoff_ctlabel String, dropoff_borocode UInt8, dropoff_boroname String, dropoff_ct2010 String, dropoff_boroct2010 String, dropoff_cdeligibil String, dropoff_ntacode String, dropoff_ntaname String, dropoff_puma String) ENGINE = MergeTree() ORDER BY id;"
-  cat data/trips.csv* | clickhouse-client --query="INSERT INTO default.$test FORMAT CSV"
-#  clickhouse-client --query="OPTIMIZE TABLE default.$test"
-  echo -e "${COLORED}\tFinished loading data to Clickhouse and at `date`${NC}"
-fi
+../../init --engine=quickwit
+../../init --engine=clickhouse
+../../init --engine=elasticsearch --type=tuned
+../../init --engine=manticoresearch --type=columnar

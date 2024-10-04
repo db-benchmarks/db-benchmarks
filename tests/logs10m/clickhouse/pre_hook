@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+echo -e "Clickhouse (type $suffix):"
+if [[ -L clickhouse/data$suffix/data/default/$test ]] || [[ -e clickhouse/data$suffix/data/default/$test ]]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
+
+docker-compose -f ../../docker-compose.yml --env-file ../../.env stop clickhouse
+docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f clickhouse
+
+cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d clickhouse"
+echo -e "\tStarting clickhouse ($cmd)"
+eval "$cmd"
+
+while true; do
+  response=$(curl -s http://localhost:8123/ping)
+  if [[ "$response" == "Ok." ]]; then
+    echo -e "\tClickHouse is ready!"
+    exit 0
+  fi
+
+  attempts=$((attempts + 1))
+
+  if [[ $attempts -ge 60 ]]; then
+    echo -e "\tTimeout reached. ClickHouse did not become available."
+    exit 1
+  fi
+
+  sleep 1
+done
+
+docker exec clickhouse_engine clickhouse-client --query="DROP TABLE IF EXISTS default.$test"

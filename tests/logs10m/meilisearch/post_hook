@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading to index at "
+date
+
+inserted=$(curl -s http://localhost:7700/indexes/$test/stats | jq .numberOfDocuments)
+echo -e "\tCount of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 10365132 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi

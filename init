@@ -1,0 +1,482 @@
+#!/usr/bin/env php
+<?php
+/* Copyright (C) 2024 Manticore Software Ltd
+ * You may use, distribute and modify this code under the
+ * terms of the AGPLv3 license.
+ *
+ * You can find a copy of the AGPLv3 license here
+ * https://www.gnu.org/licenses/agpl-3.0.txt
+ */
+
+use JetBrains\PhpStorm\NoReturn;
+
+require_once('core/helpers.php');
+
+class Init
+{
+    use Helpers;
+
+    private string $testName;
+    private string $engineName;
+    private string $type;
+    private string $suffix;
+    private string $measurementsLogPath;
+
+
+    public function __construct(
+        string $testName,
+        string $engineName,
+        string $type
+    ) {
+        $this->testName = $testName;
+        $this->engineName = $engineName;
+        $this->type = $type;
+
+        $this->checkHooksExist();
+        $this->getSuffix();
+        $this->measurementsLogPath = "/tmp/inflate_$this->engineName.txt";
+
+        try {
+            $this->preHook()
+            && $this->inflateHook()
+            && $this->postHook();
+        } catch (Exception $exception) {
+            self::die(1, $exception->getMessage());
+        }
+    }
+
+    private function checkHooksExist(): void
+    {
+        if (!file_exists("$this->engineName/pre_hook")) {
+            self::die("Can't find pre-hook for $this->engineName", 1);
+        }
+
+        if (!file_exists("$this->engineName/inflate_hook")) {
+            self::die("Can't find inflate hook for $this->engineName", 1);
+        }
+
+        if (!file_exists("$this->engineName/post_hook")) {
+            self::die("Can't find post-hook for $this->engineName", 1);
+        }
+    }
+
+    private function getSuffix(): void
+    {
+        $this->suffix = ($this->type === "")
+            ? ""
+            : "_$this->type";
+    }
+
+    public function preHook(): bool
+    {
+        echo "Run Pre-hook $this->engineName\n";
+        $result = $this->processHook("pre_hook", "Pre-hook");
+        echo "End Pre-hook $this->engineName\n";
+        return $result;
+    }
+
+    public function inflateHook(): bool
+    {
+        echo "Run Inflate Hook $this->engineName\n";
+        $scriptPath
+            = "test=$this->testName suffix=$this->suffix $this->engineName/inflate_hook";
+
+        $pid = pcntl_fork();
+        if ($pid == -1) {
+            self::die(1, 'Could not fork process');
+        } else {
+            if ($pid) {
+                $startTime = microtime(true);
+                $runStatus = $this->runScript($scriptPath);
+                echo "End Inflate Hook $this->engineName\n";
+                posix_kill($pid, SIGTERM);
+
+                pcntl_wait($status);
+
+                if ($runStatus['code'] === 0) {
+                    $this->saveStats($startTime);
+                    return true;
+                }
+
+                throw new RuntimeException("Inflate hook unexpected exit. "
+                    . $runStatus['error']);
+            } else {
+                $this->measureStats();
+            }
+        }
+    }
+
+    public function postHook(): bool
+    {
+        echo "Run Post-hook $this->engineName\n";
+        $result = $this->processHook("post_hook", "Post hook");
+        echo "End Post-hook $this->engineName\n";
+        return $result;
+    }
+
+    private function runScript($scriptPath): array
+    {
+        $descriptors = [
+            0 => ["pipe", "r"],  // stdin
+            1 => ["pipe", "w"],  // stdout
+            2 => ["pipe", "w"]   // stderr
+        ];
+
+        $process = proc_open($scriptPath, $descriptors, $pipes);
+        $exitCode = null;
+
+        $errors = null;
+        if (is_resource($process)) {
+            stream_set_blocking($pipes[1],
+                false);  // Set stdout to non-blocking mode
+            stream_set_blocking($pipes[2],
+                false);  // Set stderr to non-blocking mode
+
+            // Read from stdout
+            while (!feof($pipes[1])) {
+                $line = fgets($pipes[1]);
+                if ($line !== false) {
+                    echo "\t" . $line;
+                }
+            }
+            fclose($pipes[1]);
+
+            $i = 0;
+            while (!feof($pipes[2])) {
+                $errorLine = fgets($pipes[2]);
+                if ($errorLine !== false) {
+                    $errors .= $errorLine;
+                } else {
+                    $i++;
+                }
+                if ($i > 10) {
+                    break;
+                }
+            }
+            fclose($pipes[2]);
+
+            $exitCode = proc_close($process);
+        }
+
+        return ['code' => $exitCode, 'error' => $errors];
+    }
+
+    private function getStatsCommands(): array
+    {
+        $cpuStatCommand
+            = '$(cat /sys/fs/cgroup/cpu.stat | grep usage_usec | cut -d" " -f2)';
+        $memoryStatCommand = '$(cat /sys/fs/cgroup/memory.current)';
+        $ioStatCommand
+            = '$(awk \'\\\'\'{for(i=1;i<=NF;i++) if($i ~ /rbytes=/) {split($i, a, "="); total_rbytes += a[2]} else if($i ~ /wbytes=/) {split($i, b, "="); total_wbytes += b[2]}} END {print total_rbytes "/" total_wbytes}\'\\\'\' /sys/fs/cgroup/io.stat)';
+        $timestamp
+            = 'date +%s%N | awk \'\\\'\'{print substr($0, 1, length($0)-3)}\'\\\'\'';
+
+        return [
+            'cpu' => $cpuStatCommand,
+            'mem' => $memoryStatCommand,
+            'io' => $ioStatCommand,
+            'timestamp' => $timestamp
+        ];
+    }
+
+    #[NoReturn]
+    private function measureStats(): void
+    {
+        declare(ticks=1);
+
+        pcntl_signal(SIGTERM, function () {
+            exit(0);
+        });
+
+        if (file_exists($this->measurementsLogPath)) {
+            unlink($this->measurementsLogPath);
+        }
+
+        $fp = fopen($this->measurementsLogPath, 'w');
+        if (!$fp) {
+            echo "Cannot open file ($this->measurementsLogPath)";
+            exit(1);
+        }
+
+        $commands = $this->getStatsCommands();
+
+
+        $command = 'docker exec ' . $this->engineName . '_engine sh -c ' .
+            '\'while true; do echo -n "cpu=' .
+            $commands['cpu'] . ' mem=' . $commands['mem'] . ' ' .
+            'disc=' . $commands['io'] . ' timestamp='
+            . '" && ' . $commands['timestamp'] . '; sleep 1; done\'';
+
+        $descriptors = [
+            1 => ['pipe', 'w'], // stdout is a pipe that the child will write to
+            2 => ['pipe', 'w']  // stderr is a pipe that the child will write to
+        ];
+
+        $process = proc_open($command, $descriptors, $pipes);
+
+        if (is_resource($process)) {
+            while (!feof($pipes[1])) {
+                $output = fgets($pipes[1]);
+                if ($output === false) {
+                    break;
+                }
+                fwrite($fp, $output);
+            }
+
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+        } else {
+            echo "Cannot start process ($command)";
+            fclose($fp);
+            exit(1);
+        }
+
+        fclose($fp);
+    }
+
+
+    public function calculateStats(): array
+    {
+        $cpu = [];
+        $ram = [];
+        $disc = [
+            'read' => [],
+            'write' => []
+        ];
+
+        $content = file_get_contents($this->measurementsLogPath);
+        //CPU_LOAD MEMORY DISC MICROTIME
+        $content = explode("\n", $content);
+
+        $usageUsecStart = 0;
+        $initialTime = 0;
+        foreach ($content as $row) {
+            if ($row === '') {
+                continue;
+            }
+
+
+            $pattern
+                = '/cpu=(?<cpu>\d*) mem=(?<mem>\d*)' .
+                ' disc=(?<disc>[0-9\/.e+-]*) timestamp=(?<timestamp>\d*)/usi';
+            preg_match($pattern, $row, $parts);
+
+            if (empty($parts['timestamp'])) {
+                continue;
+            }
+
+            if ($usageUsecStart === 0) {
+                $usageUsecStart = $parts['cpu'];
+                $initialTime = $parts['timestamp'];
+                continue;
+            }
+
+            $cpu[] = $this->calculateCpuLoad((int) $usageUsecStart,
+                (int) $parts['cpu'],
+                ($parts['timestamp'] - $initialTime));
+
+            $usageUsecStart = $parts['cpu'];
+            $initialTime = $parts['timestamp'];
+
+            $ram[] = (float) $parts['mem'] / 1024 / 1024;
+
+            if ($parts['disc'] !== '/') {
+                $io = explode('/', $parts['disc']);
+                $disc['read'][] = $io[0];
+                $disc['write'][] = $io[1];
+            }
+        }
+
+        unset($content);
+
+        if ($disc['read'] === []) {
+            $commands = $this->getStatsCommands();
+            $command = 'docker exec ' . $this->engineName . '_engine sh -c ' .
+                '\'echo ' . $commands['io'] . '\'';
+
+            for ($i = 0; $i < 60; $i++) {
+                $ioStats = trim(shell_exec($command));
+                if ($ioStats !== '/') {
+                    $io = explode('/', $ioStats);
+                    $disc['read'][] = $io[0];
+                    $disc['write'][] = $io[1];
+                    break;
+                }
+                sleep(1);
+            }
+        }
+        if ($disc['read'] === []) {
+            $discRead = 0;
+        } else {
+            $discRead = max($disc['read']);
+        }
+
+        if ($disc['write'] === []) {
+            $discWrite = 0;
+        } else {
+            $discWrite = max($disc['write']);
+        }
+
+
+        unset($disc);
+
+        $results = [];
+        foreach (['cpu', 'ram'] as $measureType) {
+            if ($$measureType === []){
+                $results[$measureType]['average'] = 0;
+                $results[$measureType]['median'] = 0;
+                $results[$measureType]['95p'] = 0;
+
+                continue;
+            }
+
+            $results[$measureType]['average']
+                = round($this->calculateAverage($$measureType), 4);
+
+            sort($$measureType);
+
+            $results[$measureType]['median']
+                = round($this->calculateMedian($$measureType), 4);
+
+            $results[$measureType]['95p']
+                = round($this->calculate95Percentile($$measureType), 4);
+        }
+
+        $results['cpu']['average'] = round($results['cpu']['average'] / 100, 4);
+        $results['cpu']['median'] = round($results['cpu']['median'] / 100, 4);
+        $results['cpu']['95p'] = round($results['cpu']['95p'] / 100, 4);
+        $results['disc']['read']['total'] = round($discRead / 1024 / 1024, 4);
+        $results['disc']['write']['total'] = round($discWrite / 1024 / 1024, 4);
+        return $results;
+    }
+
+    private function calculateCpuLoad(
+        int $usageUsecStart,
+        int $usageUsecEnd,
+        int $elapsedTimeUsec
+    ): float {
+        $usageMicroseconds = ($usageUsecEnd - $usageUsecStart);
+        $cpuPercentage = ($usageMicroseconds / $elapsedTimeUsec) * 100;
+        return $cpuPercentage;
+    }
+
+
+    private function saveStats(float $startTime): void
+    {
+        $elapsed = microtime(true) - $startTime;
+
+        $date = date('ymd_his');
+        $folderPath = "../../results/$this->testName/$this->engineName/$date/";
+        $fileName = $this->testName . "_" . $this->engineName . "__init";
+
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath);
+        }
+
+        file_put_contents(
+            $folderPath . $fileName,
+            serialize([
+                'stage' => 'init',
+                'elapsedTime' => $elapsed,
+                'metrics' => $this->calculateStats(),
+                'engine' => $this->engineName,
+                'test' => $this->testName,
+                'type' => $this->type,
+                'formatVersion' => 1,
+                'version' => $this->getVersion()
+            ]));
+
+        unlink($this->measurementsLogPath);
+    }
+
+
+    private function getVersion(): string
+    {
+        include_once("../../core/engine.php");
+
+        if ($this->engineName === 'mysql_percona') {
+            include_once("../../plugins/mysql.php");
+        }
+        include_once("../../plugins/$this->engineName.php");
+
+
+        $engineClassName = $this->engineName;
+        /** @var engine $engine */
+        $engine = new $engineClassName($this->type);
+        $info = $engine->getInfo();
+        return $info['version'];
+    }
+
+
+    private function calculateAverage(array $values): float|int
+    {
+        return array_sum($values) / count($values);
+    }
+
+    private function calculateMedian(array $sortedValues): float|int
+    {
+        $count = count($sortedValues);
+        $middleKey = (int) ($count / 2);
+
+        if ($count % 2 === 0) {
+            // If even, return the average of the two middle values
+            return ($sortedValues[$middleKey - 1]
+                    + $sortedValues[$middleKey]) / 2;
+        } else {
+            // If odd, return the middle value
+            return $sortedValues[$middleKey];
+        }
+    }
+
+    private function calculate95Percentile(array $sortedValues): float|int
+    {
+        $p95key = (int) ceil(
+                sizeof($sortedValues) * 0.95
+            ) - 1; // Adjust for 0-based index
+
+        if (!isset($sortedValues[$p95key])) {
+            return max($sortedValues);
+        }
+        return $sortedValues[$p95key];
+    }
+
+
+    private function processHook(string $command, string $hookName): bool
+    {
+        $hookPath
+            = "test=$this->testName suffix=$this->suffix $this->engineName/"
+            . $command;
+        $runStatus = $this->runScript($hookPath);
+        if ($runStatus['code'] === 10) {
+            // If we don't need to rebuild this engine
+            // pre_hook should return us exit code 10
+            return false;
+        } elseif ($runStatus['code'] === 0) {
+            return true;
+        }
+
+        $redColor = "\033[31m";
+        $resetColor = "\033[0m";
+
+        echo $redColor . "$hookName unexpected exit: "
+            . $runStatus['code'] . "\n" . $runStatus['error'] . $resetColor;
+
+        exit(1);
+    }
+}
+
+$arguments = Init::getopt([
+    "test:",
+    "engine:",
+    "type:"
+]);
+
+foreach (['engine', 'test'] as $argument) {
+    if (!isset($arguments[$argument])) {
+        Init::die("Argument $argument is mandatory", 1);
+    }
+}
+
+
+new Init($arguments['test'], $arguments['engine'], $arguments['type'] ?? "");
