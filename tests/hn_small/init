@@ -20,6 +20,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+../../init --engine=zincsearch
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch
 ../../init --engine=manticoresearch
