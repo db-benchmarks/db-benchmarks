@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+export ZINC_SEARCH_HOST='http://admin:dbbenchmarks@localhost:4080'
+
+echo -en "\tStarting loading at "
+date
+for f in ./data/${test}_splitted.*; do
+  echo "\nUpload chunk $f"
+
+  curl "${ZINC_SEARCH_HOST}/api/_bulk" \
+    -X POST \
+    --data-binary @$f
+
+  rm "${f}"
+done
+
+insertSize=$(cat data/data.jsonl | wc -l)
+rm ./data/data.jsonl
+
+echo -e "\tWait until Zincsearch process batch"
+for i in $(seq 1 300); do
+  if curl -s "${ZINC_SEARCH_HOST}/api/hn_small/_search" -X POST \
+  -d '{"search_type": "alldocuments","max_results": 0}' | jq .hits.total.value | grep $insertSize; then
+    echo -e "\tSuccess"
+    break
+  fi
+  printf '%s' "."
+  sleep 1
+done
