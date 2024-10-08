@@ -242,7 +242,8 @@ services:
       - --max-indexing-threads=24
 
   zincsearch:
-    image: public.ecr.aws/zinclabs/zincsearch:0.4.10
+    build:
+      context: ./tests/hn_small/zincsearch
     networks:
       - default
     container_name: "zincsearch_engine"

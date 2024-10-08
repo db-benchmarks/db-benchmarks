@@ -28,7 +28,7 @@ class zincsearch extends engine {
         return "http://$this->auth@localhost:{$this->port}";
     }
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    public function getInfo() {
         $ret = [];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $this->getUrl()."/version");
