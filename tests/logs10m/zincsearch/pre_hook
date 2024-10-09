@@ -12,9 +12,6 @@ docker-compose -f ../../docker-compose.yml --env-file ../../.env stop zincsearch
 docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f zincsearch
 chmod -R 777 zincsearch/idx$suffix # otherwise zincsearch in docker won't start
 
-
-
-
 cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d zincsearch"
 echo -e "\tStarting Zincsearch ($cmd)"
 eval "$cmd"
@@ -35,8 +32,8 @@ if [ ! -f data/data.jsonl ]; then
   php ./quickwit/csv_jsonl.php ./data/data.csv ./data/data.jsonl
 fi
 
-if [ ! -f data/splitted_json.aaaaa ]; then
-      awk '{ print "{ \"create\" : { \"_index\" : \"logs10m\" } }\n" $0 }' ./data/data.jsonl >./data/bulk.jsonl
-      split -l 20000 -a 5 ./data/bulk.jsonl ./data/${test}_splitted.
-      rm ./data/bulk.jsonl
+if [ ! -f "data/${test}_splitted.aaaaa" ]; then
+  awk '{ print "{ \"create\" : { \"_index\" : \"logs10m\" } }\n" $0 }' ./data/data.jsonl >./data/bulk.jsonl
+  split -l 20000 -a 5 ./data/bulk.jsonl ./data/${test}_splitted.
+  rm ./data/bulk.jsonl
 fi
