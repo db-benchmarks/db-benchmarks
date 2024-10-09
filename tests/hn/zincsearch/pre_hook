@@ -29,7 +29,7 @@ curl "${ZINC_SEARCH_HOST}/es/_index_template" \
   --data-binary @./zincsearch/template.json
 
 if [ ! -f data/data.jsonl ]; then
-  php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
+  php ./quickwit/csv_jsonl.php ./data/data.csv ./data/data.jsonl
 fi
 
 if [ ! -f "data/${test}_splitted.aaaaa" ]; then
