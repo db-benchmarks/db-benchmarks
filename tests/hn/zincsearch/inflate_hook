@@ -25,5 +25,5 @@ for i in $(seq 1 300); do
     break
   fi
   printf '%s' "."
-  sleep 1
+  sleep 5
 done
