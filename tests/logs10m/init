@@ -20,9 +20,7 @@ if [ $? -ne 0 ]; then
 fi
 
 
-# Zincsearch hangs on ingestion step. Related issue https://github.com/zincsearch/zincsearch/issues/979
-# ../../init --engine=zincsearch
-
+../../init --engine=zincsearch
 ../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch

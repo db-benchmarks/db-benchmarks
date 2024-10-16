@@ -7,9 +7,17 @@ date
 for f in ./data/${test}_splitted.*; do
   echo "\nUpload chunk $f"
 
-  curl "${ZINC_SEARCH_HOST}/api/_bulk" \
-    -X POST \
-    --data-binary @$f
+  retries=3
+  for i in $(seq 1 $retries); do
+    timeout 30 curl -s "${ZINC_SEARCH_HOST}/api/_bulk" --data-binary @$f 2>&1
+    if [ $? -eq 0 ]; then
+      echo "Success on attempt $i"
+      break
+    else
+      echo "Attempt $i failed, retrying..."
+      sleep 30
+    fi
+  done
 
   rm "${f}"
 done
@@ -17,13 +25,17 @@ done
 insertSize=$(cat data/data.jsonl | wc -l)
 rm ./data/data.jsonl
 
+WAIT_ITERATIONS=600
 echo -e "\tWait until Zincsearch process batch"
-for i in $(seq 1 300); do
+for i in $(seq 1 ${WAIT_ITERATIONS}); do
   if curl -s "${ZINC_SEARCH_HOST}/api/${test}/_search" -X POST \
-  -d '{"search_type": "alldocuments","max_results": 0}' | jq .hits.total.value | grep $insertSize; then
+    -d '{"search_type": "alldocuments","max_results": 0}' | jq .hits.total.value | grep $insertSize; then
     echo -e "\tSuccess"
-    break
+    exit 0
   fi
   printf '%s' "."
   sleep 5
 done
+
+echo -e "\tZincsearch doesn't process expected count of documents. Probably you need to increase value of WAIT_ITERATIONS"
+exit 0
