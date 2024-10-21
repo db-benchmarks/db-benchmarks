@@ -31,6 +31,8 @@
         "search_type": "alldocuments",
         "max_results": 0
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": true
     }
   },
@@ -62,6 +64,8 @@
         "search_type": "alldocuments",
         "max_results": 1
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false
     }
   }

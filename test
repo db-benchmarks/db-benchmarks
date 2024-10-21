@@ -13,6 +13,7 @@ $cwd = getcwd();
 
 require_once('core/helpers.php');
 require_once('core/engine.php');
+require_once('core/EsCompatible.php');
 $files = glob(__DIR__ . '/plugins/*.php');
 foreach ($files as $file) require($file);
 

@@ -9,11 +9,13 @@
  */
 
 class zincsearch extends engine {
+    use EsCompatible;
 
     private $port = 4080;
     private string $auth = 'admin:dbbenchmarks';
     private $curl = null; // curl connection
     private mixed $getCountFromRequest = false;
+    private ?array $retrieveFields = null;
 
     protected function url() {
         return "https://zincsearch-docs.zinc.dev/";
@@ -81,6 +83,8 @@ class zincsearch extends engine {
         }
         assert(is_array($query));
         $this->getCountFromRequest = $query['getCountFromRequest'];
+        $this->retrieveFields = $query['retrieve'];
+        $this->resultsMapping = $query['mapping'];
         return $this->sendRequest($query['payload'], $query['esCompatible'] ?? false);
     }
 
@@ -124,6 +128,9 @@ class zincsearch extends engine {
             $this->getCountFromRequest && isset($curlResult['hits']['total']['value']) => [
                 ['count(*)' => $curlResult['hits']['total']['value']],
             ],
+            isset($curlResult['hits']['hits']) && $curlResult['hits']['hits'] === []
+            && isset($curlResult['aggregations'])
+            => self::parseAggregations($curlResult['aggregations']),
             !empty($curlResult['hits']['hits']) => self::filterResults($curlResult['hits']['hits']),
             default => [],
         };
@@ -133,7 +140,7 @@ class zincsearch extends engine {
      * @param array<string,mixed> $results
      * @return array<string,mixed>
      */
-    protected static function filterResults(array $results): array {
+    protected function filterResults(array $results): array {
         $filtered = [];
         foreach ($results as $row) {
             $ar = [];
@@ -141,6 +148,12 @@ class zincsearch extends engine {
                 if (in_array($k, ['id', '@timestamp'])) {
                     continue;
                 } // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
+
+                if (!empty($this->retrieveFields)
+                    && !in_array($k, $this->retrieveFields)
+                ) {
+                    continue;
+                }
 
                 if (is_numeric($v) && strpos($v, '.')) {
                     $v = round($v, 4);

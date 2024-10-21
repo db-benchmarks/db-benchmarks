@@ -31,6 +31,8 @@
         "search_type": "alldocuments",
         "max_results": 0
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": true,
       "esCompatible": false
     }
@@ -77,6 +79,8 @@
         },
         "max_results": 0
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": true,
       "esCompatible": false
     }
@@ -123,6 +127,8 @@
         },
         "max_results": 0
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": true,
       "esCompatible": false
     }
@@ -172,6 +178,8 @@
         },
         "size": 0
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": true,
       "esCompatible": true
     }
@@ -388,6 +396,8 @@
         },
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -427,6 +437,8 @@
         },
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -464,6 +476,8 @@
         },
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -523,10 +537,16 @@
           }
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -568,11 +588,21 @@
           }
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } },
-          { "story_id": { "order": "desc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          },
+          {
+            "story_id": {
+              "order": "desc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -623,12 +653,24 @@
         "query": {
           "bool": {
             "must": [
-              { "match": { "_all": "google" } },
-              { "range": { "comment_ranking": { "gt": 200 } } }
+              {
+                "match": {
+                  "_all": "google"
+                }
+              },
+              {
+                "range": {
+                  "comment_ranking": {
+                    "gt": 200
+                  }
+                }
+              }
             ]
           }
         }
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": true,
       "esCompatible": true
     }
@@ -688,17 +730,25 @@
     },
     "zincsearch": {
       "payload": {
-        "_source": ["story_id"],
+        "_source": [
+          "story_id"
+        ],
         "query": {
           "match": {
             "_all": "me"
           }
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -775,6 +825,8 @@
         },
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -820,10 +872,16 @@
           "match_all": {}
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -869,10 +927,16 @@
           "match_all": {}
         },
         "sort": [
-          { "comment_ranking": { "order": "desc" } }
+          {
+            "comment_ranking": {
+              "order": "desc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -905,11 +969,21 @@
           "match_all": {}
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } },
-          { "story_id": { "order": "asc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          },
+          {
+            "story_id": {
+              "order": "asc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -957,15 +1031,23 @@
     },
     "zincsearch": {
       "payload": {
-        "_source": ["comment_ranking"],
+        "_source": [
+          "comment_ranking"
+        ],
         "query": {
           "match_all": {}
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -1015,15 +1097,24 @@
     },
     "zincsearch": {
       "payload": {
-        "_source": ["comment_ranking", "story_text"],
+        "_source": [
+          "comment_ranking",
+          "story_text"
+        ],
         "query": {
           "match_all": {}
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
@@ -1062,13 +1153,18 @@
       "mapping": null
     },
     "zincsearch": {
-      "payload":{
+      "payload": {
         "query": {
           "terms": {
-            "comment_ranking": [100, 200]
+            "comment_ranking": [
+              100,
+              200
+            ]
           }
         }
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": true,
       "esCompatible": true
     }
@@ -1092,19 +1188,39 @@
     "typesense": "-",
     "quickwit": "-",
     "zincsearch": {
-      "payload":{
-        "_source": ["story_id"],
+      "payload": {
+        "_source": [
+          "story_id"
+        ],
         "query": {
           "match_all": {}
         },
         "sort": [
-          { "comment_ranking": { "order": "asc" } },
-          { "author_comment_count": { "order": "asc" } },
-          { "story_comment_count": { "order": "asc" } },
-          { "comment_id": { "order": "asc" } }
+          {
+            "comment_ranking": {
+              "order": "asc"
+            }
+          },
+          {
+            "author_comment_count": {
+              "order": "asc"
+            }
+          },
+          {
+            "story_comment_count": {
+              "order": "asc"
+            }
+          },
+          {
+            "comment_id": {
+              "order": "asc"
+            }
+          }
         ],
         "size": 20
       },
+      "retrieve": null,
+      "mapping": null,
       "getCountFromRequest": false,
       "esCompatible": true
     }
