@@ -48,3 +48,7 @@ fi
 if [[ -d mysql_percona ]]; then
   ../../init --engine=mysql_percona
 fi
+
+# Meilisearch never finishes ingesting the data, hence commented out
+# Meilisearch
+# . meilisearch/init

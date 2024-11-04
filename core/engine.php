@@ -368,10 +368,6 @@ abstract class engine
         }
     }
 
-    public static function save()
-    {
-        // TODO
-    }
 
     // runs test based on config for all engines
     public static function test($cwd)
@@ -540,7 +536,7 @@ abstract class engine
             self::die("ERROR: empty queries", 1);
         }
 
-        $limited = isset(self::$commandLineArguments['limited']);
+        $limited = !empty(self::$commandLineArguments['limited']);
         // let's test in all memory modes
         self::log('Starting testing', 1, 'cyan');
         foreach (self::$commandLineArguments['memory'] as $mem) {
@@ -726,7 +722,7 @@ abstract class engine
         $serverId,
         $serverInfo,
         $retest = false
-    ) {
+    ) : void {
         self::log("Saving data for engine \"" . get_class($this) . "\""
             . ($retest ? ' (retest)' : ''), 1, 'cyan');
 
@@ -734,11 +730,10 @@ abstract class engine
         if (!isset($info['version'])) {
             self::die("ERROR: version for $engine is not found, can't save results",
                 2);
-            return false;
         }
 
-        $limited = (isset(self::$commandLineArguments['limited'])
-            or $engineOptions['limited']);
+        $limited = (!empty(self::$commandLineArguments['limited'])
+            || $engineOptions['limited']);
         $fileName = self::$commandLineArguments['test']
             . "_{$engine}_{$this->type}_{$memory}" . ($retest ? '_retest' : '');
 
@@ -812,7 +807,7 @@ abstract class engine
     }
 
     // parses engine name, e.g. manticoresearch:columnar_plain_ps into parses
-    private static function parseEngineName($engine)
+    private static function parseEngineName($engine): array
     {
         $engine_type = explode(':', $engine);
         if (!$engine_type) {
@@ -833,7 +828,7 @@ abstract class engine
         $memory = false,
         $limited = false,
         $skipIOCheck = false
-    ) {
+    ): float {
         $suffix = $this->type ? "_" . $this->type
             : ""; // suffix defines some volumes in the docker-compose, e.g. ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore
         if (!$memory) {
@@ -867,20 +862,19 @@ abstract class engine
                 self::die("ERROR: $engine starting time exceeded timeout ("
                     . self::$commandLineArguments['start_timeout']
                     . " seconds)", 2);
-                return false;
             }
         }
         self::log("$engine " . ($this->type ? "(type: {$this->type}) " : '')
             . "is up and running", 3);
         if ($skipIOCheck) {
-            return true;
+            return 0.0;
         }
         $t = microtime(true);
         self::waitForNoIO();
         return round((microtime(true) - $t) * 1000);
     }
 
-    private static function waitForNoIO()
+    private static function waitForNoIO(): void
     {
         if (isset(self::$commandLineArguments['skip_inaccuracy'])) {
             return;
@@ -908,7 +902,7 @@ abstract class engine
     }
 
     // stops engine
-    private function stop()
+    private function stop(): void
     {
         $engine = get_class($this);
         self::log("Stopping $engine " . ($this->type ? "(type {$this->type})"
@@ -926,7 +920,7 @@ abstract class engine
 
     // drops all global IO caches
     // some engines require to be stopped before that, otherwise it's not effective
-    private static function dropIOCache()
+    private static function dropIOCache(): void
     {
         if (isset(self::$commandLineArguments['skip_inaccuracy'])) {
             return;
@@ -1125,7 +1119,7 @@ Environment vairables:
 
     // to be run after parsing command line arguments
     // checks that it's ok to run the test
-    public static function sanitize()
+    public static function sanitize(): void
     {
         if (self::$mode == 'test') {
             $file = dirname(__FILE__) . '/../tests/'
@@ -1137,7 +1131,7 @@ Environment vairables:
     }
 
     // initializes some global things
-    public static function init($cwd)
+    public static function init($cwd): void
     {
         self::$startTime = time();
         self::$cwd = $cwd;
@@ -1153,7 +1147,7 @@ Environment vairables:
     }
 
     // function intended to prepare the environment for proper testing: stop all docker instances, clear global caches etc.
-    public static function prepareEnvironmentForTest()
+    public static function prepareEnvironmentForTest(): void
     {
         self::log("Preparing environment for test", 1, 'cyan');
         system("test=" . self::$commandLineArguments['test']
@@ -1164,7 +1158,7 @@ Environment vairables:
         system("docker ps -a|grep _engine|awk '{print $1}'|xargs docker rm > /dev/null 2>&1");
     }
 
-    static private function checkTempAndWait()
+    static private function checkTempAndWait(): bool
     {
         if (isset(self::$commandLineArguments['skip_inaccuracy'])) {
             return true;
@@ -1211,7 +1205,7 @@ Environment vairables:
     }
 
     // function calculates coefficient of variation
-    private static function cv($ar)
+    private static function cv($ar): ?float
     {
         $c = count($ar);
         if (!$c) {
