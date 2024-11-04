@@ -240,7 +240,6 @@ services:
       - --no-analytics
       - --max-indexing-memory=2Gb
       - --max-indexing-threads=24
-
 networks:
   default:
     driver: bridge
