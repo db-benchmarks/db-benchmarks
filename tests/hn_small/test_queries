@@ -25,16 +25,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "search_type": "alldocuments",
-        "max_results": 0
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": true,
-      "esCompatible": false
     }
   },
   {
@@ -69,20 +59,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "search_type": "term",
-        "query": {
-          "term": "100",
-          "field": "comment_ranking"
-        },
-        "max_results": 0
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": true,
-      "esCompatible": false
     }
   },
   {
@@ -117,20 +93,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "search_type": "term",
-        "query": {
-          "term": "500",
-          "field": "comment_ranking"
-        },
-        "max_results": 0
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": true,
-      "esCompatible": false
     }
   },
   {
@@ -165,23 +127,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "range": {
-            "comment_ranking": {
-              "gt": 300,
-              "lt": 500
-            }
-          }
-        },
-        "size": 0
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": true,
-      "esCompatible": true
     }
   },
   {
@@ -216,8 +161,7 @@
           }
         }
       }
-    },
-    "zincsearch": "-"
+    }
   },
   {
     "default": "select story_author, avg(comment_ranking) avg from hn_small group by story_author order by avg desc limit 20",
@@ -260,8 +204,7 @@
           }
         }
       }
-    },
-    "zincsearch": "-"
+    }
   },
   {
     "default": "select comment_ranking, count(*) from hn_small group by comment_ranking order by count(*) desc limit 20",
@@ -295,29 +238,25 @@
           }
         }
       }
-    },
-    "zincsearch": "-"
+    }
   },
   {
     "default": "select comment_ranking, avg(author_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
-    "quickwit": "-",
-    "zincsearch": "-"
+    "quickwit": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
-    "quickwit": "-",
-    "zincsearch": "-"
+    "quickwit": "-"
   },
   {
     "default": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where comment_ranking < 10 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
-    "quickwit": "-",
-    "zincsearch": "-"
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -328,8 +267,7 @@
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
-    "quickwit": "-",
-    "zincsearch": "-"
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -340,8 +278,7 @@
     "postgres": "select comment_ranking, avg(author_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
-    "quickwit": "-",
-    "zincsearch": "-"
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small where match('google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
@@ -352,8 +289,7 @@
     "postgres": "select comment_ranking, avg(author_comment_count+story_comment_count) avg from hn_small WHERE story_text_ts || story_author_ts || comment_text_ts || comment_author_ts @@ to_tsquery('english', 'google') and comment_ranking > 200 group by comment_ranking order by avg desc, comment_ranking desc limit 20",
     "meilisearch": "-",
     "typesense": "-",
-    "quickwit": "-",
-    "zincsearch": "-"
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select * from hn_small where match('abc') limit 20",
@@ -386,20 +322,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "match": {
-            "_all": "abc"
-          }
-        },
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -427,20 +349,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "query_string": {
-            "query": "abc -google"
-          }
-        },
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -466,20 +374,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "match_phrase": {
-            "_all": "elon musk"
-          }
-        },
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -528,27 +422,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "match": {
-            "_all": "abc"
-          }
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -579,33 +452,7 @@
       },
       false
     ],
-    "quickwit": "-",
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "match": {
-            "_all": "abc"
-          }
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          },
-          {
-            "story_id": {
-              "order": "desc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
-    }
+    "quickwit": "-"
   },
   {
     "manticoresearch": "select count(*) from hn_small where match('google') and comment_ranking > 200",
@@ -646,33 +493,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "size": 0,
-        "query": {
-          "bool": {
-            "must": [
-              {
-                "match": {
-                  "_all": "google"
-                }
-              },
-              {
-                "range": {
-                  "comment_ranking": {
-                    "gt": 200
-                  }
-                }
-              }
-            ]
-          }
-        }
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": true,
-      "esCompatible": true
     }
   },
   {
@@ -727,30 +547,6 @@
       "retrieve": {
         "story_id": "story_id"
       }
-    },
-    "zincsearch": {
-      "payload": {
-        "_source": [
-          "story_id"
-        ],
-        "query": {
-          "match": {
-            "_all": "me"
-          }
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -806,29 +602,6 @@
         },
         "size": 20
       }
-    },
-    "zincsearch": {
-      "payload": {
-        "_source": [
-          "story_id",
-          "comment_id",
-          "comment_ranking",
-          "author_comment_count",
-          "story_comment_count",
-          "story_author",
-          "comment_author"
-        ],
-        "query": {
-          "match": {
-            "_all": "abc"
-          }
-        },
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -865,25 +638,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -920,25 +674,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "desc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -962,31 +697,7 @@
       },
       false
     ],
-    "quickwit": "-",
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          },
-          {
-            "story_id": {
-              "order": "asc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
-    }
+    "quickwit": "-"
   },
   {
     "default": "select comment_ranking from hn_small order by comment_ranking asc limit 20",
@@ -1028,28 +739,6 @@
           }
         ]
       }
-    },
-    "zincsearch": {
-      "payload": {
-        "_source": [
-          "comment_ranking"
-        ],
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -1094,29 +783,6 @@
           }
         ]
       }
-    },
-    "zincsearch": {
-      "payload": {
-        "_source": [
-          "comment_ranking",
-          "story_text"
-        ],
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
     }
   },
   {
@@ -1151,22 +817,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "query": {
-          "terms": {
-            "comment_ranking": [
-              100,
-              200
-            ]
-          }
-        }
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": true,
-      "esCompatible": true
     }
   },
   {
@@ -1186,43 +836,6 @@
       }
     ],
     "typesense": "-",
-    "quickwit": "-",
-    "zincsearch": {
-      "payload": {
-        "_source": [
-          "story_id"
-        ],
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "comment_ranking": {
-              "order": "asc"
-            }
-          },
-          {
-            "author_comment_count": {
-              "order": "asc"
-            }
-          },
-          {
-            "story_comment_count": {
-              "order": "asc"
-            }
-          },
-          {
-            "comment_id": {
-              "order": "asc"
-            }
-          }
-        ],
-        "size": 20
-      },
-      "retrieve": null,
-      "mapping": null,
-      "getCountFromRequest": false,
-      "esCompatible": true
-    }
+    "quickwit": "-"
   }
 ]

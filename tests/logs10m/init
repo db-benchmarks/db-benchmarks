@@ -20,7 +20,6 @@ if [ $? -ne 0 ]; then
 fi
 
 
-../../init --engine=zincsearch
 ../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch

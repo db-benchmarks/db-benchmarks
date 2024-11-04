@@ -20,15 +20,6 @@
       },
       "retrieve": null,
       "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "search_type": "alldocuments",
-        "max_results": 0
-      },
-      "getCountFromRequest": true,
-      "retrieve": null,
-      "mapping": null
     }
   },
   "doc": {
@@ -43,15 +34,6 @@
         "query": "*",
         "max_hits": 1
       },
-      "retrieve": null,
-      "mapping": null
-    },
-    "zincsearch": {
-      "payload": {
-        "search_type": "alldocuments",
-        "max_results": 1
-      },
-      "getCountFromRequest": false,
       "retrieve": null,
       "mapping": null
     }
