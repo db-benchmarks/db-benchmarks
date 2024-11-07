@@ -114,7 +114,7 @@ services:
       - MYSQL_ROOT_PASSWORD=
 
   manticoresearch:
-    image: manticoresearch/manticore:6.3.2
+    image: manticoresearch/manticore:6.3.6
     networks:
       - default
     container_name: "manticoresearch_engine"
