@@ -22,7 +22,7 @@ class clickhouse extends engine {
     }
     
     // attempts to fetch info about engine and return it
-    protected function getInfo() {
+    public function getInfo() {
         $ret = [];
         $version = @file_get_contents("http://localhost:{$this->port}/?query=".urlencode('select version()'));
         if ($version) $ret['version'] = trim($version);

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+echo -en "\tStarting loading at "
+date
+
+docker exec clickhouse_engine clickhouse-client --query="CREATE TABLE default.$test(
+    id UInt64,
+    remote_addr String,
+    remote_user String,
+    runtime UInt64,
+    time_local DateTime,
+    request_type String,
+    request_path String,
+    request_protocol String,
+    status UInt64,
+    size UInt64,
+    referer String,
+    usearagent String) ENGINE = MergeTree() ORDER BY id"
+
+
+cat data/data.csv | docker exec -i clickhouse_engine clickhouse-client \
+  --query="INSERT INTO default.$test FORMAT CSV"

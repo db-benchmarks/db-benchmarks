@@ -20,16 +20,17 @@ services:
     ports:
       - "127.0.0.1:9200:9200"
     environment:
-      - "ELASTIC_PASSWORD=elasticsearch_pwd"
       - "ES_JAVA_OPTS=${ES_JAVA_OPTS}"
+      - "ELASTIC_PASSWORD=elasticsearch_pwd"
       - cluster.name=docker-cluster
       - discovery.type=single-node
       - xpack.security.http.ssl.enabled=false
       - xpack.license.self_generated.type=trial
       - bootstrap.memory_lock=true # as said on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping it needs to be done for performance
     volumes:
-      - ./tests/${test}/es/idx${suffix}:/usr/share/elasticsearch/data
-      - ./tests/${test}/es/config${suffix}:/usr/share/elasticsearch/config/:rw
+      - ./tests/${test}/elasticsearch/idx${suffix}:/usr/share/elasticsearch/data
+      - ./tests/${test}/elasticsearch/config${suffix}:/usr/share/elasticsearch/config/:rw
+
 
   clickhouse:
     image: clickhouse/clickhouse-server:24.4.3.25
@@ -52,7 +53,7 @@ services:
       - "127.0.0.1:8123:8123"
       - "127.0.0.1:9000:9000"
     volumes:
-      - ./tests/${test}/ch/data${suffix}:/var/lib/clickhouse
+      - ./tests/${test}/clickhouse/data${suffix}:/var/lib/clickhouse
 
   mysql:
     image: mysql:8.4.0
@@ -135,9 +136,9 @@ services:
     environment:
       - EXTRA=1
     volumes:
-      - ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore
+      - ./tests/${test}/manticoresearch/idx${suffix}:/var/lib/manticore
       - ./tests/${test}/data:/input
-      - ./tests/${test}/manticore/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
+      - ./tests/${test}/manticoresearch/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
 
   postgres:
     image: postgres:16.3
@@ -189,6 +190,30 @@ services:
       - ./tests/${test}/typesense/data${suffix}:/data
       - ./tests/${test}/data:/input
 
+  quickwit:
+    image: quickwit/quickwit:0.8.1
+    container_name: "quickwit_engine"
+    networks:
+      - default
+    mem_limit: ${mem}m
+    cpuset: "${cpuset}"
+    privileged: true
+    mem_swappiness: 0
+    ports:
+      - "127.0.0.1:7280:7280"
+    command: 'run'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./tests/${test}/quickwit/data${suffix}:/quickwit/qwdata
+      - ./tests/${test}/quickwit/quickwit.yaml:/quickwit/config/quickwit.yaml
+
   meilisearch:
     image: getmeili/meilisearch:v1.8
     networks:
@@ -223,4 +248,3 @@ services:
 networks:
   default:
     driver: bridge
-    name: test_engines_default

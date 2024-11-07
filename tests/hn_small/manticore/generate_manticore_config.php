@@ -1,1 +1,0 @@
-../../hn/manticore/generate_manticore_config.php

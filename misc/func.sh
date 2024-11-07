@@ -39,6 +39,7 @@ init_meilisearch() {
   for csv_file in "${csv_files[@]}"; do
     # Process the current CSV file
     insert_data "$csv_file"
+    rm $csv_file;
   done
 
   # Wait until the results_length becomes 0 before exiting
@@ -110,7 +111,7 @@ split_csv() {
     '  "$file" > "$file.fix"
   fi
 
-  split "$file.fix" -a 5 -l "$chunk_size" "$file".
+  split -a 5 -l "$chunk_size" "$file.fix" "${file}."
   for chunk in "$file".?????; do
     awk '{gsub(/<-nl->/, "\n"); print}' "$chunk" > "$chunk.fix"
     mv "$chunk.fix" "$chunk"
