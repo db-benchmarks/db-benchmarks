@@ -248,3 +248,4 @@ services:
 networks:
   default:
     driver: bridge
+    name: test_engines_default
