@@ -12,5 +12,5 @@ cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
          -v $path/data/:/data/ \
          -v $path/elasticsearch/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
          -v $path/elasticsearch/logstash$suffix/template.json:/template.json \
-         docker.elastic.co/logstash/logstash:7.15.2"
+         docker.elastic.co/logstash/logstash:8.14.1"
 eval "$cmd"
