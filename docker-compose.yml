@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
     networks:
       - default
     container_name: "elasticsearch_engine"
@@ -56,7 +56,7 @@ services:
       - ./tests/${test}/clickhouse/data${suffix}:/var/lib/clickhouse
 
   mysql:
-    image: mysql:8.4.0
+    image: mysql:9.1.0
     platform: linux/x86_64
     networks:
       - default
@@ -141,7 +141,7 @@ services:
       - ./tests/${test}/manticoresearch/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
 
   postgres:
-    image: postgres:16.3
+    image: postgres:17.0
     networks:
       - default
     container_name: "postgres_engine"
@@ -167,7 +167,7 @@ services:
       - POSTGRES_DB=default
 
   typesense:
-    image: typesense/typesense:26.0
+    image: typesense/typesense:28.0
     container_name: "typesense_engine"
     networks:
       - default
@@ -191,7 +191,7 @@ services:
       - ./tests/${test}/data:/input
 
   quickwit:
-    image: quickwit/quickwit:0.8.1
+    image: quickwit/quickwit:v0.8.2
     container_name: "quickwit_engine"
     networks:
       - default
@@ -215,7 +215,7 @@ services:
       - ./tests/${test}/quickwit/quickwit.yaml:/quickwit/config/quickwit.yaml
 
   meilisearch:
-    image: getmeili/meilisearch:v1.8
+    image: getmeili/meilisearch:v1.11.1
     networks:
       - default
     container_name: "meilisearch_engine"
