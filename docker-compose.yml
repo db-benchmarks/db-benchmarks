@@ -167,7 +167,7 @@ services:
       - POSTGRES_DB=default
 
   typesense:
-    image: typesense/typesense:28.0
+    image: typesense/typesense:27.1
     container_name: "typesense_engine"
     networks:
       - default
