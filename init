@@ -11,6 +11,7 @@
 use JetBrains\PhpStorm\NoReturn;
 
 require_once('core/helpers.php');
+require_once('core/EsCompatible.php');
 
 class Init
 {
