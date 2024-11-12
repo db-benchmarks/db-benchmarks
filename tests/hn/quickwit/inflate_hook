@@ -8,7 +8,7 @@ for f in ./data/data_splitted.*; do
   echo -e "\t\tUpload chunk $f"
 
   # Index our 10k documents.
-  curl -s -XPOST "${HOST}/api/v1/${test}/ingest?commit=force" --data-binary @$f >/dev/null
+  curl -s -XPOST "${HOST}/api/v1/hn_full/ingest?commit=force" --data-binary @$f >/dev/null
 
   rm $f
 done

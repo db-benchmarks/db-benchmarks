@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo -e "Quickwit (type $suffix):"
-if find ./quickwit/data/indexes/${test}/*.split >/dev/null 2>&1; then
+if find ./quickwit/data/indexes/hn_full/*.split >/dev/null 2>&1; then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
   exit 10
 fi
