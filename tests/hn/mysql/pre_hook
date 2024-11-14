@@ -16,7 +16,7 @@ echo -e "\tStarting mysql ($cmd)"
 eval "$cmd"
 
 echo -e "\tWaiting for MySQL service to be available on localhost:3306"
-timeout 60 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_engine 2>&1) > /dev/null
+timeout 60 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_engine)
 
 dot_count=0
 attempts=0
