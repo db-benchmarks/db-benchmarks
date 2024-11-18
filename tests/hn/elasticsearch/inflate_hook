@@ -9,7 +9,7 @@ cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
          --env-file ../../.env \
          -e XPACK_MONITORING_ENABLED=false \
          -e PIPELINE_WORKERS=\"$workers\" \
-         --network=\"$network_name\" \
+         --network=\"$network_name\" --rm \
          -v $path/data/:/data/ \
          -v $path/elasticsearch/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
          -v $path/elasticsearch/logstash$suffix/template.json:/template.json \
