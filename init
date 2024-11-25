@@ -11,6 +11,7 @@
 use JetBrains\PhpStorm\NoReturn;
 
 require_once('core/helpers.php');
+require_once('core/EsCompatible.php');
 
 class Init
 {
@@ -41,7 +42,7 @@ class Init
             && $this->inflateHook()
             && $this->postHook();
         } catch (Exception $exception) {
-            self::die(1, $exception->getMessage());
+            self::die($exception->getMessage(), 1);
         }
     }
 
@@ -83,7 +84,7 @@ class Init
 
         $pid = pcntl_fork();
         if ($pid == -1) {
-            self::die(1, 'Could not fork process');
+            self::die('Could not fork process', 1);
         } else {
             if ($pid) {
                 $startTime = microtime(true);
