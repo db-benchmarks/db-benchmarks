@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading at "
+date
+
+export ZINC_SEARCH_HOST='http://admin:dbbenchmarks@localhost:4080'
+
+inserted=$(curl -s "${ZINC_SEARCH_HOST}/api/${test}/_search" -X POST \
+-d '{"search_type": "alldocuments","max_results": 0}' | jq .hits.total.value)
+
+echo -e "\tCount of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 116543900 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi
