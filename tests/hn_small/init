@@ -27,6 +27,7 @@ fi
 ../../init --engine=mysql
 ../../init --engine=postgres
 ../../init --engine=typesense
+../../init --engine=quickwit
 
 # MySQL Percona
 if [[ -d mysql_percona ]]; then

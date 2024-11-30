@@ -13,7 +13,15 @@ class clickhouse extends engine {
     private $port = 8123;
     private $curl = null; // curl connection
 
-    protected function url() {
+
+    public function __construct($type)
+    {
+        parent::__construct($type);
+        ini_set('default_socket_timeout', self::$commandLineArguments['query_timeout']);
+    }
+
+    protected function url(): string
+    {
         return "https://clickhouse.com/";
     }
 
@@ -22,10 +30,13 @@ class clickhouse extends engine {
     }
     
     // attempts to fetch info about engine and return it
-    public function getInfo() {
+    public function getInfo(): array
+    {
         $ret = [];
         $version = @file_get_contents("http://localhost:{$this->port}/?query=".urlencode('select version()'));
-        if ($version) $ret['version'] = trim($version);
+        if ($version) {
+            $ret['version'] = trim($version);
+        }
         return $ret;
     }
 
@@ -57,18 +68,17 @@ class clickhouse extends engine {
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query) {
+    protected function testOnce($query):array {
         curl_setopt($this->curl, CURLOPT_URL, "http://localhost:{$this->port}/?query=" . urlencode($query));
         $curlResult = curl_exec($this->curl);
         $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $curlErrorCode = curl_errno($this->curl);
         $curlError = curl_error($this->curl);
-        if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
-            $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
-            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/', $curlError)) $out['timeout'] = true;
-            return $out;
+        $errorResult = $this->parseCurlError($httpCode, $curlErrorCode, $curlError);
+        if ($errorResult){
+            return $errorResult;
         }
-        return $curlResult;
+        return ['error' => false, 'response' => $curlResult];
     }
 
     // To collect query stats after the query
