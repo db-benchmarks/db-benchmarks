@@ -83,6 +83,10 @@ class postgres extends engine
     protected function canConnect(): bool
     {
         $connection = $this->getConnection();
+        if ($connection === false){
+            sleep(1);
+            return false;
+        }
         $status = pg_connection_status($connection);
         if ($status === PGSQL_CONNECTION_OK) {
             $result = pg_query($connection, "show all");
@@ -111,7 +115,7 @@ class postgres extends engine
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query)
+    protected function testOnce($query):array
     {
         if (!pg_connection_busy($this->connection)) {
             pg_send_query($this->connection, $query.';');
@@ -122,20 +126,29 @@ class postgres extends engine
             $state = pg_result_error_field($res, PGSQL_DIAG_SQLSTATE);
 
             if ($state === null) {
-                return $res;
+                return ['error' => false, 'response' => $res];
             }
 
             $errorDescription = pg_result_error($res);
-            $out              = ['postgresError' => trim($errorDescription), 'postgresErrorCode' => $state];
+
+            $out = [
+                'error' => true,
+                'message'=> trim($errorDescription)
+            ];
 
             if ($state === "57014") {
-                $out['timeout'] = true;
+                $out['type'] = self::TIMEOUT_QUERY_ERROR;
+            }else{
+                $out['type'] = self::UNEXPECTED_QUERY_ERROR;
             }
 
             return $out;
         }
 
-        return ['postgresError' => 'Empty response from driver', 'postgresErrorCode' => -1];
+        return [
+            'error' => true,
+            'message'=> 'Empty response from driver'
+        ];
     }
 
     // To collect query stats after the query
