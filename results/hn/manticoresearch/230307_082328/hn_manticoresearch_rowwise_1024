@@ -188,7 +188,7 @@ It will match either text or XML markup (it's used to tokenize XML), so try exam
 "keyword[0]": "google",
 "docs[0]": "7147900",
 "hits[0]": "12436400"
-}";s:8:"checksum";i:2183051634;s:10:"warmupTime";d:24209;}i:19;a:14:{s:10:"avgFastest";i:-1;s:2:"cv";i:-1;s:3:"avg";i:-1;s:12:"cvAvgFastest";i:-1;s:4:"cold";i:-1;s:7:"fastest";i:-1;s:7:"slowest";i:-1;s:5:"times";a:0:{}s:13:"originalQuery";s:79:"select story_id from hn where match('me') order by comment_ranking asc limit 20";s:13:"modifiedQuery";s:79:"select story_id from hn where match('me') order by comment_ranking asc limit 20";s:6:"result";a:1:{s:5:"error";a:3:{s:10:"mysqlError";s:26:"MySQL server has gone away";s:14:"mysqlErrorCode";i:2006;s:7:"timeout";i:900;}}s:5:"stats";s:146:"{
+}";s:8:"checksum";i:2183051634;s:10:"warmupTime";d:24209;}i:19;a:14:{s:10:"avgFastest";i:-1;s:2:"cv";i:-1;s:3:"avg";i:-1;s:12:"cvAvgFastest";i:-1;s:4:"cold";i:-1;s:7:"fastest";i:-1;s:7:"slowest";i:-1;s:5:"times";a:0:{}s:13:"originalQuery";s:79:"select story_id from hn where match('me') order by comment_ranking asc limit 20";s:13:"modifiedQuery";s:79:"select story_id from hn where match('me') order by comment_ranking asc limit 20";s:6:"result";a:1:{s:5:"error";a:3:{s:7:"timeout";i:900;s:4:"type";s:5:"error";s:7:"message";s:32:"MySQL server has gone away(2006)";}}s:5:"stats";s:146:"{
 "total": "1",
 "total_found": "1",
 "total_relation": "eq",

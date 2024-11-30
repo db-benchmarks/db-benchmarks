@@ -13,6 +13,10 @@ abstract class engine
 
     use Helpers;
 
+    protected const UNSUPPORTED_QUERY_ERROR = 'unsupported query';
+    protected const TIMEOUT_QUERY_ERROR = 'timeout';
+    protected const UNEXPECTED_QUERY_ERROR = 'error';
+
     public static $mode; // work mode: test, save or dump
     protected static $startTime; // test start timestamp to be used as a sub-directory when saving results
     protected static $cwd; // the initial working dir the script was run in
@@ -44,9 +48,8 @@ abstract class engine
     // runs one query against engine
     // should respect self::$commandLineArguments['query_timeout']
     // must respect self::$commandLineArguments['query_timeout']
-    // must return ['timeout' => true] in case of timeout
     // TODO: control the timeout automatically
-    abstract protected function testOnce($query);
+    abstract protected function testOnce($query):array;
 
 
     // runs after query to collect query stats
@@ -284,7 +287,7 @@ abstract class engine
                     "'" . @self::mres($query['stats']) . "'",
                     $query['checksum'],
                     $query['warmupTime'],
-                    (int) @$query['result']['error']['timeout'],
+                    0,
                     "'" . self::mres(json_encode(@$query['result']['error']))
                     . "'",
                     (int) $query['retest']
@@ -497,7 +500,10 @@ abstract class engine
                             'yellow');
                         $engine->beforeQuery();
                         $result = $engine->testOnce($preparedQuery);
-                        $outs[$type] = $engine->parseResult($result);
+                        if ($result['error']){
+                            self::die("ERROR: ".$result['message'], 3);
+                        }
+                        $outs[$type] = $engine->parseResult($result['response']);
                     }
                     $count = false;
                     if (isset($outs['count']) and is_array($outs['count'])
@@ -555,6 +561,7 @@ abstract class engine
                 for ($attempt = 0; $attempt <= 1; $attempt++) {
                     $queryTimes = [];
                     foreach (self::$queries as $qn => $query) {
+                        $queryStats = [];
                         $originalQuery = is_array($query) ? current($query)
                             : $query;
                         $preparedQuery = false;
@@ -628,7 +635,9 @@ abstract class engine
                         }
                         self::log(ob_get_clean(), 4);
                         if (!$canConnect) {
-                            self::die("ERROR: couldn't connect to engine", 4);
+                            self::log("ERROR: couldn't connect to engine after ".
+                                self::$commandLineArguments['probe_timeout']." seconds. ".
+                                "Continue without connection", 4);
                         }
 
                         self::log("Making queries", 4);
@@ -642,15 +651,24 @@ abstract class engine
                                     4);
                             }
                             $engine->beforeQuery();
-                            $engine->dropEngineCache(); // before we test we need to drop caches inside the engine, otherwise we'll test cache performance which in most cases is wrong
+                            /**
+                             * Before we test we need to drop caches inside the engine,
+                             * otherwise we'll test cache performance which in most cases is wrong
+                             */
+                            $engine->dropEngineCache();
                             $t = microtime(true);
                             $result = $engine->testOnce($preparedQuery);
+
                             $t2 = microtime(true) - $t;
-                            if (is_array($result)) { // means testOnce() returned an error
-                                if (@$result['timeout']) {
-                                    $result['timeout']
-                                        = self::$commandLineArguments['query_timeout'];
+                            if ($result['error']){
+
+                                if (isset($result['type']) && $result['type'] === self::UNSUPPORTED_QUERY_ERROR){
+                                    unset($result['error']);
+                                    $result['message'] = 'This query is not supported by the current engine';
+                                }else{
+                                    $result = $engine->checkEngineStatus($result);
                                 }
+
                                 $s = "WARNING: query failed. Details: ";
                                 $s .= json_encode($result);
                                 $s .= ". It doesn't make sense to test this query further.";
@@ -658,10 +676,11 @@ abstract class engine
                                 $normalizedResult = ['error' => $result];
                                 break;
                             }
+
                             $times[] = $t2;
                             self::log(floor((microtime(true) - $t) * 1000000)
                                 . " us", 5, 'white');
-                            $normalizedResult = $engine->parseResult($result);
+                            $normalizedResult = $engine->parseResult($result['response']);
                             $queryStats = $engine->afterQuery();
 
                             $tmpTimes = $times;
@@ -669,11 +688,13 @@ abstract class engine
                             if (count($tmpTimes)
                                 > self::$commandLineArguments['times'] / 3
                             ) {
-                                $cv = self::cv(array_slice($tmpTimes, 0,
+                                $cv = self::coefficientOfVariation(array_slice($tmpTimes, 0,
                                     floor(0.8 * count($tmpTimes))));
-                                if ($cv > 0 and $cv
-                                    <= 2
-                                ) { // if the CV of fastest 80% of response times <2% and there were at least 1/3 of attempts made - that's enough
+                                if ($cv > 0 and $cv <= 2) {
+                                    // if the coefficient of variation of fastest 80%
+                                    // of response times <2% and there were
+                                    // at least 1/3 of attempts made - that's enough
+
                                     self::log(($n + 1)
                                         . " queries is enough, the quality is sufficient",
                                         5, 'white');
@@ -686,7 +707,8 @@ abstract class engine
                         $queryTimes[] = [
                             'originalQuery' => $originalQuery,
                             'modifiedQuery' => $preparedQuery,
-                            'times' => $times, 'result' => $normalizedResult,
+                            'times' => $times,
+                            'result' => $normalizedResult,
                             'stats' => $queryStats,
                             'checksum' => self::checksum($normalizedResult),
                             'warmupTime' => $warmupTime
@@ -700,6 +722,25 @@ abstract class engine
         }
     }
 
+    private function checkEngineStatus($error)
+    {
+        $runningCheckCommand = "docker inspect ".get_class($this)."_engine --format='{{.State.Running}}'";
+        $isRunning = exec($runningCheckCommand);
+        if ($isRunning !== 'true'){
+            $statusCodeCheckCommand = "docker inspect ".get_class($this)."_engine --format='{{json .State}}'";
+            $state = exec($statusCodeCheckCommand);
+            $state = json_decode($state,true);
+
+            $error['message'] = "Engine finished with exit code ".$state['ExitCode'];
+
+            if ($state['OOMKilled'] === true){
+                $error['message'] .= " due to an Out of Memory (OOM) error";
+            }
+
+        }
+        unset($error['error']);
+        return $error;
+    }
     // calculates result's checksum
     private static function checksum($normalizedResult)
     {
@@ -764,13 +805,13 @@ abstract class engine
                 ? ((int) @floor(array_sum(array_slice($timesSorted, 0,
                         floor(0.8 * count($timesSorted)))) / floor(0.8
                         * count($timesSorted)) * 1000000)) : -1;
-            $out['cv'] = self::cv($times);
+            $out['cv'] = self::coefficientOfVariation($times);
             if (!$out['cv']) {
                 $out['cv'] = -1;
             } // let's save -1 instead of 0 to make it less confusing
             $out['avg'] = (count($times) > 0) ? floor(array_sum($times)
                 / count($times) * 1000000) : -1;
-            $out['cvAvgFastest'] = self::cv(array_slice($timesSorted, 0,
+            $out['cvAvgFastest'] = self::coefficientOfVariation(array_slice($timesSorted, 0,
                 floor(0.8 * count($timesSorted)))) ?? -1;
             if (!$out['cvAvgFastest']) {
                 $out['cvAvgFastest'] = -1;
@@ -1205,7 +1246,7 @@ Environment vairables:
     }
 
     // function calculates coefficient of variation
-    private static function cv($ar): ?float
+    private static function coefficientOfVariation($ar): ?float
     {
         $c = count($ar);
         if (!$c) {
@@ -1217,5 +1258,39 @@ Environment vairables:
             $variance += pow(($i - $average), 2);
         }
         return round(sqrt($variance / $c) / $average * 100, 2);
+    }
+
+    protected function parseCurlError(int $httpCode, int $curlErrorCode, $curlError): bool|array
+    {
+        if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
+            $out = [
+                'error' => true,
+                'type' => 'error'
+            ];
+            if ($curlErrorCode == 28
+                || preg_match('/timeout|timed out/', $curlError)
+            ) {
+                $out['type'] = 'timeout';
+                $out['message'] = $curlError;
+            }
+            return $out;
+        }
+        return false;
+    }
+
+    protected function parseMysqlError($mysqlErrno, $mysqlError, $timeoutErrorCode): bool|array
+    {
+        if ($mysqlErrno) {
+            $out = [
+                'error' => true,
+                'type' => 'error'
+            ];
+            if ($mysqlErrno == $timeoutErrorCode) {
+                $out['type'] = 'timeout';
+                $out['message'] = $mysqlError;
+            }
+            return $out;
+        }
+        return false;
     }
 }

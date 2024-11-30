@@ -25,7 +25,8 @@ class meilisearch extends engine {
     public function getInfo() {
         $ret = [];
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/version");
+        curl_setopt($curl, CURLOPT_URL,
+            "http://localhost:{$this->port}/version");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $o = curl_exec($curl);
         if ($o and $o = @json_decode($o)) {
@@ -58,17 +59,22 @@ class meilisearch extends engine {
             'Accept: application/json',
         ]);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->curl, CURLOPT_TIMEOUT, self::$commandLineArguments['query_timeout']);
+        curl_setopt($this->curl, CURLOPT_TIMEOUT,
+            self::$commandLineArguments['query_timeout']);
     }
 
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query) {
+    protected function testOnce($query): array
+    {
         if (is_string($query)) {
-            return ['timeout' => true];
+            return [
+                'error' => true,
+                'type' => self::UNSUPPORTED_QUERY_ERROR
+            ];
         }
-        assert(is_array($query));
+
         return $this->sendRequest(...$query);
     }
 
@@ -80,30 +86,39 @@ class meilisearch extends engine {
     // parses query result and returns it in the format that should be common across all engines
     protected function parseResult($curlResult) {
         $curlResult = json_decode($curlResult, true);
-        return match(true) {
-            isset($curlResult['type']) && $curlResult['type'] === 'invalid_request' => [
+        return match (true) {
+            isset($curlResult['type'])
+            && $curlResult['type'] === 'invalid_request' => [
                 ['error' => $curlResult['message'], 'result' => $curlResult],
             ],
             isset($curlResult['numberOfDocuments']) => [
                 ['count(*)' => $curlResult['numberOfDocuments']],
             ],
-            isset($curlResult['hits']) && $curlResult['limit'] > 0 => static::filterResults($curlResult['hits']),
-            isset($curlResult['estimatedTotalHits']) && $curlResult['limit'] === 0 => [
+            isset($curlResult['hits'])
+            && $curlResult['limit']
+            > 0 => static::filterResults($curlResult['hits']),
+            isset($curlResult['estimatedTotalHits'])
+            && $curlResult['limit'] === 0 => [
                 ['count(*)' => $curlResult['estimatedTotalHits']],
             ],
-            isset($curlResult['type']) && $curlResult['type'] === 'invalid_request' => [
+            isset($curlResult['type'])
+            && $curlResult['type'] === 'invalid_request' => [
                 ['error' => 'invalid query'],
             ],
-            isset($curlResult['results']) && $curlResult['limit'] > 0 => static::filterResults($curlResult['results']),
+            isset($curlResult['results'])
+            && $curlResult['limit']
+            > 0 => static::filterResults($curlResult['results']),
             default => [],
         };
     }
 
     /**
      * @param array<string,mixed> $results
+     *
      * @return array<string,mixed>
      */
-    protected static function filterResults(array $results): array {
+    protected static function filterResults(array $results): array
+    {
         $filtered = [];
         foreach ($results as $row) {
             $ar = [];
@@ -129,8 +144,10 @@ class meilisearch extends engine {
         // ? Do nothing due no information available
     }
 
-    protected function sendRequest(string $path, array $payload = []): string {
-        curl_setopt($this->curl, CURLOPT_URL, "http://localhost:{$this->port}{$path}");
+    protected function sendRequest(string $path, array $payload = []): array
+    {
+        curl_setopt($this->curl, CURLOPT_URL,
+            "http://localhost:{$this->port}{$path}");
         curl_setopt($this->curl, CURLOPT_POST, !!$payload);
 
         if ($payload) {
@@ -140,11 +157,12 @@ class meilisearch extends engine {
         $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $curlErrorCode = curl_errno($this->curl);
         $curlError = curl_error($this->curl);
-        if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
-            $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
-            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/', $curlError)) $out['timeout'] = true;
-            return json_encode($out);
+
+        $errorResult = $this->parseCurlError($httpCode, $curlErrorCode,
+            $curlError);
+        if ($errorResult) {
+            return $errorResult;
         }
-        return $curlResult;
+        return ['error' => false, 'response' => $curlResult];
     }
 }

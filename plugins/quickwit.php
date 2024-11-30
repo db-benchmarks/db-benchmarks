@@ -80,12 +80,14 @@ class quickwit extends engine
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query)
+    protected function testOnce($query):array
     {
         if (is_string($query)) {
-            return ['timeout' => true];
+            return [
+                'error' => true,
+                'type' => self::UNSUPPORTED_QUERY_ERROR
+            ];
         }
-        assert(is_array($query));
 
         $this->retrieveFields = $query['retrieve'];
         $this->resultsMapping = $query['mapping'];
@@ -163,7 +165,7 @@ class quickwit extends engine
         // Do nothing because no information is available
     }
 
-    protected function sendRequest(string $path, $payload): string
+    protected function sendRequest(string $path, $payload): array
     {
         $query = "http://localhost:{$this->port}{$path}";
         curl_setopt($this->curl, CURLOPT_POST, !!$payload);
@@ -175,15 +177,11 @@ class quickwit extends engine
         $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $curlErrorCode = curl_errno($this->curl);
         $curlError = curl_error($this->curl);
-        if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
-            $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
-            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/',
-                    $curlError)
-            ) {
-                $out['timeout'] = true;
-            }
-            return json_encode($out);
+        $errorResult = $this->parseCurlError($httpCode, $curlErrorCode,
+            $curlError);
+        if ($errorResult) {
+            return $errorResult;
         }
-        return $curlResult;
+        return ['error' => false, 'response' => $curlResult];
     }
 }

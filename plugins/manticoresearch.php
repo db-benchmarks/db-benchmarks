@@ -84,8 +84,8 @@ class manticoresearch extends engine {
     }
 
     protected function beforeQuery() {
-        if (@self::$commandLineArguments['http']) return $this->beforeHTTP();
-        else return $this->beforeMysql();
+        if (@self::$commandLineArguments['http']) $this->beforeHTTP();
+        else $this->beforeMysql();
     }
 
     private function beforeMysql() {
@@ -106,34 +106,35 @@ class manticoresearch extends engine {
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query) {
+    protected function testOnce($query):array {
         if (@self::$commandLineArguments['http']) return $this->testHTTP($query);
         else return $this->testMysql($query);
     }
 
-    private function testMysql($query) {
+    private function testMysql($query): array
+    {
         $res = $this->mysql->query($query);
-        if ($this->mysql->errno) {
-            $out = ['mysqlError' => $this->mysql->error, 'mysqlErrorCode' => $this->mysql->errno];
-            if ($this->mysql->errno == 2006) $out['timeout'] = true;
-            return $out;
+
+        $errorResult = $this->parseMysqlError($this->mysql->errno, $this->mysql->error, 2006);
+        if ($errorResult){
+            return $errorResult;
         }
-        return $res;
+        return ['error' => false, 'response' => $res];
     }
 
-    private function testHTTP($query) {
+    private function testHTTP($query): array
+    {
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
         $curlResult = curl_exec($this->curl);
         $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $curlErrorCode = curl_errno($this->curl);
         $curlError = curl_error($this->curl);
-        if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
-            $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
-            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/', $curlError)) $out['timeout'] = true;
-            return $out;
-        }
-        return $curlResult;
 
+        $errorResult = $this->parseCurlError($httpCode, $curlErrorCode, $curlError);
+        if ($errorResult){
+            return $errorResult;
+        }
+        return ['error' => false, 'response' => $curlResult];
     }
 
 

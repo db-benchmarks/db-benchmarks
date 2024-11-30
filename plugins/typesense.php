@@ -76,11 +76,13 @@ class typesense extends engine {
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query) {
+    protected function testOnce($query):array {
         if (is_string($query)) {
-            return ['timeout' => true];
+            return [
+                'error' => true,
+                'type' => self::UNSUPPORTED_QUERY_ERROR
+            ];
         }
-        assert(is_array($query));
         $this->getCountFromRequest = $query[2];
         return $this->sendRequest($query[0], $query[1]);
     }
@@ -137,7 +139,7 @@ class typesense extends engine {
         // ? Do nothing due no information available
     }
 
-    protected function sendRequest(string $path, $payload): string {
+    protected function sendRequest(string $path, $payload): array {
 
         $query = "http://localhost:{$this->port}{$path}";
 
@@ -149,11 +151,11 @@ class typesense extends engine {
         $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $curlErrorCode = curl_errno($this->curl);
         $curlError = curl_error($this->curl);
-        if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
-            $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
-            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/', $curlError)) $out['timeout'] = true;
-            return json_encode($out);
+        $errorResult = $this->parseCurlError($httpCode, $curlErrorCode,
+            $curlError);
+        if ($errorResult) {
+            return $errorResult;
         }
-        return $curlResult;
+        return ['error' => false, 'response' => $curlResult];
     }
 }

@@ -15,6 +15,12 @@ class mysql extends engine {
     protected $user = "root";
     protected $db = "default";
 
+    public function __construct($type)
+    {
+        parent::__construct($type);
+        mysqli_report(MYSQLI_REPORT_OFF);
+    }
+
     protected function url() {
         return "https://mysql.com/";
     }
@@ -66,14 +72,20 @@ class mysql extends engine {
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query) {
-        $res = $this->mysql->query($query);
-        if ($this->mysql->errno) {
-            $out = ['mysqlError' => $this->mysql->error, 'mysqlErrorCode' => $this->mysql->errno];
-            if ($this->mysql->errno == 2006) $out['timeout'] = true;
-            return $out;
+    protected function testOnce($query): array
+    {
+        try {
+            $res = $this->mysql->query($query);
+            $errorResult = $this->parseMysqlError($this->mysql->errno,
+                $this->mysql->error, 2006);
+            if ($errorResult) {
+                return $errorResult;
+            }
+        } catch (Exception $exception) {
+            return ['error' => true, 'message' => $exception->getMessage()];
         }
-        return $res;
+
+        return ['error' => false, 'response' => $res];
     }
 
     // To collect query stats after the query

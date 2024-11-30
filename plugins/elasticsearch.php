@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2022 Manticore Software Ltd
+/* Copyright (C) 2024 Manticore Software Ltd
  * You may use, distribute and modify this code under the
  * terms of the AGPLv3 license.
  *
@@ -12,6 +12,12 @@ class elasticsearch extends engine {
 
     private $port = 9200;
     private $curl = null; // curl connection
+
+    public function __construct($type)
+    {
+        parent::__construct($type);
+        ini_set('default_socket_timeout', self::$commandLineArguments['query_timeout']);
+    }
 
     protected function url() {
         return "https://www.elastic.co/what-is/elasticsearch";
@@ -68,18 +74,22 @@ class elasticsearch extends engine {
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
-    protected function testOnce($query) {
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, '{"query": "' . $query . '", "request_timeout": "'.self::$commandLineArguments['query_timeout'].'s", "page_timeout": "'.self::$commandLineArguments['query_timeout'].'s"}');
+    protected function testOnce($query): array
+    {
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS,
+            '{"query": "' . $query . '", "request_timeout": "'
+            . self::$commandLineArguments['query_timeout']
+            . 's", "page_timeout": "'
+            . self::$commandLineArguments['query_timeout'] . 's"}');
         $curlResult = curl_exec($this->curl);
         $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $curlErrorCode = curl_errno($this->curl);
         $curlError = curl_error($this->curl);
-        if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
-            $out = ['httpCode' => $httpCode, 'curlError' => $curlError];
-            if ($curlErrorCode == 28 or preg_match('/timeout|timed out/', $curlError)) $out['timeout'] = true;
-            return json_encode($out);
+        $errorResult = $this->parseCurlError($httpCode, $curlErrorCode, $curlError);
+        if ($errorResult){
+            return $errorResult;
         }
-        return $curlResult;
+        return ['error' => false, 'response' => $curlResult];
     }
 
     // To collect query stats after the query
