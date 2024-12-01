@@ -1,0 +1,2543 @@
+a:12:{s:8:"testName";s:7:"logs10m";s:8:"testTime";i:1732375875;s:13:"formatVersion";i:1;s:6:"engine";s:10:"clickhouse";s:4:"type";s:9:"24.4.3.25";s:6:"memory";s:6:"110000";s:4:"info";a:6:{s:7:"version";s:9:"24.4.3.25";s:12:"typeAppendum";s:9:"24.4.3.25";s:3:"url";s:23:"https://clickhouse.com/";s:11:"description";s:133:"ClickHouse® is an open-source column-oriented database management system that allows generating analytical data reports in real-time";s:12:"datasetCount";s:8:"10365132";s:21:"datasetSampleDocument";O:8:"stdClass":11:{s:7:"referer";s:1:"-";s:11:"remote_addr";s:12:"54.36.149.41";s:11:"remote_user";s:1:"-";s:12:"request_path";s:70:"/filter/27|13 مگاپیکسل,27|کمتر از 5 مگاپیکسل,p53";s:16:"request_protocol";s:8:"HTTP/1.1";s:12:"request_type";s:3:"GET";s:7:"runtime";s:4:"5045";s:4:"size";s:5:"30577";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-22 00:26:14";s:10:"usearagent";s:66:"Mozilla/5.0 (compatible; AhrefsBot/6.1; +http://ahrefs.com/robot/)";}}s:7:"queries";a:12:{i:0;a:15:{s:10:"avgFastest";i:41358;s:2:"cv";d:10.6;s:3:"avg";d:42336;s:12:"cvAvgFastest";d:10.76;s:4:"cold";d:26240;s:7:"fastest";d:16585;s:7:"slowest";d:50222;s:5:"times";a:100:{i:0;d:26240;i:1;d:17347;i:2;d:16585;i:3;d:50222;i:4;d:45046;i:5;d:40302;i:6;d:44183;i:7;d:40869;i:8;d:40378;i:9;d:42665;i:10;d:45088;i:11;d:44145;i:12;d:40641;i:13;d:42884;i:14;d:45798;i:15;d:41036;i:16;d:41397;i:17;d:41036;i:18;d:41217;i:19;d:40523;i:20;d:43328;i:21;d:44791;i:22;d:41810;i:23;d:42957;i:24;d:41110;i:25;d:41864;i:26;d:43487;i:27;d:42358;i:28;d:41663;i:29;d:41601;i:30;d:41907;i:31;d:41133;i:32;d:43333;i:33;d:41441;i:34;d:42412;i:35;d:42004;i:36;d:42098;i:37;d:40995;i:38;d:41072;i:39;d:41864;i:40;d:42308;i:41;d:40807;i:42;d:44012;i:43;d:46297;i:44;d:41989;i:45;d:41256;i:46;d:44647;i:47;d:40869;i:48;d:42900;i:49;d:41020;i:50;d:41778;i:51;d:43987;i:52;d:44094;i:53;d:47157;i:54;d:41528;i:55;d:42613;i:56;d:48573;i:57;d:43361;i:58;d:40771;i:59;d:41573;i:60;d:40844;i:61;d:48216;i:62;d:40921;i:63;d:40711;i:64;d:41369;i:65;d:44215;i:66;d:42818;i:67;d:46320;i:68;d:45576;i:69;d:41378;i:70;d:41760;i:71;d:44210;i:72;d:46438;i:73;d:39817;i:74;d:45537;i:75;d:44478;i:76;d:41972;i:77;d:45437;i:78;d:48718;i:79;d:44206;i:80;d:41306;i:81;d:43527;i:82;d:42692;i:83;d:42796;i:84;d:44739;i:85;d:44749;i:86;d:41563;i:87;d:43856;i:88;d:46517;i:89;d:44576;i:90;d:42602;i:91;d:42137;i:92;d:42912;i:93;d:44179;i:94;d:41639;i:95;d:42149;i:96;d:45101;i:97;d:44217;i:98;d:43296;i:99;d:41808;}s:13:"originalQuery";s:94:"select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20";s:13:"modifiedQuery";s:94:"select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20";s:6:"result";a:15:{i:0;a:2:{s:8:"avg_size";d:67633.3333;s:6:"status";s:3:"206";}i:1;a:2:{s:8:"avg_size";d:32309.1096;s:6:"status";s:3:"500";}i:2;a:2:{s:8:"avg_size";d:15929.6656;s:6:"status";s:3:"404";}i:3;a:2:{s:8:"avg_size";d:13228.2646;s:6:"status";s:3:"200";}i:4;a:2:{s:8:"avg_size";i:977;s:6:"status";s:3:"405";}i:5;a:2:{s:8:"avg_size";i:951;s:6:"status";s:3:"401";}i:6;a:2:{s:8:"avg_size";i:570;s:6:"status";s:3:"504";}i:7;a:2:{s:8:"avg_size";d:419.2306;s:6:"status";s:3:"502";}i:8;a:2:{s:8:"avg_size";d:206.7782;s:6:"status";s:3:"400";}i:9;a:2:{s:8:"avg_size";d:162.0854;s:6:"status";s:3:"301";}i:10;a:2:{s:8:"avg_size";d:158.7501;s:6:"status";s:3:"403";}i:11;a:2:{s:8:"avg_size";d:0.0146;s:6:"status";s:3:"302";}i:12;a:2:{s:8:"avg_size";i:0;s:6:"status";s:3:"304";}i:13;a:2:{s:8:"avg_size";i:0;s:6:"status";s:3:"499";}i:14;a:2:{s:8:"avg_size";i:0;s:6:"status";s:3:"408";}}s:5:"stats";s:0:"";s:8:"checksum";i:1816765933;s:10:"warmupTime";d:6052;s:6:"retest";b:1;}i:1;a:15:{s:10:"avgFastest";i:348983;s:2:"cv";d:4.07;s:3:"avg";d:354264;s:12:"cvAvgFastest";d:2.87;s:4:"cold";d:346965;s:7:"fastest";d:315599;s:7:"slowest";d:403301;s:5:"times";a:100:{i:0;d:346965;i:1;d:315599;i:2;d:335916;i:3;d:346891;i:4;d:338804;i:5;d:361636;i:6;d:339085;i:7;d:340582;i:8;d:356874;i:9;d:374392;i:10;d:368798;i:11;d:370067;i:12;d:346763;i:13;d:363301;i:14;d:354993;i:15;d:360263;i:16;d:338579;i:17;d:352716;i:18;d:339912;i:19;d:347717;i:20;d:354856;i:21;d:341907;i:22;d:366160;i:23;d:391839;i:24;d:350811;i:25;d:342932;i:26;d:345194;i:27;d:362596;i:28;d:356142;i:29;d:340172;i:30;d:376079;i:31;d:353981;i:32;d:365428;i:33;d:351270;i:34;d:360737;i:35;d:362959;i:36;d:357324;i:37;d:365493;i:38;d:376926;i:39;d:354703;i:40;d:357538;i:41;d:356171;i:42;d:374321;i:43;d:375306;i:44;d:351271;i:45;d:339838;i:46;d:366380;i:47;d:364161;i:48;d:376046;i:49;d:343843;i:50;d:343367;i:51;d:362371;i:52;d:339583;i:53;d:346763;i:54;d:340572;i:55;d:339153;i:56;d:337805;i:57;d:363516;i:58;d:371369;i:59;d:364019;i:60;d:403301;i:61;d:339270;i:62;d:349967;i:63;d:339255;i:64;d:363937;i:65;d:343825;i:66;d:353435;i:67;d:381600;i:68;d:359708;i:69;d:344822;i:70;d:342455;i:71;d:358289;i:72;d:351944;i:73;d:340203;i:74;d:339728;i:75;d:364102;i:76;d:344565;i:77;d:347650;i:78;d:342319;i:79;d:373664;i:80;d:364671;i:81;d:339336;i:82;d:345911;i:83;d:341491;i:84;d:338102;i:85;d:340997;i:86;d:338885;i:87;d:338421;i:88;d:362898;i:89;d:338917;i:90;d:369625;i:91;d:340607;i:92;d:364832;i:93;d:367693;i:94;d:357753;i:95;d:382973;i:96;d:338869;i:97;d:343317;i:98;d:360624;i:99;d:375696;}s:13:"originalQuery";s:130:"select count(*) as cnt, avg(runtime), avg(size) from logs10m where match('@request_path settings logo') order by cnt desc limit 20";s:13:"modifiedQuery";s:204:"select count(*) as cnt, avg(runtime), avg(size) from logs10m where (match(request_path, '(?i)(\W|\A)settings\Wlogo(\W|\z)') or match(request_path, '(?i)(\W|\A)logo\Wsettings(\W|\z)')) limit 20 FORMAT JSON";s:6:"result";a:1:{i:0;a:3:{s:12:"avg(runtime)";d:5051.7133;s:9:"avg(size)";d:4104.5011;s:3:"cnt";s:6:"352047";}}s:5:"stats";s:0:"";s:8:"checksum";i:2073081490;s:10:"warmupTime";d:12100;s:6:"retest";b:1;}i:2;a:15:{s:10:"avgFastest";i:1527;s:2:"cv";d:11.21;s:3:"avg";d:1570;s:12:"cvAvgFastest";d:2.74;s:4:"cold";d:2662;s:7:"fastest";d:1419;s:7:"slowest";d:2788;s:5:"times";a:100:{i:0;d:2662;i:1;d:1856;i:2;d:1580;i:3;d:1578;i:4;d:1529;i:5;d:1675;i:6;d:1559;i:7;d:1523;i:8;d:1586;i:9;d:1521;i:10;d:1607;i:11;d:1452;i:12;d:1594;i:13;d:1563;i:14;d:1514;i:15;d:1503;i:16;d:1577;i:17;d:1528;i:18;d:1590;i:19;d:1604;i:20;d:1592;i:21;d:1542;i:22;d:1483;i:23;d:1567;i:24;d:1573;i:25;d:1488;i:26;d:1482;i:27;d:1459;i:28;d:1500;i:29;d:1559;i:30;d:1563;i:31;d:1453;i:32;d:1601;i:33;d:1532;i:34;d:1419;i:35;d:1565;i:36;d:1454;i:37;d:1571;i:38;d:1475;i:39;d:1504;i:40;d:1572;i:41;d:1603;i:42;d:1513;i:43;d:1554;i:44;d:1580;i:45;d:1572;i:46;d:1510;i:47;d:1587;i:48;d:1524;i:49;d:1530;i:50;d:1505;i:51;d:1508;i:52;d:1480;i:53;d:1500;i:54;d:1572;i:55;d:1685;i:56;d:1609;i:57;d:1576;i:58;d:1595;i:59;d:1625;i:60;d:1517;i:61;d:1578;i:62;d:1561;i:63;d:1498;i:64;d:1521;i:65;d:1625;i:66;d:1497;i:67;d:2788;i:68;d:1578;i:69;d:1524;i:70;d:1540;i:71;d:1598;i:72;d:1574;i:73;d:1692;i:74;d:1590;i:75;d:1464;i:76;d:1444;i:77;d:1572;i:78;d:1506;i:79;d:1512;i:80;d:1451;i:81;d:1565;i:82;d:1569;i:83;d:1577;i:84;d:1561;i:85;d:1567;i:86;d:1568;i:87;d:1554;i:88;d:1491;i:89;d:1520;i:90;d:1476;i:91;d:1486;i:92;d:1469;i:93;d:1547;i:94;d:1600;i:95;d:1511;i:96;d:1495;i:97;d:1550;i:98;d:1532;i:99;d:1571;}s:13:"originalQuery";s:28:"select count(*) from logs10m";s:13:"modifiedQuery";s:28:"select count(*) from logs10m";s:6:"result";a:1:{i:0;a:1:{s:7:"count()";s:8:"10365132";}}s:5:"stats";s:0:"";s:8:"checksum";i:4132020857;s:10:"warmupTime";d:6051;s:6:"retest";b:1;}i:3;a:15:{s:10:"avgFastest";i:44118;s:2:"cv";d:11.21;s:3:"avg";d:45199;s:12:"cvAvgFastest";d:11.23;s:4:"cold";d:26533;s:7:"fastest";d:16401;s:7:"slowest";d:59986;s:5:"times";a:100:{i:0;d:26533;i:1;d:16401;i:2;d:17278;i:3;d:59986;i:4;d:50806;i:5;d:44760;i:6;d:44849;i:7;d:45719;i:8;d:49105;i:9;d:45223;i:10;d:43383;i:11;d:48727;i:12;d:44566;i:13;d:43381;i:14;d:48742;i:15;d:43970;i:16;d:45682;i:17;d:45093;i:18;d:44288;i:19;d:43797;i:20;d:46322;i:21;d:47375;i:22;d:48922;i:23;d:44780;i:24;d:51112;i:25;d:46365;i:26;d:45414;i:27;d:44804;i:28;d:46086;i:29;d:49837;i:30;d:47322;i:31;d:44864;i:32;d:45667;i:33;d:44961;i:34;d:49859;i:35;d:44018;i:36;d:46232;i:37;d:45990;i:38;d:46389;i:39;d:48555;i:40;d:43487;i:41;d:46730;i:42;d:49982;i:43;d:44276;i:44;d:44151;i:45;d:44129;i:46;d:45088;i:47;d:44366;i:48;d:45881;i:49;d:46676;i:50;d:48580;i:51;d:43921;i:52;d:44199;i:53;d:44368;i:54;d:46196;i:55;d:47321;i:56;d:44012;i:57;d:48463;i:58;d:44857;i:59;d:44901;i:60;d:43942;i:61;d:44338;i:62;d:48225;i:63;d:43627;i:64;d:43069;i:65;d:45382;i:66;d:44246;i:67;d:45814;i:68;d:44604;i:69;d:47981;i:70;d:46280;i:71;d:44227;i:72;d:47085;i:73;d:46943;i:74;d:47208;i:75;d:44323;i:76;d:47927;i:77;d:50634;i:78;d:44455;i:79;d:44177;i:80;d:45620;i:81;d:44051;i:82;d:45875;i:83;d:46213;i:84;d:46547;i:85;d:44116;i:86;d:43622;i:87;d:46939;i:88;d:45599;i:89;d:43501;i:90;d:48329;i:91;d:44290;i:92;d:47349;i:93;d:43439;i:94;d:45138;i:95;d:44143;i:96;d:45681;i:97;d:47193;i:98;d:44360;i:99;d:44709;}s:13:"originalQuery";s:67:"select count(*), avg(runtime) from logs10m group by status limit 20";s:13:"modifiedQuery";s:67:"select count(*), avg(runtime) from logs10m group by status limit 20";s:6:"result";a:15:{i:0;a:2:{s:12:"avg(runtime)";d:5065.9842;s:7:"count()";s:6:"105010";}i:1;a:2:{s:12:"avg(runtime)";d:5043.8177;s:7:"count()";s:4:"5634";}i:2;a:2:{s:12:"avg(runtime)";d:4570.6019;s:7:"count()";s:3:"103";}i:3;a:2:{s:12:"avg(runtime)";d:5041.8333;s:7:"count()";s:1:"6";}i:4;a:2:{s:12:"avg(runtime)";d:4982.4149;s:7:"count()";s:3:"323";}i:5;a:2:{s:12:"avg(runtime)";d:5017.215;s:7:"count()";s:3:"586";}i:6;a:2:{s:12:"avg(runtime)";d:5052.6859;s:7:"count()";s:6:"340228";}i:7;a:2:{s:12:"avg(runtime)";d:5007.1092;s:7:"count()";s:5:"14266";}i:8;a:2:{s:12:"avg(runtime)";d:5057.2277;s:7:"count()";s:5:"50852";}i:9;a:2:{s:12:"avg(runtime)";d:5037.1011;s:7:"count()";s:5:"67552";}i:10;a:2:{s:12:"avg(runtime)";d:5373.6071;s:7:"count()";s:3:"112";}i:11;a:2:{s:12:"avg(runtime)";i:5613;s:7:"count()";s:1:"3";}i:12;a:2:{s:12:"avg(runtime)";d:5056.4862;s:7:"count()";s:6:"199835";}i:13;a:2:{s:12:"avg(runtime)";d:4999.7619;s:7:"count()";s:3:"798";}i:14;a:2:{s:12:"avg(runtime)";d:5049.1629;s:7:"count()";s:7:"9579824";}}s:5:"stats";s:0:"";s:8:"checksum";i:3750482516;s:10:"warmupTime";d:12099;s:6:"retest";b:1;}i:4;a:15:{s:10:"avgFastest";i:178888;s:2:"cv";d:3.3;s:3:"avg";d:180834;s:12:"cvAvgFastest";d:2.41;s:4:"cold";d:207705;s:7:"fastest";d:163094;s:7:"slowest";d:207705;s:5:"times";a:100:{i:0;d:207705;i:1;d:187377;i:2;d:184126;i:3;d:181600;i:4;d:178788;i:5;d:178694;i:6;d:181269;i:7;d:179431;i:8;d:180016;i:9;d:181727;i:10;d:178997;i:11;d:193095;i:12;d:187827;i:13;d:178390;i:14;d:180802;i:15;d:180234;i:16;d:178582;i:17;d:184187;i:18;d:181882;i:19;d:183341;i:20;d:184782;i:21;d:165906;i:22;d:178153;i:23;d:179148;i:24;d:181167;i:25;d:180630;i:26;d:166348;i:27;d:183505;i:28;d:185382;i:29;d:182302;i:30;d:182735;i:31;d:183923;i:32;d:184948;i:33;d:172630;i:34;d:184920;i:35;d:172213;i:36;d:177553;i:37;d:177337;i:38;d:181746;i:39;d:181022;i:40;d:179364;i:41;d:176670;i:42;d:178233;i:43;d:180320;i:44;d:187584;i:45;d:187056;i:46;d:183410;i:47;d:182820;i:48;d:180172;i:49;d:178231;i:50;d:180971;i:51;d:185637;i:52;d:180673;i:53;d:183715;i:54;d:180049;i:55;d:170335;i:56;d:179262;i:57;d:165234;i:58;d:180190;i:59;d:179293;i:60;d:180909;i:61;d:180686;i:62;d:179823;i:63;d:181012;i:64;d:177161;i:65;d:184277;i:66;d:168510;i:67;d:180557;i:68;d:174844;i:69;d:183489;i:70;d:178918;i:71;d:180520;i:72;d:180714;i:73;d:178359;i:74;d:179532;i:75;d:177328;i:76;d:174881;i:77;d:179919;i:78;d:175634;i:79;d:163094;i:80;d:176637;i:81;d:178138;i:82;d:176177;i:83;d:184424;i:84;d:195425;i:85;d:190638;i:86;d:180503;i:87;d:181997;i:88;d:179664;i:89;d:185241;i:90;d:189453;i:91;d:191693;i:92;d:176535;i:93;d:187163;i:94;d:185780;i:95;d:180049;i:96;d:181992;i:97;d:180643;i:98;d:186279;i:99;d:181233;}s:13:"originalQuery";s:121:"select count(distinct request_path) cnt_distinct, status from logs10m group by status order by cnt_distinct desc limit 20";s:13:"modifiedQuery";s:121:"select count(distinct request_path) cnt_distinct, status from logs10m group by status order by cnt_distinct desc limit 20";s:6:"result";a:15:{i:0;a:2:{s:12:"cnt_distinct";s:6:"765593";s:6:"status";s:3:"200";}i:1;a:2:{s:12:"cnt_distinct";s:5:"76997";s:6:"status";s:3:"302";}i:2;a:2:{s:12:"cnt_distinct";s:5:"29266";s:6:"status";s:3:"301";}i:3;a:2:{s:12:"cnt_distinct";s:5:"19870";s:6:"status";s:3:"499";}i:4;a:2:{s:12:"cnt_distinct";s:5:"12998";s:6:"status";s:3:"500";}i:5;a:2:{s:12:"cnt_distinct";s:4:"9510";s:6:"status";s:3:"404";}i:6;a:2:{s:12:"cnt_distinct";s:4:"1787";s:6:"status";s:3:"403";}i:7;a:2:{s:12:"cnt_distinct";s:3:"744";s:6:"status";s:3:"502";}i:8;a:2:{s:12:"cnt_distinct";s:3:"156";s:6:"status";s:3:"304";}i:9;a:2:{s:12:"cnt_distinct";s:2:"98";s:6:"status";s:3:"504";}i:10;a:2:{s:12:"cnt_distinct";s:2:"79";s:6:"status";s:3:"408";}i:11;a:2:{s:12:"cnt_distinct";s:2:"33";s:6:"status";s:3:"400";}i:12;a:2:{s:12:"cnt_distinct";s:1:"3";s:6:"status";s:3:"405";}i:13;a:2:{s:12:"cnt_distinct";s:1:"2";s:6:"status";s:3:"206";}i:14;a:2:{s:12:"cnt_distinct";s:1:"1";s:6:"status";s:3:"401";}}s:5:"stats";s:0:"";s:8:"checksum";i:495836218;s:10:"warmupTime";d:6049;s:6:"retest";b:1;}i:5;a:15:{s:10:"avgFastest";i:44446;s:2:"cv";d:9.68;s:3:"avg";d:45367;s:12:"cvAvgFastest";d:9.85;s:4:"cold";d:24349;s:7:"fastest";d:20019;s:7:"slowest";d:54484;s:5:"times";a:100:{i:0;d:24349;i:1;d:24389;i:2;d:20019;i:3;d:54484;i:4;d:48813;i:5;d:45275;i:6;d:48707;i:7;d:52741;i:8;d:43766;i:9;d:44372;i:10;d:45635;i:11;d:44307;i:12;d:45128;i:13;d:44552;i:14;d:44604;i:15;d:43126;i:16;d:46332;i:17;d:49358;i:18;d:47736;i:19;d:46612;i:20;d:47066;i:21;d:48844;i:22;d:45758;i:23;d:45980;i:24;d:45506;i:25;d:45263;i:26;d:44660;i:27;d:45710;i:28;d:47443;i:29;d:44009;i:30;d:44055;i:31;d:44325;i:32;d:43887;i:33;d:47300;i:34;d:46014;i:35;d:48424;i:36;d:45799;i:37;d:44409;i:38;d:44386;i:39;d:44087;i:40;d:47184;i:41;d:46182;i:42;d:45861;i:43;d:45721;i:44;d:45569;i:45;d:44921;i:46;d:43969;i:47;d:46720;i:48;d:44992;i:49;d:47456;i:50;d:46649;i:51;d:47426;i:52;d:45401;i:53;d:48817;i:54;d:46415;i:55;d:45408;i:56;d:46246;i:57;d:46777;i:58;d:47014;i:59;d:46493;i:60;d:50462;i:61;d:46838;i:62;d:45064;i:63;d:44584;i:64;d:45596;i:65;d:47301;i:66;d:48195;i:67;d:48303;i:68;d:45274;i:69;d:43828;i:70;d:44226;i:71;d:45282;i:72;d:49238;i:73;d:45647;i:74;d:45609;i:75;d:43708;i:76;d:49218;i:77;d:44644;i:78;d:44299;i:79;d:46857;i:80;d:45503;i:81;d:44882;i:82;d:44438;i:83;d:45354;i:84;d:45937;i:85;d:45283;i:86;d:44205;i:87;d:48667;i:88;d:44190;i:89;d:45918;i:90;d:45238;i:91;d:45668;i:92;d:48384;i:93;d:44473;i:94;d:44557;i:95;d:48326;i:96;d:45273;i:97;d:43788;i:98;d:45399;i:99;d:44686;}s:13:"originalQuery";s:107:"select min(size) min_size, status from logs10m group by status order by min_size desc, status desc limit 20";s:13:"modifiedQuery";s:107:"select min(size) min_size, status from logs10m group by status order by min_size desc, status desc limit 20";s:6:"result";a:15:{i:0;a:2:{s:8:"min_size";s:3:"977";s:6:"status";s:3:"405";}i:1;a:2:{s:8:"min_size";s:3:"951";s:6:"status";s:3:"401";}i:2;a:2:{s:8:"min_size";s:3:"570";s:6:"status";s:3:"504";}i:3;a:2:{s:8:"min_size";s:3:"134";s:6:"status";s:3:"403";}i:4;a:2:{s:8:"min_size";s:2:"64";s:6:"status";s:3:"206";}i:5;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"502";}i:6;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"500";}i:7;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"499";}i:8;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"408";}i:9;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"404";}i:10;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"400";}i:11;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"304";}i:12;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"302";}i:13;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"301";}i:14;a:2:{s:8:"min_size";s:1:"0";s:6:"status";s:3:"200";}}s:5:"stats";s:0:"";s:8:"checksum";i:3598655439;s:10:"warmupTime";d:6051;s:6:"retest";b:1;}i:6;a:15:{s:10:"avgFastest";i:75965;s:2:"cv";d:5.27;s:3:"avg";d:77183;s:12:"cvAvgFastest";d:2.51;s:4:"cold";d:107710;s:7:"fastest";d:69772;s:7:"slowest";d:107710;s:5:"times";a:100:{i:0;d:107710;i:1;d:83908;i:2;d:77956;i:3;d:76802;i:4;d:74427;i:5;d:77744;i:6;d:78424;i:7;d:77084;i:8;d:76534;i:9;d:75199;i:10;d:75078;i:11;d:74916;i:12;d:75242;i:13;d:77856;i:14;d:74563;i:15;d:73512;i:16;d:72954;i:17;d:87281;i:18;d:74140;i:19;d:73796;i:20;d:77882;i:21;d:77746;i:22;d:77097;i:23;d:78916;i:24;d:71400;i:25;d:76030;i:26;d:79066;i:27;d:82081;i:28;d:76438;i:29;d:75115;i:30;d:74532;i:31;d:78063;i:32;d:79075;i:33;d:79384;i:34;d:80883;i:35;d:78134;i:36;d:73619;i:37;d:79745;i:38;d:77263;i:39;d:77197;i:40;d:77513;i:41;d:73136;i:42;d:76934;i:43;d:76672;i:44;d:74339;i:45;d:75937;i:46;d:77340;i:47;d:76068;i:48;d:76043;i:49;d:76477;i:50;d:73221;i:51;d:74579;i:52;d:76637;i:53;d:77500;i:54;d:76376;i:55;d:77376;i:56;d:79207;i:57;d:77291;i:58;d:77798;i:59;d:75163;i:60;d:69772;i:61;d:74077;i:62;d:80099;i:63;d:79366;i:64;d:80268;i:65;d:74552;i:66;d:78278;i:67;d:76698;i:68;d:78990;i:69;d:80106;i:70;d:76207;i:71;d:80475;i:72;d:72702;i:73;d:77256;i:74;d:73800;i:75;d:76226;i:76;d:80020;i:77;d:78715;i:78;d:76615;i:79;d:76349;i:80;d:71455;i:81;d:74859;i:82;d:77146;i:83;d:78376;i:84;d:76519;i:85;d:78706;i:86;d:74883;i:87;d:76811;i:88;d:76656;i:89;d:82790;i:90;d:79985;i:91;d:77670;i:92;d:74073;i:93;d:73542;i:94;d:77451;i:95;d:74582;i:96;d:74308;i:97;d:79664;i:98;d:77885;i:99;d:79989;}s:13:"originalQuery";s:111:"select request_path, runtime, status, size from logs10m where size > 0 order by runtime desc, size asc limit 20";s:13:"modifiedQuery";s:111:"select request_path, runtime, status, size from logs10m where size > 0 order by runtime desc, size asc limit 20";s:6:"result";a:20:{i:0;a:4:{s:12:"request_path";s:51:"/image/{{basketItem.id}}?type=productModel&wh=50x50";s:7:"runtime";s:5:"10000";s:4:"size";s:1:"5";s:6:"status";s:3:"200";}i:1;a:4:{s:12:"request_path";s:51:"/image/{{basketItem.id}}?type=productModel&wh=50x50";s:7:"runtime";s:5:"10000";s:4:"size";s:1:"5";s:6:"status";s:3:"200";}i:2;a:4:{s:12:"request_path";s:51:"/image/{{basketItem.id}}?type=productModel&wh=50x50";s:7:"runtime";s:5:"10000";s:4:"size";s:1:"5";s:6:"status";s:3:"200";}i:3;a:4:{s:12:"request_path";s:51:"/image/{{basketItem.id}}?type=productModel&wh=50x50";s:7:"runtime";s:5:"10000";s:4:"size";s:1:"5";s:6:"status";s:3:"200";}i:4;a:4:{s:12:"request_path";s:51:"/image/{{basketItem.id}}?type=productModel&wh=50x50";s:7:"runtime";s:5:"10000";s:4:"size";s:1:"5";s:6:"status";s:3:"200";}i:5;a:4:{s:12:"request_path";s:51:"/image/{{basketItem.id}}?type=productModel&wh=50x50";s:7:"runtime";s:5:"10000";s:4:"size";s:1:"5";s:6:"status";s:3:"200";}i:6;a:4:{s:12:"request_path";s:28:"/image/24081/productTypeMenu";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:7;a:4:{s:12:"request_path";s:28:"/image/32553/productTypeMenu";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:8;a:4:{s:12:"request_path";s:31:"/image/8795/specialSale?role=e1";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:9;a:4:{s:12:"request_path";s:31:"/image/8895/specialSale?role=e2";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:10;a:4:{s:12:"request_path";s:28:"/image/28997/productTypeMenu";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:11;a:4:{s:12:"request_path";s:31:"/image/8804/specialSale?role=e2";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:12;a:4:{s:12:"request_path";s:31:"/image/8850/specialSale?role=e2";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:13;a:4:{s:12:"request_path";s:28:"/image/13009/productTypeMenu";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:14;a:4:{s:12:"request_path";s:28:"/image/13275/productTypeMenu";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:15;a:4:{s:12:"request_path";s:27:"/image/6385/productTypeMenu";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:16;a:4:{s:12:"request_path";s:31:"/image/8791/specialSale?role=e3";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:17;a:4:{s:12:"request_path";s:31:"/image/8851/specialSale?role=e2";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:18;a:4:{s:12:"request_path";s:31:"/image/8886/specialSale?role=e2";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}i:19;a:4:{s:12:"request_path";s:31:"/image/8879/specialSale?role=e3";s:7:"runtime";s:5:"10000";s:4:"size";s:2:"11";s:6:"status";s:3:"200";}}s:5:"stats";s:0:"";s:8:"checksum";i:199337247;s:10:"warmupTime";d:6049;s:6:"retest";b:1;}i:7;a:15:{s:10:"avgFastest";i:62777;s:2:"cv";d:7.92;s:3:"avg";d:64207;s:12:"cvAvgFastest";d:2;s:4:"cold";d:96786;s:7:"fastest";d:59147;s:7:"slowest";d:96786;s:5:"times";a:67:{i:0;d:96786;i:1;d:72534;i:2;d:59581;i:3;d:61975;i:4;d:62860;i:5;d:64170;i:6;d:64376;i:7;d:66013;i:8;d:63793;i:9;d:63787;i:10;d:63802;i:11;d:64726;i:12;d:62101;i:13;d:63990;i:14;d:64201;i:15;d:63615;i:16;d:63780;i:17;d:61993;i:18;d:62868;i:19;d:61363;i:20;d:64299;i:21;d:60660;i:22;d:64707;i:23;d:62714;i:24;d:64699;i:25;d:63979;i:26;d:61030;i:27;d:62914;i:28;d:63898;i:29;d:63248;i:30;d:61850;i:31;d:74462;i:32;d:61379;i:33;d:64085;i:34;d:59147;i:35;d:63700;i:36;d:62048;i:37;d:63871;i:38;d:61634;i:39;d:64814;i:40;d:63410;i:41;d:61732;i:42;d:64279;i:43;d:60947;i:44;d:64434;i:45;d:64217;i:46;d:65801;i:47;d:63265;i:48;d:62567;i:49;d:63461;i:50;d:81440;i:51;d:63914;i:52;d:64975;i:53;d:61143;i:54;d:63176;i:55;d:63889;i:56;d:64224;i:57;d:64581;i:58;d:61823;i:59;d:61401;i:60;d:62282;i:61;d:62656;i:62;d:64688;i:63;d:61972;i:64;d:61909;i:65;d:62535;i:66;d:63713;}s:13:"originalQuery";s:126:"select request_path, runtime, status, size, time_local from logs10m order by runtime desc, size desc, time_local desc limit 20";s:13:"modifiedQuery";s:126:"select request_path, runtime, status, size, time_local from logs10m order by runtime desc, size desc, time_local desc limit 20";s:6:"result";a:20:{i:0;a:5:{s:12:"request_path";s:39:"/image/get?path=/Image/yakhchal4(1).png";s:7:"runtime";s:5:"10000";s:4:"size";s:6:"893294";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-25 12:18:21";}i:1;a:5:{s:12:"request_path";s:75:"/product/17010/32563/شیر-روشویی-راسان-مدل-پارمیسR354";s:7:"runtime";s:5:"10000";s:4:"size";s:6:"552733";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-24 11:34:28";}i:2;a:5:{s:12:"request_path";s:39:"/static/bundle-bundle_site_defer.min.js";s:7:"runtime";s:5:"10000";s:4:"size";s:6:"185207";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-22 07:23:10";}i:3;a:5:{s:12:"request_path";s:60:"/static/plugins/ckeditor-3.6.2.2/js/ckeditor/ckeditor.min.js";s:7:"runtime";s:5:"10000";s:4:"size";s:6:"116467";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-25 11:45:11";}i:4;a:5:{s:12:"request_path";s:60:"/static/plugins/ckeditor-3.6.2.2/js/ckeditor/ckeditor.min.js";s:7:"runtime";s:5:"10000";s:4:"size";s:6:"116467";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-23 18:58:23";}i:5;a:5:{s:12:"request_path";s:60:"/static/plugins/ckeditor-3.6.2.2/js/ckeditor/ckeditor.min.js";s:7:"runtime";s:5:"10000";s:4:"size";s:6:"116467";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-23 10:04:20";}i:6;a:5:{s:12:"request_path";s:33:"/image/33960?name=j6-b.jpg&wh=max";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"99312";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-26 04:16:56";}i:7;a:5:{s:12:"request_path";s:31:"/image/get?path=/Image/2(2).jpg";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"97049";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-23 16:48:19";}i:8;a:5:{s:12:"request_path";s:35:"/image/5878?name=at890-1.jpg&wh=max";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"95672";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-22 21:20:30";}i:9;a:5:{s:12:"request_path";s:20:"/image/778/mainSlide";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"94758";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-25 13:27:12";}i:10;a:5:{s:12:"request_path";s:20:"/image/818/mainSlide";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"91037";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-22 10:10:43";}i:11;a:5:{s:12:"request_path";s:21:"/image/1230/mainSlide";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"90819";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-26 04:39:50";}i:12;a:5:{s:12:"request_path";s:20:"/image/880/mainSlide";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"90137";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-22 12:30:05";}i:13;a:5:{s:12:"request_path";s:20:"/image/987/mainSlide";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"89848";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-22 09:44:58";}i:14;a:5:{s:12:"request_path";s:21:"/image/1219/mainSlide";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"87969";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-26 06:48:36";}i:15;a:5:{s:12:"request_path";s:21:"/image/1219/mainSlide";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"87969";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-24 13:36:38";}i:16;a:5:{s:12:"request_path";s:35:"/image/28728?name=rt5802.jpg&wh=max";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"80611";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-23 07:04:34";}i:17;a:5:{s:12:"request_path";s:64:"/static/css/font_awesome/fonts/fontawesome-webfont.woff2?v=4.7.0";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"77171";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-26 05:07:34";}i:18;a:5:{s:12:"request_path";s:64:"/static/css/font_awesome/fonts/fontawesome-webfont.woff2?v=4.7.0";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"77171";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-23 09:06:55";}i:19;a:5:{s:12:"request_path";s:27:"/image/1221/mainSlideMobile";s:7:"runtime";s:5:"10000";s:4:"size";s:5:"68387";s:6:"status";s:3:"200";s:10:"time_local";s:19:"2019-01-25 15:44:39";}}s:5:"stats";s:0:"";s:8:"checksum";i:528686151;s:10:"warmupTime";d:12100;s:6:"retest";b:1;}i:8;a:15:{s:10:"avgFastest";i:41072;s:2:"cv";d:11.65;s:3:"avg";d:42291;s:12:"cvAvgFastest";d:11.29;s:4:"cold";d:24539;s:7:"fastest";d:15357;s:7:"slowest";d:55791;s:5:"times";a:100:{i:0;d:24539;i:1;d:15357;i:2;d:17087;i:3;d:55791;i:4;d:41127;i:5;d:50299;i:6;d:41393;i:7;d:43347;i:8;d:40401;i:9;d:43154;i:10;d:48812;i:11;d:43815;i:12;d:41540;i:13;d:45891;i:14;d:44184;i:15;d:42480;i:16;d:43940;i:17;d:43396;i:18;d:46441;i:19;d:46954;i:20;d:47697;i:21;d:41374;i:22;d:45066;i:23;d:46126;i:24;d:46681;i:25;d:45149;i:26;d:40629;i:27;d:42868;i:28;d:42473;i:29;d:40627;i:30;d:41073;i:31;d:41438;i:32;d:41045;i:33;d:40701;i:34;d:41827;i:35;d:46815;i:36;d:44954;i:37;d:41535;i:38;d:40466;i:39;d:46205;i:40;d:46953;i:41;d:44825;i:42;d:41528;i:43;d:41672;i:44;d:44000;i:45;d:43859;i:46;d:45006;i:47;d:41058;i:48;d:43147;i:49;d:46088;i:50;d:41254;i:51;d:40030;i:52;d:40777;i:53;d:42048;i:54;d:41276;i:55;d:40175;i:56;d:39910;i:57;d:44392;i:58;d:45112;i:59;d:46409;i:60;d:41088;i:61;d:40065;i:62;d:45677;i:63;d:44352;i:64;d:41477;i:65;d:40840;i:66;d:49098;i:67;d:41297;i:68;d:43609;i:69;d:44596;i:70;d:42917;i:71;d:42580;i:72;d:42473;i:73;d:41212;i:74;d:40850;i:75;d:40648;i:76;d:43793;i:77;d:41240;i:78;d:43725;i:79;d:40646;i:80;d:41303;i:81;d:42243;i:82;d:41275;i:83;d:41396;i:84;d:40615;i:85;d:41221;i:86;d:40380;i:87;d:40482;i:88;d:46118;i:89;d:41860;i:90;d:40199;i:91;d:41785;i:92;d:40537;i:93;d:40809;i:94;d:41593;i:95;d:42643;i:96;d:44992;i:97;d:40198;i:98;d:40597;i:99;d:42516;}s:13:"originalQuery";s:84:"select status, count(*) from logs10m group by status order by count(*) desc limit 20";s:13:"modifiedQuery";s:94:"select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20";s:6:"result";a:15:{i:0;a:2:{s:8:"avg_size";d:67633.3333;s:6:"status";s:3:"206";}i:1;a:2:{s:8:"avg_size";d:32309.1096;s:6:"status";s:3:"500";}i:2;a:2:{s:8:"avg_size";d:15929.6656;s:6:"status";s:3:"404";}i:3;a:2:{s:8:"avg_size";d:13228.2646;s:6:"status";s:3:"200";}i:4;a:2:{s:8:"avg_size";i:977;s:6:"status";s:3:"405";}i:5;a:2:{s:8:"avg_size";i:951;s:6:"status";s:3:"401";}i:6;a:2:{s:8:"avg_size";i:570;s:6:"status";s:3:"504";}i:7;a:2:{s:8:"avg_size";d:419.2306;s:6:"status";s:3:"502";}i:8;a:2:{s:8:"avg_size";d:206.7782;s:6:"status";s:3:"400";}i:9;a:2:{s:8:"avg_size";d:162.0854;s:6:"status";s:3:"301";}i:10;a:2:{s:8:"avg_size";d:158.7501;s:6:"status";s:3:"403";}i:11;a:2:{s:8:"avg_size";d:0.0146;s:6:"status";s:3:"302";}i:12;a:2:{s:8:"avg_size";i:0;s:6:"status";s:3:"304";}i:13;a:2:{s:8:"avg_size";i:0;s:6:"status";s:3:"499";}i:14;a:2:{s:8:"avg_size";i:0;s:6:"status";s:3:"408";}}s:5:"stats";s:0:"";s:8:"checksum";i:1816765933;s:10:"warmupTime";d:12100;s:6:"retest";b:1;}i:9;a:15:{s:10:"avgFastest";i:40434;s:2:"cv";d:10.94;s:3:"avg";d:41533;s:12:"cvAvgFastest";d:10.56;s:4:"cold";d:28217;s:7:"fastest";d:16309;s:7:"slowest";d:54548;s:5:"times";a:100:{i:0;d:28217;i:1;d:16309;i:2;d:16648;i:3;d:54548;i:4;d:45066;i:5;d:44703;i:6;d:40432;i:7;d:43137;i:8;d:41860;i:9;d:41954;i:10;d:41246;i:11;d:43407;i:12;d:40004;i:13;d:40411;i:14;d:45956;i:15;d:41124;i:16;d:40978;i:17;d:41151;i:18;d:40914;i:19;d:39261;i:20;d:43830;i:21;d:46461;i:22;d:41164;i:23;d:39004;i:24;d:43290;i:25;d:41915;i:26;d:39023;i:27;d:41847;i:28;d:49306;i:29;d:42472;i:30;d:40395;i:31;d:39679;i:32;d:43614;i:33;d:42642;i:34;d:41124;i:35;d:41749;i:36;d:39201;i:37;d:42539;i:38;d:41484;i:39;d:41513;i:40;d:42056;i:41;d:40705;i:42;d:41657;i:43;d:40514;i:44;d:39444;i:45;d:44555;i:46;d:40446;i:47;d:39728;i:48;d:44468;i:49;d:40326;i:50;d:41522;i:51;d:40771;i:52;d:42134;i:53;d:40942;i:54;d:41375;i:55;d:47590;i:56;d:40427;i:57;d:40526;i:58;d:40696;i:59;d:40478;i:60;d:42512;i:61;d:40624;i:62;d:42588;i:63;d:39770;i:64;d:39506;i:65;d:42910;i:66;d:40199;i:67;d:43215;i:68;d:40927;i:69;d:39564;i:70;d:43902;i:71;d:39581;i:72;d:41024;i:73;d:41810;i:74;d:41284;i:75;d:39797;i:76;d:42516;i:77;d:41751;i:78;d:48770;i:79;d:44063;i:80;d:43228;i:81;d:41407;i:82;d:39572;i:83;d:43027;i:84;d:39261;i:85;d:45979;i:86;d:42234;i:87;d:41949;i:88;d:44906;i:89;d:44849;i:90;d:44775;i:91;d:43251;i:92;d:41396;i:93;d:41947;i:94;d:44671;i:95;d:44815;i:96;d:40251;i:97;d:45369;i:98;d:43376;i:99;d:40816;}s:13:"originalQuery";s:88:"select status, sum(runtime) from logs10m group by status order by count(*) desc limit 20";s:13:"modifiedQuery";s:88:"select status, sum(runtime) from logs10m group by status order by count(*) desc limit 20";s:6:"result";a:15:{i:0;a:2:{s:6:"status";s:3:"200";s:12:"sum(runtime)";s:11:"48370092333";}i:1;a:2:{s:6:"status";s:3:"304";s:12:"sum(runtime)";s:10:"1719065213";}i:2;a:2:{s:6:"status";s:3:"302";s:12:"sum(runtime)";s:10:"1010462921";}i:3;a:2:{s:6:"status";s:3:"404";s:12:"sum(runtime)";s:9:"531979004";}i:4;a:2:{s:6:"status";s:3:"301";s:12:"sum(runtime)";s:9:"340266252";}i:5;a:2:{s:6:"status";s:3:"499";s:12:"sum(runtime)";s:9:"257170144";}i:6;a:2:{s:6:"status";s:3:"500";s:12:"sum(runtime)";s:8:"71431420";}i:7;a:2:{s:6:"status";s:3:"403";s:12:"sum(runtime)";s:8:"28416869";}i:8;a:2:{s:6:"status";s:3:"502";s:12:"sum(runtime)";s:7:"3989810";}i:9;a:2:{s:6:"status";s:3:"400";s:12:"sum(runtime)";s:7:"2940088";}i:10;a:2:{s:6:"status";s:3:"401";s:12:"sum(runtime)";s:7:"1609320";}i:11;a:2:{s:6:"status";s:3:"408";s:12:"sum(runtime)";s:6:"601844";}i:12;a:2:{s:6:"status";s:3:"504";s:12:"sum(runtime)";s:6:"470772";}i:13;a:2:{s:6:"status";s:3:"405";s:12:"sum(runtime)";s:5:"30251";}i:14;a:2:{s:6:"status";s:3:"206";s:12:"sum(runtime)";s:5:"16839";}}s:5:"stats";s:0:"";s:8:"checksum";i:3681369067;s:10:"warmupTime";d:6051;s:6:"retest";b:1;}i:10;a:15:{s:10:"avgFastest";i:256300;s:2:"cv";d:2.49;s:3:"avg";d:258135;s:12:"cvAvgFastest";d:2.02;s:4:"cold";d:277753;s:7:"fastest";d:225298;s:7:"slowest";d:281631;s:5:"times";a:100:{i:0;d:277753;i:1;d:227490;i:2;d:225298;i:3;d:263301;i:4;d:254023;i:5;d:257659;i:6;d:266934;i:7;d:258556;i:8;d:257284;i:9;d:258752;i:10;d:265414;i:11;d:261350;i:12;d:262390;i:13;d:258405;i:14;d:281631;i:15;d:262122;i:16;d:257601;i:17;d:256992;i:18;d:252482;i:19;d:259223;i:20;d:257128;i:21;d:257853;i:22;d:262583;i:23;d:255798;i:24;d:258480;i:25;d:261480;i:26;d:259449;i:27;d:259497;i:28;d:263797;i:29;d:258571;i:30;d:259123;i:31;d:258429;i:32;d:257172;i:33;d:275183;i:34;d:256209;i:35;d:255913;i:36;d:265715;i:37;d:255416;i:38;d:262917;i:39;d:255516;i:40;d:257372;i:41;d:259257;i:42;d:264279;i:43;d:257898;i:44;d:257657;i:45;d:258248;i:46;d:261639;i:47;d:261000;i:48;d:257046;i:49;d:258179;i:50;d:255663;i:51;d:258561;i:52;d:259497;i:53;d:255526;i:54;d:260081;i:55;d:260794;i:56;d:256944;i:57;d:252952;i:58;d:257429;i:59;d:256590;i:60;d:254203;i:61;d:258208;i:62;d:258595;i:63;d:257227;i:64;d:252749;i:65;d:259086;i:66;d:258087;i:67;d:255162;i:68;d:260959;i:69;d:263580;i:70;d:261110;i:71;d:255778;i:72;d:255175;i:73;d:252782;i:74;d:254463;i:75;d:253626;i:76;d:256641;i:77;d:257842;i:78;d:254719;i:79;d:256337;i:80;d:255680;i:81;d:257149;i:82;d:255986;i:83;d:261893;i:84;d:254971;i:85;d:258599;i:86;d:258419;i:87;d:259181;i:88;d:257943;i:89;d:258422;i:90;d:254702;i:91;d:255263;i:92;d:254387;i:93;d:254765;i:94;d:256510;i:95;d:259072;i:96;d:256596;i:97;d:258686;i:98;d:264422;i:99;d:257097;}s:13:"originalQuery";s:123:"select count(*) as cnt, request_path, avg(runtime), avg(size) from logs10m group by request_path order by cnt desc limit 20";s:13:"modifiedQuery";s:123:"select count(*) as cnt, request_path, avg(runtime), avg(size) from logs10m group by request_path order by cnt desc limit 20";s:6:"result";a:20:{i:0;a:4:{s:12:"avg(runtime)";d:5051.7133;s:9:"avg(size)";d:4104.5011;s:3:"cnt";s:6:"352047";s:12:"request_path";s:14:"/settings/logo";}i:1;a:4:{s:12:"avg(runtime)";d:5049.5534;s:9:"avg(size)";d:11613.895;s:3:"cnt";s:6:"280176";s:12:"request_path";s:33:"/static/css/font/wyekan/font.woff";}i:2;a:4:{s:12:"avg(runtime)";d:5058.8478;s:9:"avg(size)";d:5195.4648;s:3:"cnt";s:6:"138010";s:12:"request_path";s:39:"/static/images/guarantees/bestPrice.png";}i:3;a:4:{s:12:"avg(runtime)";d:5055.3486;s:9:"avg(size)";d:5961.4373;s:3:"cnt";s:6:"125689";s:12:"request_path";s:42:"/static/images/guarantees/fastDelivery.png";}i:4;a:4:{s:12:"avg(runtime)";d:5041.0057;s:9:"avg(size)";d:4561.9727;s:3:"cnt";s:6:"124127";s:12:"request_path";s:38:"/static/images/guarantees/warranty.png";}i:5;a:4:{s:12:"avg(runtime)";d:5042.6521;s:9:"avg(size)";d:5382.4467;s:3:"cnt";s:6:"116653";s:12:"request_path";s:42:"/static/images/guarantees/goodShopping.png";}i:6;a:4:{s:12:"avg(runtime)";d:5047.7075;s:9:"avg(size)";d:319.7017;s:3:"cnt";s:6:"103798";s:12:"request_path";s:24:"/site/alexaGooleAnalitic";}i:7;a:4:{s:12:"avg(runtime)";d:5046.2437;s:9:"avg(size)";d:1.3195;s:3:"cnt";s:6:"102731";s:12:"request_path";s:12:"/favicon.ico";}i:8;a:4:{s:12:"avg(runtime)";d:5055.0384;s:9:"avg(size)";d:6245.8149;s:3:"cnt";s:5:"98460";s:12:"request_path";s:37:"/static/images/guarantees/support.png";}i:9;a:4:{s:12:"avg(runtime)";d:5047.7252;s:9:"avg(size)";d:4485.0407;s:3:"cnt";s:5:"92409";s:12:"request_path";s:31:"/static/images/amp/telegram.png";}i:10;a:4:{s:12:"avg(runtime)";d:5045.827;s:9:"avg(size)";d:3554.9087;s:3:"cnt";s:5:"92156";s:12:"request_path";s:27:"/static/images/amp/blog.png";}i:11;a:4:{s:12:"avg(runtime)";d:5023.281;s:9:"avg(size)";d:6917.188;s:3:"cnt";s:5:"89008";s:12:"request_path";s:32:"/static/images/amp/instagram.png";}i:12;a:4:{s:12:"avg(runtime)";d:5072.255;s:9:"avg(size)";d:57723.3777;s:3:"cnt";s:5:"60783";s:12:"request_path";s:48:"/static/images/amp/third-party/footer-mobile.png";}i:13;a:4:{s:12:"avg(runtime)";d:5056.392;s:9:"avg(size)";d:16193.447;s:3:"cnt";s:5:"47577";s:12:"request_path";s:1:"/";}i:14;a:4:{s:12:"avg(runtime)";d:5044.3594;s:9:"avg(size)";d:131.2781;s:3:"cnt";s:5:"47091";s:12:"request_path";s:119:"/amp-helper-frame.html?appId=a624a1c1-0c93-466a-a546-e146710f97e6&parentOrigin=https://www-zanbil-ir.cdn.ampproject.org";}i:15;a:4:{s:12:"avg(runtime)";d:5053.4467;s:9:"avg(size)";d:131.0615;s:3:"cnt";s:5:"44865";s:12:"request_path";s:100:"/amp-helper-frame.html?appId=a624a1c1-0c93-466a-a546-e146710f97e6&parentOrigin=https://www.zanbil.ir";}i:16;a:4:{s:12:"avg(runtime)";d:5055.3097;s:9:"avg(size)";d:5.0488;s:3:"cnt";s:5:"36974";s:12:"request_path";s:51:"/image/{{basketItem.id}}?type=productModel&wh=50x50";}i:17;a:4:{s:12:"avg(runtime)";d:5061.4997;s:9:"avg(size)";d:49900.7652;s:3:"cnt";s:5:"35560";s:12:"request_path";s:35:"/static/bundle-bundle_site_head.css";}i:18;a:4:{s:12:"avg(runtime)";d:5031.0329;s:9:"avg(size)";d:150.6714;s:3:"cnt";s:5:"34073";s:12:"request_path";s:26:"/static/images/favicon.ico";}i:19;a:4:{s:12:"avg(runtime)";d:5065.9372;s:9:"avg(size)";d:51369.9073;s:3:"cnt";s:5:"33989";s:12:"request_path";s:37:"/static/images/third-party/footer.png";}}s:5:"stats";s:0:"";s:8:"checksum";i:1312129112;s:10:"warmupTime";d:12099;s:6:"retest";b:1;}i:11;a:15:{s:10:"avgFastest";i:257374;s:2:"cv";d:2.44;s:3:"avg";d:259178;s:12:"cvAvgFastest";d:2.1;s:4:"cold";d:279674;s:7:"fastest";d:225022;s:7:"slowest";d:279674;s:5:"times";a:100:{i:0;d:279674;i:1;d:225022;i:2;d:227485;i:3;d:266576;i:4;d:256253;i:5;d:258645;i:6;d:254420;i:7;d:265351;i:8;d:265766;i:9;d:260682;i:10;d:256913;i:11;d:255126;i:12;d:259465;i:13;d:256109;i:14;d:256871;i:15;d:257718;i:16;d:261871;i:17;d:257534;i:18;d:260010;i:19;d:256702;i:20;d:259101;i:21;d:257741;i:22;d:256736;i:23;d:260854;i:24;d:263006;i:25;d:259310;i:26;d:263983;i:27;d:261068;i:28;d:256537;i:29;d:269287;i:30;d:258441;i:31;d:259193;i:32;d:260845;i:33;d:255875;i:34;d:259882;i:35;d:261460;i:36;d:267087;i:37;d:259529;i:38;d:262851;i:39;d:258810;i:40;d:260045;i:41;d:256974;i:42;d:258408;i:43;d:255182;i:44;d:258266;i:45;d:260226;i:46;d:256754;i:47;d:262235;i:48;d:256372;i:49;d:257936;i:50;d:265283;i:51;d:254547;i:52;d:258724;i:53;d:261590;i:54;d:260122;i:55;d:264466;i:56;d:263762;i:57;d:257081;i:58;d:257513;i:59;d:257295;i:60;d:255710;i:61;d:260321;i:62;d:255212;i:63;d:259133;i:64;d:276186;i:65;d:267596;i:66;d:254633;i:67;d:257433;i:68;d:259190;i:69;d:261968;i:70;d:256575;i:71;d:265653;i:72;d:261993;i:73;d:257449;i:74;d:257733;i:75;d:256251;i:76;d:255218;i:77;d:257968;i:78;d:260766;i:79;d:261531;i:80;d:255171;i:81;d:263128;i:82;d:256361;i:83;d:259369;i:84;d:258884;i:85;d:253628;i:86;d:258718;i:87;d:254865;i:88;d:256429;i:89;d:260088;i:90;d:259296;i:91;d:259824;i:92;d:266407;i:93;d:257783;i:94;d:259721;i:95;d:263253;i:96;d:257981;i:97;d:257275;i:98;d:265731;i:99;d:262852;}s:13:"originalQuery";s:136:"select request_path, count(*), avg(runtime) runtime_avg, avg(size) from logs10m group by request_path order by runtime_avg desc limit 20";s:13:"modifiedQuery";s:136:"select request_path, count(*), avg(runtime) runtime_avg, avg(size) from logs10m group by request_path order by runtime_avg desc limit 20";s:6:"result";a:20:{i:0;a:4:{s:9:"avg(size)";i:1389;s:7:"count()";s:1:"1";s:12:"request_path";s:1093:"/rapidGrails/jsonList?maxColumns=16&domainClass=eshop.Order&filter=[{op:'inSession', field:'id', val:'orderList5ef3b14a7e4a44998405214d115310f7'}]&columns=[{'name':'trackingCode','width':110},{'name':'ownerName','width':120},{'name':'productsName','width':320,'sortable':false},{'name':'ownerMobile','width':110},{'name':'deliveryMethodName','width':120,'sortable':false},{'name':'deliveryCityName','width':120,'sortable':false},{'name':'addressRegionName','width':120,'sortable':false},{'name':'courier','width':120,'expression':'obj[\x5C'courier\x5C']?.fullName'},{'name':'status','width':110},{'name':'invoiceType','width':60,'expression':'g.message(code: obj[\x5C'invoiceTypeCode\x5C'])'},{'name':'itemsDeliveryStatus','width':60},{'name':'creationType','width':50},{'name':'creationMedia','width':50},{'name':'completionMedia','width':50},{'name':'completionFollower','width':120},{'name':'lastActionDate','width':100,'expression':'rg.formatJalaliDate(date:  obj[\x5C'lastActionDate\x5C'], hm:\x5C'true\x5C' )'}]&_search=false&nd=1548311859866&rows=10&page=1&sidx=lastActionDate&sord=desc";s:11:"runtime_avg";i:10000;}i:1;a:4:{s:9:"avg(size)";i:16969;s:7:"count()";s:1:"1";s:12:"request_path";s:21:"/m/search/تاج-گل";s:11:"runtime_avg";i:10000;}i:2;a:4:{s:9:"avg(size)";i:37774;s:7:"count()";s:1:"1";s:12:"request_path";s:17:"/filter/b5,b74,b8";s:11:"runtime_avg";i:10000;}i:3;a:4:{s:9:"avg(size)";i:39001;s:7:"count()";s:1:"1";s:12:"request_path";s:95:"/filter/b211,b502,b214,b389,b335,b360,b554,b327,b392,b489,b522,b33,b337,b552,b297,b476,b734,b82";s:11:"runtime_avg";i:10000;}i:4;a:4:{s:9:"avg(size)";i:38970;s:7:"count()";s:1:"1";s:12:"request_path";s:367:"/filter/b481,b226,b570,b80,b270,b903,b883,b152,b249,b701,b723,b42,b198,b183,b219,b308,b126,b900,b188,b703,b890,b236,b74,b400,b209,b19,b454,b651,b202,b4,b22,b596,b143,b221,b194,b647,b497,b546,b105,b185,b151,b88,b43,b103,b613,b880,b212,b861,b148,b135,b186,b778,b113,b224,b879,b256,b614,b118,b484,b574,b820,b82,b648,b99,b321,b36,b615,b523,b3,b8,b619,b584,b548,p51?page=7";s:11:"runtime_avg";i:10000;}i:5;a:4:{s:9:"avg(size)";i:39356;s:7:"count()";s:1:"1";s:12:"request_path";s:100:"/filter/b571,b288,b70,b57,b43,b320,b197,b385,b440,b105,b217,b302,b450,b498,b243,b126,b36,b877?page=0";s:11:"runtime_avg";i:10000;}i:6;a:4:{s:9:"avg(size)";i:38413;s:7:"count()";s:1:"1";s:12:"request_path";s:101:"/filter/b1,b103,b105,b109,b111,b113,b135,b144,b151,b176,b221,b261,b291,b423,b454,b52,b598,b74,b77,b83";s:11:"runtime_avg";i:10000;}i:7;a:4:{s:9:"avg(size)";i:40201;s:7:"count()";s:1:"1";s:12:"request_path";s:276:"/filter/b874,b67,b226,b570,b598,stexists,b880,b99,b261,b152,b249,b20,b701,b198,b35,b88,b236,b209,b651,b202,b4,b22,b613,b36,b217,b147,b95,b882,b218,b221,b596,b43,b203,b215,b151,b136,b647,b485,b32,b210,b200,b543,b148,b74,b220,b211,b900,b50,b5,b615,b400,b2,b216,b186,b143?page=60";s:11:"runtime_avg";i:10000;}i:8;a:4:{s:9:"avg(size)";i:370;s:7:"count()";s:1:"1";s:12:"request_path";s:1069:"/rapidGrails/jsonList?maxColumns=16&domainClass=eshop.Order&columns=[{'name':'trackingCode','width':110},{'name':'ownerName','width':120},{'name':'productsName','width':320,'sortable':false},{'name':'ownerMobile','width':110},{'name':'deliveryMethodName','width':120,'sortable':false},{'name':'deliveryCityName','width':120,'sortable':false},{'name':'addressRegionName','width':120,'sortable':false},{'name':'courier','width':120,'expression':'obj[\x5C'courier\x5C']?.fullName'},{'name':'status','width':110},{'name':'invoiceType','width':60,'expression':'g.message(code: obj[\x5C'invoiceTypeCode\x5C'])'},{'name':'itemsDeliveryStatus','width':60},{'name':'creationType','width':50},{'name':'creationMedia','width':50},{'name':'completionMedia','width':50},{'name':'completionFollower','width':120},{'name':'lastActionDate','width':100,'expression':'rg.formatJalaliDate(date:  obj[\x5C'lastActionDate\x5C'], hm:\x5C'true\x5C' )'}]&filter=[{"op":"eq","val":"9711040839","field":"trackingCode"}]&_search=false&nd=1548327496166&rows=10&page=1&sidx=lastActionDate&sord=desc";s:11:"runtime_avg";i:10000;}i:9;a:4:{s:9:"avg(size)";i:0;s:7:"count()";s:1:"1";s:12:"request_path";s:28:"/filter/p10,t114,v1|مشکی";s:11:"runtime_avg";i:10000;}i:10;a:4:{s:9:"avg(size)";i:1569;s:7:"count()";s:1:"1";s:12:"request_path";s:31:"/image/61322/productModel/50x50";s:11:"runtime_avg";i:10000;}i:11;a:4:{s:9:"avg(size)";i:854;s:7:"count()";s:1:"1";s:12:"request_path";s:1093:"/rapidGrails/jsonList?maxColumns=16&domainClass=eshop.Order&filter=[{op:'inSession', field:'id', val:'orderListd4fbc07a2c06455493d9c9fcdf95fe35'}]&columns=[{'name':'trackingCode','width':110},{'name':'ownerName','width':120},{'name':'productsName','width':320,'sortable':false},{'name':'ownerMobile','width':110},{'name':'deliveryMethodName','width':120,'sortable':false},{'name':'deliveryCityName','width':120,'sortable':false},{'name':'addressRegionName','width':120,'sortable':false},{'name':'courier','width':120,'expression':'obj[\x5C'courier\x5C']?.fullName'},{'name':'status','width':110},{'name':'invoiceType','width':60,'expression':'g.message(code: obj[\x5C'invoiceTypeCode\x5C'])'},{'name':'itemsDeliveryStatus','width':60},{'name':'creationType','width':50},{'name':'creationMedia','width':50},{'name':'completionMedia','width':50},{'name':'completionFollower','width':120},{'name':'lastActionDate','width':100,'expression':'rg.formatJalaliDate(date:  obj[\x5C'lastActionDate\x5C'], hm:\x5C'true\x5C' )'}]&_search=false&nd=1548141754687&rows=10&page=1&sidx=lastActionDate&sord=desc";s:11:"runtime_avg";i:10000;}i:12;a:4:{s:9:"avg(size)";i:32440;s:7:"count()";s:1:"1";s:12:"request_path";s:58:"/filter/p18,b88,c329|آب میوه گیری,v1|سیلور.";s:11:"runtime_avg";i:10000;}i:13;a:4:{s:9:"avg(size)";i:1512;s:7:"count()";s:1:"1";s:12:"request_path";s:1093:"/rapidGrails/jsonList?maxColumns=16&domainClass=eshop.Order&filter=[{op:'inSession', field:'id', val:'orderList73ca91d2ec8446b891970865b539fe59'}]&columns=[{'name':'trackingCode','width':110},{'name':'ownerName','width':120},{'name':'productsName','width':320,'sortable':false},{'name':'ownerMobile','width':110},{'name':'deliveryMethodName','width':120,'sortable':false},{'name':'deliveryCityName','width':120,'sortable':false},{'name':'addressRegionName','width':120,'sortable':false},{'name':'courier','width':120,'expression':'obj[\x5C'courier\x5C']?.fullName'},{'name':'status','width':110},{'name':'invoiceType','width':60,'expression':'g.message(code: obj[\x5C'invoiceTypeCode\x5C'])'},{'name':'itemsDeliveryStatus','width':60},{'name':'creationType','width':50},{'name':'creationMedia','width':50},{'name':'completionMedia','width':50},{'name':'completionFollower','width':120},{'name':'lastActionDate','width':100,'expression':'rg.formatJalaliDate(date:  obj[\x5C'lastActionDate\x5C'], hm:\x5C'true\x5C' )'}]&_search=false&nd=1548150293416&rows=10&page=1&sidx=lastActionDate&sord=desc";s:11:"runtime_avg";i:10000;}i:14;a:4:{s:9:"avg(size)";i:41413;s:7:"count()";s:1:"1";s:12:"request_path";s:320:"/filter/b481,b874,b67,b226,b570,b598,stexists,b883,b99,b261,b152,b249,b20,b701,b723,b198,b35,b1,b236,b400,b209,b651,b202,b4,b613,b217,b63,b147,b95,b882,b542,b218,b221,b596,b43,b203,b215,b151,b136,b647,b485,b32,b168,b523,b200,b543,b148,b105,b74,b220,b211,b900,b82,b795,b41,b2,b584,b231,b441,b185,b36,b656,b879,b614?page=3";s:11:"runtime_avg";i:10000;}i:15;a:4:{s:9:"avg(size)";i:1113;s:7:"count()";s:1:"1";s:12:"request_path";s:25:"/image/6916/product/50x50";s:11:"runtime_avg";i:10000;}i:16;a:4:{s:9:"avg(size)";i:37654;s:7:"count()";s:1:"1";s:12:"request_path";s:21:"/filter/b111,b124,b41";s:11:"runtime_avg";i:10000;}i:17;a:4:{s:9:"avg(size)";i:37136;s:7:"count()";s:1:"1";s:12:"request_path";s:34:"/filter/b105,b195,b3,b42,b573,b648";s:11:"runtime_avg";i:10000;}i:18;a:4:{s:9:"avg(size)";i:36732;s:7:"count()";s:1:"1";s:12:"request_path";s:109:"/filter/b1,b103,b105,b109,b111,b113,b135,b144,b176,b186,b221,b261,b291,b43,b481,b52,b598,b615,b63,b77,b83,p51";s:11:"runtime_avg";i:10000;}i:19;a:4:{s:9:"avg(size)";i:37855;s:7:"count()";s:1:"1";s:12:"request_path";s:88:"/filter/b211,b408,b50,b270,b341,b295,b231,b447,b20,b458,b285,b153,b508,b417,b393,b202,b1";s:11:"runtime_avg";i:10000;}}s:5:"stats";s:0:"";s:8:"checksum";i:4089684135;s:10:"warmupTime";d:6049;s:6:"retest";b:1;}}s:7:"limited";i:0;s:8:"serverId";s:32:"9cb27f4d3c8d4331982e83e66c09a5ff";s:10:"serverInfo";a:9:{s:4:"argv";s:95:"../../test --test=logs10m --engines=clickhouse --memory=110000 --dir=results/logs10m/clickhouse";s:7:"cpuInfo";s:50061:"processor	: 0
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 0
+cpu cores	: 16
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 1
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 1
+cpu cores	: 16
+apicid		: 2
+initial apicid	: 2
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 2
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 2
+cpu cores	: 16
+apicid		: 4
+initial apicid	: 4
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 3
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 3
+cpu cores	: 16
+apicid		: 6
+initial apicid	: 6
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 4
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 4
+cpu cores	: 16
+apicid		: 8
+initial apicid	: 8
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 5
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 5
+cpu cores	: 16
+apicid		: 10
+initial apicid	: 10
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 6
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 6
+cpu cores	: 16
+apicid		: 12
+initial apicid	: 12
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 7
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 7
+cpu cores	: 16
+apicid		: 14
+initial apicid	: 14
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 8
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 8
+cpu cores	: 16
+apicid		: 16
+initial apicid	: 16
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 9
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 9
+cpu cores	: 16
+apicid		: 18
+initial apicid	: 18
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 10
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 10
+cpu cores	: 16
+apicid		: 20
+initial apicid	: 20
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 11
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 11
+cpu cores	: 16
+apicid		: 22
+initial apicid	: 22
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 12
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 12
+cpu cores	: 16
+apicid		: 24
+initial apicid	: 24
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 13
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 13
+cpu cores	: 16
+apicid		: 26
+initial apicid	: 26
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 14
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2794.791
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 14
+cpu cores	: 16
+apicid		: 28
+initial apicid	: 28
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 15
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 15
+cpu cores	: 16
+apicid		: 30
+initial apicid	: 30
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 16
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 0
+cpu cores	: 16
+apicid		: 1
+initial apicid	: 1
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 17
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 1
+cpu cores	: 16
+apicid		: 3
+initial apicid	: 3
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 18
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 2
+cpu cores	: 16
+apicid		: 5
+initial apicid	: 5
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 19
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 3
+cpu cores	: 16
+apicid		: 7
+initial apicid	: 7
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 20
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 4
+cpu cores	: 16
+apicid		: 9
+initial apicid	: 9
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 21
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 5
+cpu cores	: 16
+apicid		: 11
+initial apicid	: 11
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 22
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 6
+cpu cores	: 16
+apicid		: 13
+initial apicid	: 13
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 23
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 7
+cpu cores	: 16
+apicid		: 15
+initial apicid	: 15
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 24
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 8
+cpu cores	: 16
+apicid		: 17
+initial apicid	: 17
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 25
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 9
+cpu cores	: 16
+apicid		: 19
+initial apicid	: 19
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 26
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 10
+cpu cores	: 16
+apicid		: 21
+initial apicid	: 21
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 27
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 11
+cpu cores	: 16
+apicid		: 23
+initial apicid	: 23
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 28
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 12
+cpu cores	: 16
+apicid		: 25
+initial apicid	: 25
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 29
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 13
+cpu cores	: 16
+apicid		: 27
+initial apicid	: 27
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 30
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 14
+cpu cores	: 16
+apicid		: 29
+initial apicid	: 29
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+
+processor	: 31
+vendor_id	: AuthenticAMD
+cpu family	: 25
+model		: 33
+model name	: AMD Ryzen 9 5950X 16-Core Processor
+stepping	: 0
+microcode	: 0xa201025
+cpu MHz		: 2800.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 32
+core id		: 15
+cpu cores	: 16
+apicid		: 31
+initial apicid	: 31
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 16
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
+bugs		: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6787.42
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]
+";s:4:"free";s:206:"               total        used        free      shared  buff/cache   available
+Mem:       131831320    11426884   119829580        1524      574856   119302140
+Swap:              0           0           0";s:2:"ps";s:41469:"USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0 165912 10252 ?        Ss    2023  23:44 /sbin/init
+root           2  0.0  0.0      0     0 ?        S     2023   0:08 [kthreadd]
+root           3  0.0  0.0      0     0 ?        I<    2023   0:00 [rcu_gp]
+root           4  0.0  0.0      0     0 ?        I<    2023   0:00 [rcu_par_gp]
+root           6  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/0:0H-events_highpri]
+root           9  0.0  0.0      0     0 ?        I<    2023   0:00 [mm_percpu_wq]
+root          10  0.0  0.0      0     0 ?        S     2023   0:00 [rcu_tasks_rude_]
+root          11  0.0  0.0      0     0 ?        S     2023   0:00 [rcu_tasks_trace]
+root          12  0.0  0.0      0     0 ?        S     2023   0:52 [ksoftirqd/0]
+root          13  0.0  0.0      0     0 ?        I     2023 101:28 [rcu_sched]
+root          14  0.0  0.0      0     0 ?        S     2023   0:51 [migration/0]
+root          15  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/0]
+root          16  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/0]
+root          17  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/1]
+root          18  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/1]
+root          19  0.0  0.0      0     0 ?        S     2023   0:49 [migration/1]
+root          20  0.0  0.0      0     0 ?        S     2023   0:25 [ksoftirqd/1]
+root          22  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/1:0H-events_highpri]
+root          23  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/2]
+root          24  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/2]
+root          25  0.0  0.0      0     0 ?        S     2023   0:49 [migration/2]
+root          26  0.0  0.0      0     0 ?        S     2023   0:20 [ksoftirqd/2]
+root          28  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/2:0H-events_highpri]
+root          29  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/3]
+root          30  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/3]
+root          31  0.0  0.0      0     0 ?        S     2023   0:48 [migration/3]
+root          32  0.0  0.0      0     0 ?        S     2023   0:18 [ksoftirqd/3]
+root          34  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/3:0H-events_highpri]
+root          35  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/4]
+root          36  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/4]
+root          37  0.0  0.0      0     0 ?        S     2023   0:49 [migration/4]
+root          38  0.0  0.0      0     0 ?        S     2023   0:31 [ksoftirqd/4]
+root          40  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/4:0H-events_highpri]
+root          41  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/5]
+root          42  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/5]
+root          43  0.0  0.0      0     0 ?        S     2023   0:49 [migration/5]
+root          44  0.0  0.0      0     0 ?        S     2023   0:17 [ksoftirqd/5]
+root          46  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/5:0H-events_highpri]
+root          47  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/6]
+root          48  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/6]
+root          49  0.0  0.0      0     0 ?        S     2023   0:49 [migration/6]
+root          50  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/6]
+root          52  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/6:0H-events_highpri]
+root          53  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/7]
+root          54  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/7]
+root          55  0.0  0.0      0     0 ?        S     2023   0:50 [migration/7]
+root          56  0.0  0.0      0     0 ?        S     2023   0:18 [ksoftirqd/7]
+root          58  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/7:0H-events_highpri]
+root          59  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/8]
+root          60  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/8]
+root          61  0.0  0.0      0     0 ?        S     2023   0:52 [migration/8]
+root          62  0.0  0.0      0     0 ?        S     2023   0:21 [ksoftirqd/8]
+root          64  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/8:0H-events_highpri]
+root          65  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/9]
+root          66  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/9]
+root          67  0.0  0.0      0     0 ?        S     2023   0:51 [migration/9]
+root          68  0.0  0.0      0     0 ?        S     2023   0:19 [ksoftirqd/9]
+root          70  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/9:0H-events_highpri]
+root          71  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/10]
+root          72  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/10]
+root          73  0.0  0.0      0     0 ?        S     2023   0:49 [migration/10]
+root          74  0.0  0.0      0     0 ?        S     2023   0:18 [ksoftirqd/10]
+root          76  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/10:0H-events_highpri]
+root          77  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/11]
+root          78  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/11]
+root          79  0.0  0.0      0     0 ?        S     2023   0:49 [migration/11]
+root          80  0.0  0.0      0     0 ?        S     2023   0:24 [ksoftirqd/11]
+root          82  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/11:0H-events_highpri]
+root          83  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/12]
+root          84  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/12]
+root          85  0.0  0.0      0     0 ?        S     2023   0:49 [migration/12]
+root          86  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/12]
+root          88  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/12:0H-events_highpri]
+root          89  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/13]
+root          90  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/13]
+root          91  0.0  0.0      0     0 ?        S     2023   0:49 [migration/13]
+root          92  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/13]
+root          94  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/13:0H-events_highpri]
+root          95  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/14]
+root          96  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/14]
+root          97  0.0  0.0      0     0 ?        S     2023   0:50 [migration/14]
+root          98  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/14]
+root         100  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/14:0H-events_highpri]
+root         101  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/15]
+root         102  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/15]
+root         103  0.0  0.0      0     0 ?        S     2023   0:48 [migration/15]
+root         104  0.0  0.0      0     0 ?        S     2023   0:17 [ksoftirqd/15]
+root         106  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/15:0H-events_highpri]
+root         107  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/16]
+root         108  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/16]
+root         109  0.0  0.0      0     0 ?        S     2023   0:48 [migration/16]
+root         110  0.0  0.0      0     0 ?        S     2023   0:18 [ksoftirqd/16]
+root         112  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/16:0H-events_highpri]
+root         113  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/17]
+root         114  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/17]
+root         115  0.0  0.0      0     0 ?        S     2023   0:46 [migration/17]
+root         116  0.0  0.0      0     0 ?        S     2023   0:17 [ksoftirqd/17]
+root         118  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/17:0H-kblockd]
+root         119  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/18]
+root         120  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/18]
+root         121  0.0  0.0      0     0 ?        S     2023   0:47 [migration/18]
+root         122  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/18]
+root         124  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/18:0H-events_highpri]
+root         125  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/19]
+root         126  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/19]
+root         127  0.0  0.0      0     0 ?        S     2023   0:46 [migration/19]
+root         128  0.0  0.0      0     0 ?        S     2023   0:15 [ksoftirqd/19]
+root         130  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/19:0H-events_highpri]
+root         131  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/20]
+root         132  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/20]
+root         133  0.0  0.0      0     0 ?        S     2023   0:47 [migration/20]
+root         134  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/20]
+root         136  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/20:0H-events_highpri]
+root         137  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/21]
+root         138  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/21]
+root         139  0.0  0.0      0     0 ?        S     2023   0:47 [migration/21]
+root         140  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/21]
+root         142  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/21:0H-events_highpri]
+root         143  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/22]
+root         144  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/22]
+root         145  0.0  0.0      0     0 ?        S     2023   0:47 [migration/22]
+root         146  0.0  0.0      0     0 ?        S     2023   0:15 [ksoftirqd/22]
+root         148  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/22:0H-events_highpri]
+root         149  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/23]
+root         150  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/23]
+root         151  0.0  0.0      0     0 ?        S     2023   0:46 [migration/23]
+root         152  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/23]
+root         154  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/23:0H-events_highpri]
+root         155  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/24]
+root         156  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/24]
+root         157  0.0  0.0      0     0 ?        S     2023   0:46 [migration/24]
+root         158  0.0  0.0      0     0 ?        S     2023   0:20 [ksoftirqd/24]
+root         160  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/24:0H-events_highpri]
+root         161  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/25]
+root         162  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/25]
+root         163  0.0  0.0      0     0 ?        S     2023   0:47 [migration/25]
+root         164  0.0  0.0      0     0 ?        S     2023   0:17 [ksoftirqd/25]
+root         166  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/25:0H-events_highpri]
+root         167  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/26]
+root         168  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/26]
+root         169  0.0  0.0      0     0 ?        S     2023   0:47 [migration/26]
+root         170  0.0  0.0      0     0 ?        S     2023   0:17 [ksoftirqd/26]
+root         172  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/26:0H-events_highpri]
+root         173  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/27]
+root         174  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/27]
+root         175  0.0  0.0      0     0 ?        S     2023   0:47 [migration/27]
+root         176  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/27]
+root         178  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/27:0H-events_highpri]
+root         179  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/28]
+root         180  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/28]
+root         181  0.0  0.0      0     0 ?        S     2023   0:47 [migration/28]
+root         182  0.0  0.0      0     0 ?        S     2023   0:16 [ksoftirqd/28]
+root         184  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/28:0H-events_highpri]
+root         185  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/29]
+root         186  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/29]
+root         187  0.0  0.0      0     0 ?        S     2023   0:47 [migration/29]
+root         188  0.0  0.0      0     0 ?        S     2023   0:15 [ksoftirqd/29]
+root         190  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/29:0H-events_highpri]
+root         191  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/30]
+root         192  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/30]
+root         193  0.0  0.0      0     0 ?        S     2023   0:47 [migration/30]
+root         194  0.0  0.0      0     0 ?        S     2023   0:15 [ksoftirqd/30]
+root         196  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/30:0H-events_highpri]
+root         197  0.0  0.0      0     0 ?        S     2023   0:00 [cpuhp/31]
+root         198  0.0  0.0      0     0 ?        S     2023   0:00 [idle_inject/31]
+root         199  0.0  0.0      0     0 ?        S     2023   0:47 [migration/31]
+root         200  0.0  0.0      0     0 ?        S     2023   0:17 [ksoftirqd/31]
+root         202  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/31:0H-kblockd]
+root         203  0.0  0.0      0     0 ?        S     2023   0:00 [kdevtmpfs]
+root         204  0.0  0.0      0     0 ?        I<    2023   0:00 [netns]
+root         205  0.0  0.0      0     0 ?        I<    2023   0:00 [inet_frag_wq]
+root         206  0.0  0.0      0     0 ?        S     2023   0:00 [kauditd]
+root         210  0.0  0.0      0     0 ?        S     2023   0:31 [khungtaskd]
+root         211  0.0  0.0      0     0 ?        S     2023   0:18 [oom_reaper]
+root         212  0.0  0.0      0     0 ?        I<    2023   0:00 [writeback]
+root         213  0.0  0.0      0     0 ?        S     2023 164:56 [kcompactd0]
+root         214  0.0  0.0      0     0 ?        SN    2023   0:00 [ksmd]
+root         215  0.0  0.0      0     0 ?        SN    2023   0:21 [khugepaged]
+root         262  0.0  0.0      0     0 ?        I<    2023   0:00 [kintegrityd]
+root         263  0.0  0.0      0     0 ?        I<    2023   0:00 [kblockd]
+root         264  0.0  0.0      0     0 ?        I<    2023   0:00 [blkcg_punt_bio]
+root         265  0.0  0.0      0     0 ?        I<    2023   0:00 [tpm_dev_wq]
+root         266  0.0  0.0      0     0 ?        I<    2023   0:00 [ata_sff]
+root         267  0.0  0.0      0     0 ?        I<    2023   0:00 [md]
+root         268  0.0  0.0      0     0 ?        I<    2023   0:00 [edac-poller]
+root         269  0.0  0.0      0     0 ?        I<    2023   0:00 [devfreq_wq]
+root         271  0.0  0.0      0     0 ?        S     2023   0:00 [watchdogd]
+root         273  0.0  0.0      0     0 ?        I<    2023   1:01 [kworker/16:1H-kblockd]
+root         274  0.0  0.0      0     0 ?        S     2023   0:00 [irq/25-AMD-Vi]
+root         276  0.0  0.0      0     0 ?        S     2023 248:56 [kswapd0]
+root         277  0.0  0.0      0     0 ?        S     2023   0:00 [ecryptfs-kthrea]
+root         279  0.0  0.0      0     0 ?        I<    2023   0:00 [kthrotld]
+root         280  0.0  0.0      0     0 ?        S     2023   0:00 [irq/27-aerdrv]
+root         281  0.0  0.0      0     0 ?        S     2023   0:00 [irq/28-aerdrv]
+root         282  0.0  0.0      0     0 ?        S     2023   0:00 [irq/29-aerdrv]
+root         283  0.0  0.0      0     0 ?        S     2023   0:00 [irq/31-aerdrv]
+root         284  0.0  0.0      0     0 ?        S     2023   0:00 [irq/32-aerdrv]
+root         313  0.0  0.0      0     0 ?        I<    2023   0:00 [acpi_thermal_pm]
+root         319  0.0  0.0      0     0 ?        I<    2023   0:00 [vfio-irqfd-clea]
+root         320  0.0  0.0      0     0 ?        I<    2023   0:00 [mld]
+root         321  0.0  0.0      0     0 ?        I<    2023   0:00 [ipv6_addrconf]
+root         323  0.0  0.0      0     0 ?        I<    2023   0:56 [kworker/19:1H-kblockd]
+root         331  0.0  0.0      0     0 ?        I<    2023   0:00 [kstrp]
+root         334  0.0  0.0      0     0 ?        I<    2023   0:00 [zswap-shrink]
+root         335  0.0  0.0      0     0 ?        I<    2023   0:00 [kworker/u65:0]
+root         340  0.0  0.0      0     0 ?        I<    2023   0:00 [charger_manager]
+root         343  0.0  0.0      0     0 ?        S     2023   0:00 [irq/26-ACPI:Eve]
+root         372  0.0  0.0      0     0 ?        I<    2023   0:59 [kworker/18:1H-kblockd]
+root         395  0.0  0.0      0     0 ?        I<    2023   0:51 [kworker/26:1H-kblockd]
+root         421  0.0  0.0      0     0 ?        I<    2023   0:00 [cryptd]
+root         424  0.0  0.0      0     0 ?        I<    2023   0:00 [nvme-wq]
+root         430  0.0  0.0      0     0 ?        I<    2023   0:00 [nvme-reset-wq]
+root         432  0.0  0.0      0     0 ?        I<    2023   0:00 [nvme-delete-wq]
+root         465  0.0  0.0      0     0 ?        I<    2023   0:52 [kworker/23:1H-kblockd]
+root         470  0.0  0.0      0     0 ?        I<    2023   1:09 [kworker/5:1H-kblockd]
+root         476  0.0  0.0      0     0 ?        S     2023   0:00 [scsi_eh_0]
+root         478  0.0  0.0      0     0 ?        I<    2023   1:02 [kworker/9:1H-kblockd]
+root         479  0.0  0.0      0     0 ?        I<    2023   0:00 [scsi_tmf_0]
+root         484  0.0  0.0      0     0 ?        I<    2023   0:58 [kworker/22:1H-kblockd]
+root         485  0.0  0.0      0     0 ?        I<    2023   3:07 [kworker/0:1H-kblockd]
+root         486  0.0  0.0      0     0 ?        S     2023   0:00 [scsi_eh_1]
+root         487  0.0  0.0      0     0 ?        I<    2023   0:00 [scsi_tmf_1]
+root         488  0.0  0.0      0     0 ?        S     2023   0:00 [scsi_eh_2]
+root         490  0.0  0.0      0     0 ?        I<    2023   0:54 [kworker/30:1H-kblockd]
+root         491  0.0  0.0      0     0 ?        I<    2023   0:00 [scsi_tmf_2]
+root         492  0.0  0.0      0     0 ?        I<    2023   1:07 [kworker/3:1H-kblockd]
+root         493  0.0  0.0      0     0 ?        S     2023   0:00 [scsi_eh_3]
+root         494  0.0  0.0      0     0 ?        I<    2023   0:00 [scsi_tmf_3]
+root         495  0.0  0.0      0     0 ?        I<    2023   0:54 [kworker/21:1H-kblockd]
+root         496  0.0  0.0      0     0 ?        S     2023   0:00 [scsi_eh_4]
+root         497  0.0  0.0      0     0 ?        I<    2023   0:00 [scsi_tmf_4]
+root         498  0.0  0.0      0     0 ?        S     2023   0:00 [scsi_eh_5]
+root         499  0.0  0.0      0     0 ?        I<    2023   0:00 [scsi_tmf_5]
+root         509  0.0  0.0      0     0 ?        I<    2023   0:55 [kworker/28:1H-kblockd]
+root         514  0.0  0.0      0     0 ?        I<    2023   0:55 [kworker/29:1H-kblockd]
+root         518  0.0  0.0      0     0 ?        I<    2023   1:10 [kworker/4:1H-kblockd]
+root         545  0.0  0.0      0     0 ?        I<    2023   0:00 [raid5wq]
+root         592  0.0  0.0      0     0 ?        S     2023 103:47 [jbd2/nvme0n1p2-]
+root         593  0.0  0.0      0     0 ?        I<    2023   0:00 [ext4-rsv-conver]
+root         608  0.0  0.0      0     0 ?        I<    2023   1:01 [kworker/13:1H-kblockd]
+root         627  0.0  0.0      0     0 ?        I<    2023   1:08 [kworker/6:1H-kblockd]
+root         656  0.0  0.0 118016 57368 ?        S<s   2023 267:11 /lib/systemd/systemd-journald
+root         671  0.0  0.0      0     0 ?        I<    2023   1:00 [kworker/14:1H-kblockd]
+root         689  0.0  0.0      0     0 ?        I<    2023   0:56 [kworker/20:1H-kblockd]
+root         693  0.0  0.0  23940  4588 ?        Ss    2023   0:59 /lib/systemd/systemd-udevd
+root         695  0.0  0.0      0     0 ?        I<    2023   1:04 [kworker/7:1H-kblockd]
+systemd+     709  0.0  0.0  18468  3856 ?        Ss    2023   1:58 /lib/systemd/systemd-networkd
+root         778  0.0  0.0      0     0 ?        I<    2023   0:51 [kworker/24:1H-kblockd]
+root         781  0.0  0.0      0     0 ?        I<    2023   1:04 [kworker/12:1H-kblockd]
+root         788  0.0  0.0      0     0 ?        I<    2023   1:04 [kworker/11:1H-kblockd]
+root         790  0.0  0.0      0     0 ?        I<    2023   1:05 [kworker/2:1H-kblockd]
+root         792  0.0  0.0      0     0 ?        I<    2023   0:53 [kworker/27:1H-kblockd]
+root         799  0.0  0.0      0     0 ?        I<    2023   1:04 [kworker/10:1H-kblockd]
+root         808  0.0  0.0      0     0 ?        I<    2023   0:58 [kworker/15:1H-kblockd]
+root         819  0.0  0.0      0     0 ?        I<    2023   1:02 [kworker/8:1H-kblockd]
+root         821  0.0  0.0      0     0 ?        I<    2023   3:17 [kworker/1:1H-kblockd]
+root         832  0.0  0.0      0     0 ?        I<    2023   0:56 [kworker/31:1H-kblockd]
+root         836  0.0  0.0      0     0 ?        I<    2023   0:00 [kaluad]
+root         838  0.0  0.0      0     0 ?        I<    2023   0:00 [kmpath_rdacd]
+root         839  0.0  0.0      0     0 ?        I<    2023   0:00 [kmpathd]
+root         840  0.0  0.0      0     0 ?        I<    2023   0:00 [kmpath_handlerd]
+root         841  0.0  0.0 215128 18320 ?        SLsl  2023  15:21 /sbin/multipathd -d -s
+root         850  0.0  0.0      0     0 ?        S     2023   0:00 [jbd2/nvme0n1p1-]
+root         851  0.0  0.0      0     0 ?        I<    2023   0:00 [ext4-rsv-conver]
+root         852  0.0  0.0      0     0 ?        S     2023  17:00 [jbd2/nvme1n1p1-]
+root         853  0.0  0.0      0     0 ?        I<    2023   0:00 [ext4-rsv-conver]
+systemd+     873  0.0  0.0  23772  8108 ?        Ss    2023   2:29 /lib/systemd/systemd-resolved
+systemd+     874  0.0  0.0  87660  2488 ?        Ssl   2023   0:38 /lib/systemd/systemd-timesyncd
+message+     877  0.0  0.0   9028  4580 ?        Ss    2023   1:37 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root         881  0.0  0.0  82724  3544 ?        Ssl   2023  44:20 /usr/sbin/irqbalance --foreground
+syslog       888  0.0  0.0 221252  4504 ?        Ssl   2023 439:14 /usr/sbin/rsyslogd -n -iNONE
+root         892  0.0  0.0  14820  4832 ?        Ss    2023   0:40 /lib/systemd/systemd-logind
+root         896  0.0  0.0 392896  8692 ?        Ssl   2023   0:36 /usr/libexec/udisks2/udisksd
+root         931  0.1  0.0 3565800 29284 ?       Ssl   2023 1219:07 /usr/bin/containerd
+root         943  0.0  0.0 234188  5016 ?        Ssl   2023   0:16 /usr/libexec/polkitd --no-debug
+root         966  0.0  0.0      0     0 ?        I<    2023   0:52 [kworker/25:1H-kblockd]
+root        1265  0.0  0.0   6880  2404 ?        Ss    2023   0:33 /usr/sbin/cron -f -P
+daemon      1281  0.0  0.0   3856  1072 ?        Ss    2023   0:00 /usr/sbin/atd -f
+root        1288  0.0  0.0  13132  5108 ?        Ss    2023  19:11 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+root        1319  0.0  0.0   6140   856 tty1     Ss+   2023   0:00 /sbin/agetty -o -p -- \u --noclear tty1 linux
+root       20211  0.0  0.0      0     0 ?        I<    2023   1:00 [kworker/17:1H-kblockd]
+root       71229  0.0  0.0 292412  7228 ?        Ssl   2023   1:16 /usr/libexec/packagekitd
+root      127803  0.0  0.0   8308  3880 pts/35   T    Jul01   0:00 nano ../../.env
+root      155640  0.0  0.0 246404  5144 ?        Ssl   2023   0:00 /usr/libexec/upowerd
+root      246907  0.3  0.0 5955600 79312 ?       Ssl  Apr15 1243:17 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+root      280966  0.0  0.0  14768  4168 ?        Ss   Apr23   0:00 sshd: root@pts/19
+root      281102  0.0  0.0  14220  9208 pts/19   Ss   Apr23   0:00 -bash
+root      335609  0.0  0.0   7284  2136 pts/19   S+   Apr23   0:00 tmux attach-session -t vector-bench
+root      431488  0.0  0.9 1274248 1268584 ?     Ss   Jun24   1:08 SCREEN -S es_indexing
+root      431489  0.0  0.0  17760 12448 pts/36   Ss+  Jun24   0:03 /bin/bash
+root      449157  0.0  0.0  15196  9900 pts/38   Ss+  Jun24   0:03 /bin/bash
+root      451729  0.0  0.0  15212  9828 pts/39   Ss+  Jun24   0:06 /bin/bash
+root      463194  0.0  0.0   7680   524 pts/44   S+   Aug07   0:00 tail -f /tmp/docs
+root      473408  0.0  0.0  19060 13744 pts/40   Ss+  Jun24   0:01 /bin/bash
+root      490218  0.0  0.0  16264 10892 pts/41   Ss+  Jun24   0:00 /bin/bash
+root      555681  0.0  0.0  14768  4120 ?        Ss   May09   0:00 sshd: root@pts/25
+root      555827  0.0  0.0  13896  8932 pts/25   Ss   May09   0:00 -bash
+root      556580  0.0  0.0   7284  2168 pts/25   S+   May09   0:00 tmux attach-session -t vector-bench
+root      576248  0.0  0.0  23572  4100 pts/37   S+   Aug07   0:00 mysql -P9306 -h0
+root      660275  0.0  0.0  14768  4348 ?        Ss   May09   0:01 sshd: root@pts/26
+root      660406  0.0  0.0  13896  8976 pts/26   Ss   May09   0:00 -bash
+root      660586  0.0  0.0   7284  2208 pts/26   S+   May09   0:00 tmux attach-session -t vector-bench
+root      690791  0.0  0.0  15456 10516 pts/27   Ss+  May09   0:02 -bash
+root      726179  0.0  0.0  18468 14468 pts/51   Ss   Sep25   0:05 /bin/bash
+root      845535  0.0  0.0  17324  3920 pts/5    S+    2023   0:00 mc
+root      845537  0.0  0.0  13400  8392 pts/7    Ss    2023   0:00 bash -rcfile .bashrc
+root      913209  0.0  0.0  64972 60984 pts/35   Ss+  Jun24   0:37 /bin/bash
+root      913495  0.0  0.0  14628  9196 ?        Ss   Nov19   0:00 sshd: klirichek [priv]
+klirich+  913578  0.0  0.0  14640  5424 ?        S    Nov19   0:00 sshd: klirichek@pts/33
+klirich+  913591  0.0  0.0   8636  5364 pts/33   Ss+  Nov19   0:00 -bash
+root      987903  0.0  0.0 496624 24280 pts/13   S+   Feb12   0:00 clickhouse-client -m
+root      999411  0.0  0.0  21708  3752 pts/14   S+   Feb12   0:00 mysql -P9306 -h0
+root     1020608  0.0  0.0  15152  4944 ?        Ss   May09   0:02 sshd: root@pts/28
+root     1020740  0.0  0.0  13904  8972 pts/28   Ss   May09   0:00 -bash
+root     1020879  0.0  0.0   7284  2192 pts/28   S+   May09   0:00 tmux attach-session -t vector-bench
+root     1081424  0.0  0.0  13832  8740 pts/15   Ss+  Feb16   0:00 /bin/bash
+root     1162329  0.0  0.0  14768  8924 ?        Ss   14:10   0:00 sshd: root@pts/50
+root     1162478  0.0  0.0  15568 11964 pts/50   Ss   14:10   0:00 -bash
+root     1162569  0.0  0.0   7364  1348 pts/50   S+   14:10   0:00 screen -x ret
+root     1163042  0.0  0.0 438236 84888 ?        Ssl  14:10   0:00 /usr/libexec/fwupd/fwupd
+ilya     1207772  0.0  0.0  15436  6432 ?        Ss    2023   2:11 /lib/systemd/systemd --user
+ilya     1207773  0.0  0.0 167672  3748 ?        S     2023   0:00 (sd-pam)
+root     1208159  0.0  1.0 1449364 1443820 ?     Ss    2023   0:35 SCREEN
+root     1208160  0.0  0.0  13124  8116 pts/3    Ss    2023   0:00 /bin/bash
+root     1208258  0.0  0.0  17356  3972 pts/3    S+    2023   0:26 mc
+root     1208260  0.0  0.0  13544  8540 pts/4    Ss+   2023   0:03 bash -rcfile .bashrc
+root     1243442  0.0  0.0      0     0 ?        I    14:49   0:00 [kworker/u64:1-ext4-rsv-conversion]
+root     1243443  0.0  0.0      0     0 ?        I    14:49   0:00 [kworker/16:1-events]
+root     1245472  0.0  0.0   7804  3952 pts/51   S+   14:51   0:00 bash 1.sh
+root     1249726  0.0  0.0      0     0 ?        I    14:54   0:00 [kworker/26:3-events]
+root     1249858  0.0  0.0      0     0 ?        I    14:54   0:00 [kworker/24:2-rcu_par_gp]
+root     1250708  0.0  0.0      0     0 ?        I    14:55   0:00 [kworker/18:1-events]
+root     1251130  0.0  0.0      0     0 ?        I    14:56   0:00 [kworker/19:3-events]
+root     1253779  0.0  0.0      0     0 ?        I    14:57   0:00 [kworker/14:4-rcu_gp]
+root     1255791  0.0  0.0      0     0 ?        I    14:59   0:00 [kworker/30:3-events]
+root     1257350  0.0  0.0      0     0 ?        I    15:01   0:00 [kworker/29:2-rcu_par_gp]
+root     1259107  0.0  0.0      0     0 ?        I    15:03   0:00 [kworker/20:0-rcu_par_gp]
+root     1259108  0.0  0.0      0     0 ?        I    15:03   0:00 [kworker/21:1-rcu_gp]
+root     1259241  0.0  0.0      0     0 ?        I    15:03   0:00 [kworker/27:2-rcu_gp]
+root     1264398  0.0  0.0      0     0 ?        I    15:09   0:00 [kworker/8:1-events]
+root     1266980  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/17:0-events]
+root     1266981  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/18:2-events]
+root     1266995  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/6:0-rcu_gp]
+root     1266996  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/7:2-events_freezable]
+root     1266997  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/7:3-rcu_par_gp]
+root     1266998  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/11:1-rcu_gp]
+root     1267000  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/13:0-cgroup_destroy]
+root     1267002  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/31:0-rcu_par_gp]
+root     1267100  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/u64:2-flush-259:2]
+root     1267268  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/28:2-rcu_par_gp]
+root     1267271  0.0  0.0      0     0 ?        I    15:12   0:00 [kworker/5:1-rcu_par_gp]
+root     1268131  0.0  0.0      0     0 ?        I    15:13   0:00 [kworker/3:0-rcu_par_gp]
+root     1268137  0.0  0.0      0     0 ?        I    15:13   0:00 [kworker/12:1-rcu_par_gp]
+root     1268139  0.0  0.0      0     0 ?        I    15:13   0:00 [kworker/10:3-events]
+root     1269323  0.0  0.0      0     0 ?        I    15:14   0:00 [kworker/16:2-events]
+root     1269336  0.0  0.0      0     0 ?        I    15:14   0:00 [kworker/15:3-rcu_par_gp]
+root     1269466  0.0  0.0      0     0 ?        I    15:14   0:00 [kworker/9:1-rcu_par_gp]
+root     1269467  0.0  0.0      0     0 ?        I    15:14   0:00 [kworker/11:4-rcu_par_gp]
+root     1269516  0.0  0.0      0     0 ?        I    15:14   0:00 [kworker/20:2-mm_percpu_wq]
+root     1269616  0.0  0.0      0     0 ?        I    15:14   0:00 [kworker/1:0-rcu_par_gp]
+root     1270138  0.0  0.0      0     0 ?        I    15:14   0:00 [kworker/2:1-events]
+root     1270457  0.0  0.0      0     0 ?        I    15:15   0:00 [kworker/28:3-rcu_gp]
+root     1270459  0.0  0.0      0     0 ?        I    15:15   0:00 [kworker/29:3-rcu_par_gp]
+root     1271784  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/23:2-rcu_par_gp]
+root     1271792  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/4:2-events]
+root     1271793  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/21:0-events]
+root     1271795  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/23:3-mm_percpu_wq]
+root     1272356  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/26:0-rcu_par_gp]
+root     1272361  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/3:1-rcu_gp]
+root     1272371  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/u64:5-events_unbound]
+root     1272438  0.0  0.0      0     0 ?        I    15:16   0:00 [kworker/22:2-events]
+root     1273091  0.0  0.0      0     0 ?        I    15:17   0:00 [kworker/8:3-rcu_gp]
+root     1273363  0.0  0.0      0     0 ?        I    15:17   0:00 [kworker/19:1-events]
+root     1273651  0.0  0.0      0     0 ?        I    15:17   0:00 [kworker/0:2-events]
+root     1273666  0.0  0.0      0     0 ?        I    15:17   0:00 [kworker/31:1-events]
+root     1273945  0.0  0.0      0     0 ?        I    15:18   0:00 [kworker/17:1-events]
+root     1274310  0.0  0.0      0     0 ?        I    15:18   0:00 [kworker/1:3-mm_percpu_wq]
+root     1274312  0.0  0.0      0     0 ?        I    15:18   0:00 [kworker/0:3-rcu_par_gp]
+root     1275329  0.0  0.0      0     0 ?        I    15:19   0:00 [kworker/12:2-rcu_gp]
+root     1275333  0.0  0.0      0     0 ?        I    15:19   0:00 [kworker/14:1-rcu_par_gp]
+root     1275552  0.0  0.0      0     0 ?        I    15:19   0:00 [kworker/27:1-events]
+root     1275984  0.0  0.0      0     0 ?        I    15:19   0:00 [kworker/25:0-events]
+root     1276425  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/15:0-rcu_gp]
+root     1276522  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/30:0-events]
+root     1276535  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/24:3-mm_percpu_wq]
+root     1276536  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/25:3-events]
+root     1276538  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/22:3-events]
+root     1276552  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/2:2-events]
+root     1276666  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/9:0-events]
+root     1276667  0.0  0.0      0     0 ?        I    15:20   0:00 [kworker/10:0-cgroup_destroy]
+root     1278544  0.0  0.0      0     0 ?        I    15:22   0:00 [kworker/4:0-events]
+root     1278818  0.0  0.0      0     0 ?        I    15:22   0:00 [kworker/5:2-events]
+root     1278819  0.0  0.0      0     0 ?        I    15:22   0:00 [kworker/6:1-mm_percpu_wq]
+root     1281045  0.0  0.0      0     0 ?        I    15:24   0:00 [kworker/13:2-events]
+root     1286266  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/29:0-events]
+root     1286267  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/30:1-events]
+root     1286274  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/2:0]
+root     1286277  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/17:2]
+root     1286282  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/11:0-events]
+root     1286283  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/12:0-rcu_par_gp]
+root     1286284  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/12:3-events]
+root     1286286  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/11:2-events]
+root     1286307  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/15:1-events]
+root     1286308  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/u64:0-ext4-rsv-conversion]
+root     1286309  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/u64:3]
+root     1286310  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/u64:4]
+root     1286311  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/3:2-events]
+root     1286397  1.0  0.0  77500 24336 pts/51   S+   15:31   0:00 php ../../test --test=logs10m --engines=clickhouse --memory=110000 --dir=results/logs10m/clickhouse
+root     1286407  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/14:0-events]
+root     1286408  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/28:0-events]
+root     1286409  0.0  0.0  23940  3528 ?        S    15:31   0:00 /lib/systemd/systemd-udevd
+root     1286410  0.0  0.0  23940  3528 ?        S    15:31   0:00 /lib/systemd/systemd-udevd
+root     1286414  0.0  0.0      0     0 ?        I    15:31   0:00 [kworker/19:0-events]
+root     1286444  0.0  0.0   5752   956 ?        S    15:31   0:00 sleep 1
+root     1286524  0.0  0.0   2872   988 pts/51   S+   15:31   0:00 sh -c ps aux
+root     1286525  0.0  0.0  10256  3592 pts/51   R+   15:31   0:00 ps aux
+root     1500958  0.0  1.6 2139784 2134624 ?     Ss    2023  27:20 SCREEN -S ind
+root     1500959  0.0  0.0  20736 15636 pts/2    Ss+   2023   0:17 /bin/bash
+root     1500991  0.0  0.0  16784 11944 pts/9    Ss+   2023   0:11 /bin/bash
+root     1501438  0.0  0.0  17576 12580 pts/10   Ss+   2023   0:07 /bin/bash
+root     1772572  0.0  0.0  81300  2560 ?        SLs  May02   0:00 /usr/bin/gpg-agent --supervised
+root     1781736  0.0  0.2 272728 267384 ?       Ss   May02   0:00 SCREEN -S upg
+root     1781737  0.0  0.0  14932 10076 pts/21   Ss+  May02   0:00 /bin/bash
+root     1797602  0.0  0.2 272728 267400 ?       Ss   May02   0:00 SCREEN -S mem
+root     1797603  0.0  0.0  13844  8896 pts/22   Ss+  May02   0:00 /bin/bash
+root     1853854  0.4  0.0  23164 17820 ?        Ss    2023 2320:17 tmux
+root     1853855  0.0  0.0  14620  9708 pts/11   Ss+   2023   0:08 -bash
+root     1853903  0.0  0.0  14360  9436 pts/12   Ss+   2023   0:02 -bash
+root     1901426  0.0  0.0  14628  8840 ?        Ss   Nov20   0:00 sshd: klirichek [priv]
+klirich+ 1901575  0.0  0.0  14632  6216 ?        S    Nov20   0:00 sshd: klirichek@notty
+root     1951570  0.0  0.0  14768  4340 ?        Ss   May10   0:00 sshd: root@pts/29
+root     1951716  0.0  0.0  14412  9428 pts/29   Ss   May10   0:00 -bash
+root     1951838  0.0  0.0   7284  2136 pts/29   S+   May10   0:00 tmux attach-session -t vector-bench
+root     2044682  0.0  0.0 693400 25664 pts/1    Tl   Feb04   0:00 clickhouse-client -m
+root     2047400  0.0  0.0  33428 29176 pts/34   Ss+  Aug19   0:14 /bin/bash
+root     2051640  0.0  0.0 695960 26192 pts/1    Tl   Feb04   0:00 clickhouse-client -m
+root     2054156  0.0  0.0  16820 11860 pts/13   Ss   Feb04   0:05 /bin/bash
+root     2060202  0.0  0.0 634004 24832 pts/1    Tl   Feb04   0:00 clickhouse-client -m
+root     2197903  0.0  0.0  14804  9960 pts/14   Ss   Feb12   0:02 /bin/bash
+root     2302660  0.0  0.0  21840  3960 pts/7    S+    2023   0:00 mysql -h0 -P9306
+root     2317457  0.0  0.0  18444  4768 pts/6    S+    2023   0:00 mc
+root     2317459  0.0  0.0  13400  8244 pts/8    Ss+   2023   0:01 bash -rcfile .bashrc
+root     2604121  0.0  0.2 273096 267232 ?       Ss   Jun18   0:00 SCREEN
+root     2604122  0.0  0.0  14776  9416 pts/30   Ss+  Jun18   0:00 /bin/bash
+root     2621083  0.0  0.0  14764  4104 ?        Ss   Apr21   0:00 sshd: root@pts/0
+root     2621232  0.0  0.0  13884  9128 pts/0    Ss   Apr21   0:00 -bash
+root     2626476  0.0  0.0   7284  2228 pts/0    S+   Apr21   0:00 tmux new-session -s vector-bench
+root     2626477  0.0  0.0  15276 10420 pts/16   Ss+  Apr21   0:07 -bash
+root     2627028  0.0  0.0  15436 10464 pts/17   Ss+  Apr21   0:02 -bash
+root     2627089  0.0  0.0  15268 10492 pts/18   Ss+  Apr21   0:04 -bash
+root     2634166  0.0  0.8 1094892 1089816 ?     Ss   Aug27   0:03 SCREEN -S 1core
+root     2634167  0.0  0.0  15144 10124 pts/42   Ss+  Aug27   0:00 /bin/bash
+root     2637109  0.0  0.0  22304 17264 pts/47   Ss+  Aug27   0:06 /bin/bash
+root     2645693  0.0  0.0  16984 12040 pts/48   Ss+  Aug27   0:02 /bin/bash
+root     2649340  0.0  0.2 280348 274604 ?       Ss   May30   0:03 SCREEN -S typesense
+root     2649341  0.0  0.0  16760 11492 pts/31   Ss+  May30   0:03 /bin/bash
+klirich+ 3044477  0.0  0.0  15512  6564 ?        Ss   Nov08   0:18 /lib/systemd/systemd --user
+klirich+ 3044478  0.0  0.0 168604  4932 ?        S    Nov08   0:00 (sd-pam)
+klirich+ 3044545  0.0  0.0  41276  1220 ?        S    Nov08   0:00 /usr/bin/podman
+klirich+ 3044827  0.0  0.0   8100  2956 ?        Ss   Nov08   0:00 /usr/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root     3305801  0.0  0.0  15596  6556 ?        Ss    2023   1:47 /lib/systemd/systemd --user
+root     3305802  0.0  0.0 167772  3872 ?        S     2023   0:00 (sd-pam)
+root     3370173  0.0  1.0 1328440 1321280 ?     Ss   Jul12   0:20 SCREEN -S load
+root     3370174  0.0  0.0  18104 11312 pts/37   Ss   Jul12   0:01 /bin/bash
+root     3434306  0.0  0.0  18204 11320 pts/43   Ss+  Jul12   0:00 /bin/bash
+root     3435215  0.0  0.0  17932 11120 pts/44   Ss   Jul12   0:00 /bin/bash
+root     3435273  0.0  0.0  17904 11096 pts/45   Ss+  Jul12   0:01 /bin/bash
+root     3436402  0.0  0.0  17904 11152 pts/46   Ss+  Jul12   0:03 /bin/bash
+root     3448963  0.0  0.0   8100  2396 ?        Ss    2023   0:00 /usr/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root     3560163  0.4  1.0 1373920 1369028 ?     Ss   Jun19 1058:55 SCREEN -S retest_all
+root     3568856  0.0  0.0      0     0 ?        I<   Jun19   0:00 [dio/nvme0n1p2]
+root     3778969  0.0  0.0  13400  8412 pts/5    Ss    2023   0:00 /bin/bash
+root     3779008  0.0  0.0  13400  8412 pts/6    Ss    2023   0:00 /bin/bash
+root     3783844  0.0  0.0  14896  4404 ?        Ss   May08   0:00 sshd: root@pts/20
+root     3783988  0.0  0.0  14256  9248 pts/20   Ss+  May08   0:00 -bash
+root     3785000  0.0  0.0  14260  9320 pts/23   Ss+  May08   0:03 -bash
+root     3785265  0.0  0.0  15416 10484 pts/24   Ss+  May08   0:01 -bash
+root     3880838  0.0  0.0   7332  3052 ?        Ss    2023 401:20 /bin/bash /root/load_monitor.sh
+root     3978583  0.0  0.0  15848 10908 pts/1    Ss+   2023   0:06 /bin/bash
+root     4034472  0.0  0.2 288012 282396 ?       Ss   Jun12   0:02 SCREEN -S quickwik
+root     4034473  0.0  0.0  18056 12888 pts/32   Ss+  Jun12   0:03 /bin/bash
+root     4077013  0.0  0.0  16144 11132 pts/49   Ss+  Aug28   0:00 /bin/bash";s:7:"DMIInfo";s:12261:"# dmidecode 3.3
+Getting SMBIOS data from sysfs.
+SMBIOS 3.3.0 present.
+Table at 0x000E6CC0.
+
+Handle 0x0000, DMI type 0, 26 bytes
+BIOS Information
+	Vendor: American Megatrends International, LLC.
+	Version: L0.31
+	Release Date: 08/24/2023
+	Address: 0xF0000
+	Runtime Size: 64 kB
+	ROM Size: 16 MB
+	Characteristics:
+		PCI is supported
+		BIOS is upgradeable
+		BIOS shadowing is allowed
+		Boot from CD is supported
+		Selectable boot is supported
+		BIOS ROM is socketed
+		EDD is supported
+		Japanese floppy for NEC 9800 1.2 MB is supported (int 13h)
+		Japanese floppy for Toshiba 1.2 MB is supported (int 13h)
+		5.25"/360 kB floppy services are supported (int 13h)
+		5.25"/1.2 MB floppy services are supported (int 13h)
+		3.5"/720 kB floppy services are supported (int 13h)
+		3.5"/2.88 MB floppy services are supported (int 13h)
+		Print screen service is supported (int 5h)
+		Serial services are supported (int 14h)
+		Printer services are supported (int 17h)
+		CGA/mono video services are supported (int 10h)
+		USB legacy is supported
+		BIOS boot specification is supported
+		Targeted content distribution is supported
+		UEFI is supported
+	BIOS Revision: 5.17
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Hetzner
+	Product Name:
+	Version: 1.0
+	Serial Number:
+	UUID: 23b87830-4f5a-11ee-a1ce-809df03a8d3a
+	Wake-up Type: Power Switch
+	SKU Number:
+	Family:
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: ASRockRack
+	Product Name: B565D4-V1L
+	Version:
+	Serial Number: 214165870000123
+	Asset Tag:
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis:
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0003, DMI type 3, 22 bytes
+Chassis Information
+	Manufacturer: To Be Filled By O.E.M.
+	Type: Desktop
+	Lock: Not Present
+	Version: To Be Filled By O.E.M.
+	Serial Number: To Be Filled By O.E.M.
+	Asset Tag: To Be Filled By O.E.M.
+	Boot-up State: Safe
+	Power Supply State: Safe
+	Thermal State: Safe
+	Security Status: None
+	OEM Information: 0x00000000
+	Height: Unspecified
+	Number Of Power Cords: 1
+	Contained Elements: 0
+	SKU Number: Default string
+
+Handle 0x0004, DMI type 10, 6 bytes
+On Board Device Information
+	Type: Video
+	Status: Enabled
+	Description:    To Be Filled By O.E.M.
+
+Handle 0x0005, DMI type 11, 5 bytes
+OEM Strings
+	String 1: Default string
+
+Handle 0x0006, DMI type 32, 20 bytes
+System Boot Information
+	Status: No errors detected
+
+Handle 0x0007, DMI type 44, 9 bytes
+Unknown Type
+	Header and Data:
+		2C 09 07 00 FF FF 01 01 00
+
+Handle 0x0008, DMI type 18, 23 bytes
+32-bit Memory Error Information
+	Type: OK
+	Granularity: Unknown
+	Operation: Unknown
+	Vendor Syndrome: Unknown
+	Memory Array Address: Unknown
+	Device Address: Unknown
+	Resolution: Unknown
+
+Handle 0x0009, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 128 GB
+	Error Information Handle: 0x0008
+	Number Of Devices: 4
+
+Handle 0x000A, DMI type 19, 31 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x000BFFFFFFF
+	Range Size: 3 GB
+	Physical Array Handle: 0x0009
+	Partition Width: 4
+
+Handle 0x000B, DMI type 19, 31 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00100000000
+	Ending Address: 0x0203FFFFFFF
+	Range Size: 125 GB
+	Physical Array Handle: 0x0009
+	Partition Width: 4
+
+Handle 0x000C, DMI type 7, 27 bytes
+Cache Information
+	Socket Designation: L1 - Cache
+	Configuration: Enabled, Not Socketed, Level 1
+	Operational Mode: Write Back
+	Location: Internal
+	Installed Size: 1 MB
+	Maximum Size: 1 MB
+	Supported SRAM Types:
+		Pipeline Burst
+	Installed SRAM Type: Pipeline Burst
+	Speed: 1 ns
+	Error Correction Type: Multi-bit ECC
+	System Type: Unified
+	Associativity: 8-way Set-associative
+
+Handle 0x000D, DMI type 7, 27 bytes
+Cache Information
+	Socket Designation: L2 - Cache
+	Configuration: Enabled, Not Socketed, Level 2
+	Operational Mode: Write Back
+	Location: Internal
+	Installed Size: 8 MB
+	Maximum Size: 8 MB
+	Supported SRAM Types:
+		Pipeline Burst
+	Installed SRAM Type: Pipeline Burst
+	Speed: 1 ns
+	Error Correction Type: Multi-bit ECC
+	System Type: Unified
+	Associativity: 8-way Set-associative
+
+Handle 0x000E, DMI type 7, 27 bytes
+Cache Information
+	Socket Designation: L3 - Cache
+	Configuration: Enabled, Not Socketed, Level 3
+	Operational Mode: Write Back
+	Location: Internal
+	Installed Size: 64 MB
+	Maximum Size: 64 MB
+	Supported SRAM Types:
+		Pipeline Burst
+	Installed SRAM Type: Pipeline Burst
+	Speed: 1 ns
+	Error Correction Type: Multi-bit ECC
+	System Type: Unified
+	Associativity: 16-way Set-associative
+
+Handle 0x000F, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU1
+	Type: Central Processor
+	Family: Zen
+	Manufacturer: Advanced Micro Devices, Inc.
+	ID: 10 0F A2 00 FF FB 8B 17
+	Signature: Family 25, Model 33, Stepping 0
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		HTT (Multi-threading)
+	Version: AMD Ryzen 9 5950X 16-Core Processor
+	Voltage: 1.1 V
+	External Clock: 100 MHz
+	Max Speed: 5050 MHz
+	Current Speed: 3400 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket AM4
+	L1 Cache Handle: 0x000C
+	L2 Cache Handle: 0x000D
+	L3 Cache Handle: 0x000E
+	Serial Number: Unknown
+	Asset Tag: Unknown
+	Part Number: Unknown
+	Core Count: 16
+	Core Enabled: 16
+	Thread Count: 32
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0010, DMI type 18, 23 bytes
+32-bit Memory Error Information
+	Type: OK
+	Granularity: Unknown
+	Operation: Unknown
+	Vendor Syndrome: Unknown
+	Memory Array Address: Unknown
+	Device Address: Unknown
+	Resolution: Unknown
+
+Handle 0x0011, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: 0x0010
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM 0
+	Bank Locator: P0 CHANNEL A
+	Type: DDR4
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 3200 MT/s
+	Manufacturer: Samsung
+	Serial Number: 01F78791
+	Asset Tag: Not Specified
+	Part Number: M391A4G43AB1-CWE
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: Unknown
+	Module Manufacturer ID: Bank 1, Hex 0xCE
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 32 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0012, DMI type 20, 35 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x01FFFFFFFFF
+	Range Size: 128 GB
+	Physical Device Handle: 0x0011
+	Memory Array Mapped Address Handle: 0x000B
+	Partition Row Position: Unknown
+	Interleave Position: Unknown
+	Interleaved Data Depth: Unknown
+
+Handle 0x0013, DMI type 18, 23 bytes
+32-bit Memory Error Information
+	Type: OK
+	Granularity: Unknown
+	Operation: Unknown
+	Vendor Syndrome: Unknown
+	Memory Array Address: Unknown
+	Device Address: Unknown
+	Resolution: Unknown
+
+Handle 0x0014, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: 0x0013
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM 1
+	Bank Locator: P0 CHANNEL A
+	Type: DDR4
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 3200 MT/s
+	Manufacturer: Samsung
+	Serial Number: 01F78CCE
+	Asset Tag: Not Specified
+	Part Number: M391A4G43AB1-CWE
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: Unknown
+	Module Manufacturer ID: Bank 1, Hex 0xCE
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 32 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0015, DMI type 20, 35 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x01FFFFFFFFF
+	Range Size: 128 GB
+	Physical Device Handle: 0x0014
+	Memory Array Mapped Address Handle: 0x000B
+	Partition Row Position: Unknown
+	Interleave Position: Unknown
+	Interleaved Data Depth: Unknown
+
+Handle 0x0016, DMI type 18, 23 bytes
+32-bit Memory Error Information
+	Type: OK
+	Granularity: Unknown
+	Operation: Unknown
+	Vendor Syndrome: Unknown
+	Memory Array Address: Unknown
+	Device Address: Unknown
+	Resolution: Unknown
+
+Handle 0x0017, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: 0x0016
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM 0
+	Bank Locator: P0 CHANNEL B
+	Type: DDR4
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 3200 MT/s
+	Manufacturer: Samsung
+	Serial Number: 01F78C97
+	Asset Tag: Not Specified
+	Part Number: M391A4G43AB1-CWE
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: Unknown
+	Module Manufacturer ID: Bank 1, Hex 0xCE
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 32 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0018, DMI type 20, 35 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x01FFFFFFFFF
+	Range Size: 128 GB
+	Physical Device Handle: 0x0017
+	Memory Array Mapped Address Handle: 0x000B
+	Partition Row Position: Unknown
+	Interleave Position: Unknown
+	Interleaved Data Depth: Unknown
+
+Handle 0x0019, DMI type 18, 23 bytes
+32-bit Memory Error Information
+	Type: OK
+	Granularity: Unknown
+	Operation: Unknown
+	Vendor Syndrome: Unknown
+	Memory Array Address: Unknown
+	Device Address: Unknown
+	Resolution: Unknown
+
+Handle 0x001A, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: 0x0019
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM 1
+	Bank Locator: P0 CHANNEL B
+	Type: DDR4
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 3200 MT/s
+	Manufacturer: Samsung
+	Serial Number: 01F78CCD
+	Asset Tag: Not Specified
+	Part Number: M391A4G43AB1-CWE
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: Unknown
+	Module Manufacturer ID: Bank 1, Hex 0xCE
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 32 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x001B, DMI type 20, 35 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x01FFFFFFFFF
+	Range Size: 128 GB
+	Physical Device Handle: 0x001A
+	Memory Array Mapped Address Handle: 0x000B
+	Partition Row Position: Unknown
+	Interleave Position: Unknown
+	Interleaved Data Depth: Unknown
+
+Handle 0x001C, DMI type 13, 22 bytes
+BIOS Language Information
+	Language Description Format: Long
+	Installable Languages: 1
+		en|US|iso8859-1
+	Currently Installed Language: en|US|iso8859-1
+
+Handle 0x001D, DMI type 127, 4 bytes
+End Of Table
+";s:2:"df";s:473:"Filesystem      Size  Used Avail Use% Mounted on
+tmpfs            13G  1.4M   13G   1% /run
+/dev/nvme0n1p2  3.5T  1.4T  1.9T  43% /
+tmpfs            63G  168K   63G   1% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+/dev/nvme0n1p1  488M   90M  373M  20% /boot
+/dev/nvme1n1p1  3.5T  2.8T  545G  84% /mnt/ssd
+tmpfs            13G     0   13G   0% /run/user/1001
+tmpfs            13G     0   13G   0% /run/user/0
+tmpfs            13G  8.0K   13G   1% /run/user/1002";s:4:"lshw";s:29071:"perf3
+    description: Desktop Computer
+    product: To Be Filled By O.E.M.
+    vendor: Hetzner
+    version: 1.0
+    serial: To Be Filled By O.E.M.
+    width: 64 bits
+    capabilities: smbios-3.3.0 dmi-3.3.0 smp vsyscall32
+    configuration: boot=normal chassis=desktop uuid=3078B823-5A4F-EE11-A1CE-809DF03A8D3A
+  *-core
+       description: Motherboard
+       product: B565D4-V1L
+       vendor: ASRockRack
+       physical id: 0
+       serial: 214165870000123
+     *-firmware
+          description: BIOS
+          vendor: American Megatrends International, LLC.
+          physical id: 0
+          version: L0.31
+          date: 08/24/2023
+          size: 64KiB
+          capacity: 16MiB
+          capabilities: pci upgrade shadowing cdboot bootselect socketedrom edd int13floppynec int13floppytoshiba int13floppy360 int13floppy1200 int13floppy720 int13floppy2880 int5printscreen int14serial int17printer int10video usb biosbootspecification uefi
+     *-memory
+          description: System Memory
+          physical id: 9
+          slot: System board or motherboard
+          size: 128GiB
+          capabilities: ecc
+          configuration: errordetection=multi-bit-ecc
+        *-bank:0
+             description: DIMM DDR4 Synchronous Unbuffered (Unregistered) 3200 MHz (0.3 ns)
+             product: M391A4G43AB1-CWE
+             vendor: Samsung
+             physical id: 0
+             serial: 01F78791
+             slot: DIMM 0
+             size: 32GiB
+             width: 64 bits
+             clock: 3200MHz (0.3ns)
+        *-bank:1
+             description: DIMM DDR4 Synchronous Unbuffered (Unregistered) 3200 MHz (0.3 ns)
+             product: M391A4G43AB1-CWE
+             vendor: Samsung
+             physical id: 1
+             serial: 01F78CCE
+             slot: DIMM 1
+             size: 32GiB
+             width: 64 bits
+             clock: 3200MHz (0.3ns)
+        *-bank:2
+             description: DIMM DDR4 Synchronous Unbuffered (Unregistered) 3200 MHz (0.3 ns)
+             product: M391A4G43AB1-CWE
+             vendor: Samsung
+             physical id: 2
+             serial: 01F78C97
+             slot: DIMM 0
+             size: 32GiB
+             width: 64 bits
+             clock: 3200MHz (0.3ns)
+        *-bank:3
+             description: DIMM DDR4 Synchronous Unbuffered (Unregistered) 3200 MHz (0.3 ns)
+             product: M391A4G43AB1-CWE
+             vendor: Samsung
+             physical id: 3
+             serial: 01F78CCD
+             slot: DIMM 1
+             size: 32GiB
+             width: 64 bits
+             clock: 3200MHz (0.3ns)
+     *-cache:0
+          description: L1 cache
+          physical id: c
+          slot: L1 - Cache
+          size: 1MiB
+          capacity: 1MiB
+          clock: 1GHz (1.0ns)
+          capabilities: pipeline-burst internal write-back unified
+          configuration: level=1
+     *-cache:1
+          description: L2 cache
+          physical id: d
+          slot: L2 - Cache
+          size: 8MiB
+          capacity: 8MiB
+          clock: 1GHz (1.0ns)
+          capabilities: pipeline-burst internal write-back unified
+          configuration: level=2
+     *-cache:2
+          description: L3 cache
+          physical id: e
+          slot: L3 - Cache
+          size: 64MiB
+          capacity: 64MiB
+          clock: 1GHz (1.0ns)
+          capabilities: pipeline-burst internal write-back unified
+          configuration: level=3
+     *-cpu
+          description: CPU
+          product: AMD Ryzen 9 5950X 16-Core Processor
+          vendor: Advanced Micro Devices [AMD]
+          physical id: f
+          bus info: cpu@0
+          version: AMD Ryzen 9 5950X 16-Core Processor
+          serial: Unknown
+          slot: CPU1
+          size: 2792MHz
+          capacity: 5083MHz
+          width: 64 bits
+          clock: 100MHz
+          capabilities: lm fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp x86-64 constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm cpufreq
+          configuration: cores=16 enabledcores=16 threads=32
+     *-pci:0
+          description: Host bridge
+          product: Starship/Matisse Root Complex
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 100
+          bus info: pci@0000:00:00.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+        *-generic UNCLAIMED
+             description: IOMMU
+             product: Starship/Matisse IOMMU
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 0.2
+             bus info: pci@0000:00:00.2
+             version: 00
+             width: 32 bits
+             clock: 33MHz
+             capabilities: msi ht bus_master cap_list
+             configuration: latency=0
+        *-pci:0
+             description: PCI bridge
+             product: Starship/Matisse GPP Bridge
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 1.2
+             bus info: pci@0000:00:01.2
+             version: 00
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci pm pciexpress msi ht normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:27 ioport:e000(size=8192) memory:fb000000-fc3fffff
+           *-usb
+                description: USB controller
+                product: Advanced Micro Devices, Inc. [AMD]
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0
+                bus info: pci@0000:02:00.0
+                version: 00
+                width: 64 bits
+                clock: 33MHz
+                capabilities: msi msix pm pciexpress xhci bus_master cap_list
+                configuration: driver=xhci_hcd latency=0
+                resources: irq:35 memory:fc3a0000-fc3a7fff
+              *-usbhost:0
+                   product: xHCI Host Controller
+                   vendor: Linux 5.13.0-21-generic xhci-hcd
+                   physical id: 0
+                   bus info: usb@1
+                   logical name: usb1
+                   version: 5.13
+                   capabilities: usb-2.00
+                   configuration: driver=hub slots=10 speed=480Mbit/s
+                 *-usb
+                      description: Keyboard
+                      product: PS2toUSB Adapter
+                      vendor: PS2toUSB
+                      physical id: 1
+                      bus info: usb@1:1
+                      version: 3.02
+                      capabilities: usb-1.10
+                      configuration: driver=usbhid maxpower=480mA speed=2Mbit/s
+              *-usbhost:1
+                   product: xHCI Host Controller
+                   vendor: Linux 5.13.0-21-generic xhci-hcd
+                   physical id: 1
+                   bus info: usb@2
+                   logical name: usb2
+                   version: 5.13
+                   capabilities: usb-3.10
+                   configuration: driver=hub slots=4 speed=10000Mbit/s
+           *-sata
+                description: SATA controller
+                product: Advanced Micro Devices, Inc. [AMD]
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0.1
+                bus info: pci@0000:02:00.1
+                version: 00
+                width: 32 bits
+                clock: 33MHz
+                capabilities: sata msi pm pciexpress ahci_1.0 bus_master cap_list rom
+                configuration: driver=ahci latency=0
+                resources: irq:39 memory:fc380000-fc39ffff memory:fc300000-fc37ffff
+           *-pci
+                description: PCI bridge
+                product: Advanced Micro Devices, Inc. [AMD]
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0.2
+                bus info: pci@0000:02:00.2
+                version: 00
+                width: 32 bits
+                clock: 33MHz
+                capabilities: pci msi pm pciexpress normal_decode bus_master cap_list
+                configuration: driver=pcieport
+                resources: irq:34 ioport:e000(size=8192) memory:fb000000-fc2fffff
+              *-pci:0
+                   description: PCI bridge
+                   product: Advanced Micro Devices, Inc. [AMD]
+                   vendor: Advanced Micro Devices, Inc. [AMD]
+                   physical id: 8
+                   bus info: pci@0000:20:08.0
+                   version: 00
+                   width: 32 bits
+                   clock: 33MHz
+                   capabilities: pci msi pm pciexpress normal_decode bus_master cap_list
+                   configuration: driver=pcieport
+                   resources: irq:36 ioport:f000(size=4096) memory:fc200000-fc2fffff
+                 *-network
+                      description: Ethernet interface
+                      product: I210 Gigabit Network Connection
+                      vendor: Intel Corporation
+                      physical id: 0
+                      bus info: pci@0000:29:00.0
+                      logical name: enp41s0
+                      version: 03
+                      serial: d0:50:99:fd:d5:1f
+                      size: 1Gbit/s
+                      capacity: 1Gbit/s
+                      width: 32 bits
+                      clock: 33MHz
+                      capabilities: pm msi msix pciexpress bus_master cap_list ethernet physical tp 10bt 10bt-fd 100bt 100bt-fd 1000bt-fd autonegotiation
+                      configuration: autonegotiation=on broadcast=yes driver=igb driverversion=5.13.0-21-generic duplex=full firmware=3.16, 0x800004d6 ip=46.4.23.57 latency=0 link=yes multicast=yes port=twisted pair speed=1Gbit/s
+                      resources: irq:35 memory:fc200000-fc27ffff ioport:f000(size=32) memory:fc280000-fc283fff
+              *-pci:1
+                   description: PCI bridge
+                   product: Advanced Micro Devices, Inc. [AMD]
+                   vendor: Advanced Micro Devices, Inc. [AMD]
+                   physical id: 9
+                   bus info: pci@0000:20:09.0
+                   version: 00
+                   width: 32 bits
+                   clock: 33MHz
+                   capabilities: pci msi pm pciexpress normal_decode bus_master cap_list
+                   configuration: driver=pcieport
+                   resources: irq:38 ioport:e000(size=4096) memory:fb000000-fc0fffff
+                 *-pci
+                      description: PCI bridge
+                      product: AST1150 PCI-to-PCI Bridge
+                      vendor: ASPEED Technology, Inc.
+                      physical id: 0
+                      bus info: pci@0000:2a:00.0
+                      version: 04
+                      width: 32 bits
+                      clock: 33MHz
+                      capabilities: pci msi pm pciexpress normal_decode bus_master cap_list
+                      resources: ioport:e000(size=4096) memory:fb000000-fc0fffff
+                    *-display UNCLAIMED
+                         description: VGA compatible controller
+                         product: ASPEED Graphics Family
+                         vendor: ASPEED Technology, Inc.
+                         physical id: 0
+                         bus info: pci@0000:2b:00.0
+                         version: 41
+                         width: 32 bits
+                         clock: 33MHz
+                         capabilities: pm msi vga_controller bus_master cap_list
+                         configuration: latency=0
+                         resources: memory:fb000000-fbffffff memory:fc000000-fc01ffff ioport:e000(size=128) memory:c0000-dffff
+        *-pci:1
+             description: PCI bridge
+             product: Starship/Matisse GPP Bridge
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 3.1
+             bus info: pci@0000:00:03.1
+             version: 00
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci pm pciexpress msi ht normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:28 memory:fc900000-fc9fffff
+           *-storage
+                description: Non-Volatile memory controller
+                product: Micron Technology Inc
+                vendor: Micron Technology Inc
+                physical id: 0
+                bus info: pci@0000:2c:00.0
+                version: 01
+                width: 64 bits
+                clock: 33MHz
+                capabilities: storage pm msi msix pciexpress nvm_express bus_master cap_list rom
+                configuration: driver=nvme latency=0
+                resources: irq:40 memory:fc920000-fc923fff memory:fc900000-fc91ffff
+              *-nvme0
+                   description: NVMe device
+                   product: Micron_7300_MTFDHBE3T8TDF
+                   physical id: 0
+                   logical name: /dev/nvme0
+                   version: 95420260
+                   serial: 213230F4B1AB
+                   configuration: nqn=nqn.2016-08.com.micron:nvme:nvm-subsystem-sn-213230F4B1AB state=live
+                 *-namespace
+                      description: NVMe namespace
+                      physical id: 1
+                      logical name: /dev/nvme0n1
+                      size: 3576GiB (3840GB)
+                      capabilities: gpt-1.00 partitioned partitioned:gpt
+                      configuration: guid=238ed375-a95a-4545-bdc0-fcfe00dddcba logicalsectorsize=512 sectorsize=512
+                    *-volume:0
+                         description: EXT3 volume
+                         vendor: Linux
+                         physical id: 1
+                         logical name: /dev/nvme0n1p1
+                         logical name: /boot
+                         version: 1.0
+                         serial: ee80cdd7-d013-4258-a624-07ef6a24ba57
+                         size: 512MiB
+                         capabilities: journaled extended_attributes large_files recover ext3 ext2 initialized
+                         configuration: created=2021-11-26 10:49:26 filesystem=ext3 lastmountpoint=/boot modified=2023-09-09 23:24:28 mount.fstype=ext3 mount.options=rw,relatime mounted=2023-09-09 23:24:28 state=mounted
+                    *-volume:1
+                         description: EXT4 volume
+                         vendor: Linux
+                         physical id: 2
+                         logical name: /dev/nvme0n1p2
+                         logical name: /
+                         version: 1.0
+                         serial: ba28a78b-28b3-4e8a-8c5a-a7a52c3462a9
+                         size: 3576GiB
+                         capacity: 3576GiB
+                         capabilities: journaled extended_attributes large_files huge_files dir_nlink recover 64bit extents ext4 ext2 initialized
+                         configuration: created=2021-11-26 10:49:30 filesystem=ext4 lastmountpoint=/ modified=2023-09-09 23:24:27 mount.fstype=ext4 mount.options=rw,relatime mounted=2023-09-09 23:24:27 state=mounted
+                    *-volume:2
+                         description: BIOS Boot partition
+                         vendor: EFI
+                         physical id: 3
+                         logical name: /dev/nvme0n1p3
+                         serial: 1f605df3-d769-4c08-817f-4d7aad4cac44
+                         capacity: 1023KiB
+                         capabilities: nofs
+        *-pci:2
+             description: PCI bridge
+             product: Starship/Matisse GPP Bridge
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 3.2
+             bus info: pci@0000:00:03.2
+             version: 00
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci pm pciexpress msi ht normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:29 memory:fc800000-fc8fffff
+           *-storage
+                description: Non-Volatile memory controller
+                product: Micron Technology Inc
+                vendor: Micron Technology Inc
+                physical id: 0
+                bus info: pci@0000:2d:00.0
+                version: 01
+                width: 64 bits
+                clock: 33MHz
+                capabilities: storage pm msi msix pciexpress nvm_express bus_master cap_list rom
+                configuration: driver=nvme latency=0
+                resources: irq:41 memory:fc820000-fc823fff memory:fc800000-fc81ffff
+              *-nvme1
+                   description: NVMe device
+                   product: Micron_7300_MTFDHBE3T8TDF
+                   physical id: 0
+                   logical name: /dev/nvme1
+                   version: 95420260
+                   serial: 213230F4B11C
+                   configuration: nqn=nqn.2016-08.com.micron:nvme:nvm-subsystem-sn-213230F4B11C state=live
+                 *-namespace
+                      description: NVMe namespace
+                      physical id: 1
+                      logical name: /dev/nvme1n1
+                      size: 3576GiB (3840GB)
+                      capabilities: gpt-1.00 partitioned partitioned:gpt
+                      configuration: guid=79df77a6-683f-4133-8e66-10c02b3ca2e6 logicalsectorsize=512 sectorsize=512
+                    *-volume
+                         description: EXT4 volume
+                         vendor: Linux
+                         physical id: 1
+                         logical name: /dev/nvme1n1p1
+                         logical name: /mnt/ssd
+                         version: 1.0
+                         serial: 366e9bb7-713f-4b70-89fb-868d9b3789c1
+                         size: 3576GiB
+                         capacity: 3576GiB
+                         capabilities: journaled extended_attributes large_files huge_files dir_nlink recover 64bit extents ext4 ext2 initialized
+                         configuration: created=2021-11-26 11:01:58 filesystem=ext4 lastmountpoint=/mnt/ssd modified=2023-09-09 23:24:28 mount.fstype=ext4 mount.options=rw,relatime mounted=2023-09-09 23:24:28 state=mounted
+        *-pci:3
+             description: PCI bridge
+             product: Starship/Matisse Internal PCIe GPP Bridge 0 to bus[E:B]
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 7.1
+             bus info: pci@0000:00:07.1
+             version: 00
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci pm pciexpress msi ht normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:31
+           *-generic UNCLAIMED
+                description: Non-Essential Instrumentation
+                product: Starship/Matisse PCIe Dummy Function
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0
+                bus info: pci@0000:2e:00.0
+                version: 00
+                width: 32 bits
+                clock: 33MHz
+                capabilities: pm pciexpress bus_master cap_list
+                configuration: latency=0
+        *-pci:4
+             description: PCI bridge
+             product: Starship/Matisse Internal PCIe GPP Bridge 0 to bus[E:B]
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 8.1
+             bus info: pci@0000:00:08.1
+             version: 00
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci pm pciexpress msi ht normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:32 memory:fc500000-fc7fffff
+           *-generic:0 UNCLAIMED
+                description: Non-Essential Instrumentation
+                product: Starship/Matisse Reserved SPP
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0
+                bus info: pci@0000:2f:00.0
+                version: 00
+                width: 32 bits
+                clock: 33MHz
+                capabilities: pm pciexpress bus_master cap_list
+                configuration: latency=0
+           *-generic:1
+                description: Encryption controller
+                product: Starship/Matisse Cryptographic Coprocessor PSPCPP
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0.1
+                bus info: pci@0000:2f:00.1
+                version: 00
+                width: 32 bits
+                clock: 33MHz
+                capabilities: pm pciexpress msi msix bus_master cap_list
+                configuration: driver=ccp latency=0
+                resources: irq:130 memory:fc600000-fc6fffff memory:fc708000-fc709fff
+           *-usb
+                description: USB controller
+                product: Matisse USB 3.0 Host Controller
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0.3
+                bus info: pci@0000:2f:00.3
+                version: 00
+                width: 64 bits
+                clock: 33MHz
+                capabilities: pm pciexpress msi msix xhci bus_master cap_list
+                configuration: driver=xhci_hcd latency=0
+                resources: irq:57 memory:fc500000-fc5fffff
+              *-usbhost:0
+                   product: xHCI Host Controller
+                   vendor: Linux 5.13.0-21-generic xhci-hcd
+                   physical id: 0
+                   bus info: usb@3
+                   logical name: usb3
+                   version: 5.13
+                   capabilities: usb-2.00
+                   configuration: driver=hub slots=4 speed=480Mbit/s
+              *-usbhost:1
+                   product: xHCI Host Controller
+                   vendor: Linux 5.13.0-21-generic xhci-hcd
+                   physical id: 1
+                   bus info: usb@4
+                   logical name: usb4
+                   version: 5.13
+                   capabilities: usb-3.10
+                   configuration: driver=hub slots=4 speed=10000Mbit/s
+           *-multimedia
+                description: Audio device
+                product: Starship/Matisse HD Audio Controller
+                vendor: Advanced Micro Devices, Inc. [AMD]
+                physical id: 0.4
+                bus info: pci@0000:2f:00.4
+                version: 00
+                width: 32 bits
+                clock: 33MHz
+                capabilities: pm pciexpress msi bus_master cap_list
+                configuration: driver=snd_hda_intel latency=0
+                resources: irq:134 memory:fc700000-fc707fff
+        *-serial
+             description: SMBus
+             product: FCH SMBus Controller
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 14
+             bus info: pci@0000:00:14.0
+             version: 61
+             width: 32 bits
+             clock: 66MHz
+             configuration: driver=piix4_smbus latency=0
+             resources: irq:0
+        *-isa
+             description: ISA bridge
+             product: FCH LPC Bridge
+             vendor: Advanced Micro Devices, Inc. [AMD]
+             physical id: 14.3
+             bus info: pci@0000:00:14.3
+             version: 51
+             width: 32 bits
+             clock: 66MHz
+             capabilities: isa bus_master
+             configuration: latency=0
+     *-pci:1
+          description: Host bridge
+          product: Starship/Matisse PCIe Dummy Host Bridge
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 101
+          bus info: pci@0000:00:01.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:2
+          description: Host bridge
+          product: Starship/Matisse PCIe Dummy Host Bridge
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 102
+          bus info: pci@0000:00:02.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:3
+          description: Host bridge
+          product: Starship/Matisse PCIe Dummy Host Bridge
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 103
+          bus info: pci@0000:00:03.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:4
+          description: Host bridge
+          product: Starship/Matisse PCIe Dummy Host Bridge
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 104
+          bus info: pci@0000:00:04.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:5
+          description: Host bridge
+          product: Starship/Matisse PCIe Dummy Host Bridge
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 105
+          bus info: pci@0000:00:05.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:6
+          description: Host bridge
+          product: Starship/Matisse PCIe Dummy Host Bridge
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 106
+          bus info: pci@0000:00:07.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:7
+          description: Host bridge
+          product: Starship/Matisse PCIe Dummy Host Bridge
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 107
+          bus info: pci@0000:00:08.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:8
+          description: Host bridge
+          product: Matisse Device 24: Function 0
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 108
+          bus info: pci@0000:00:18.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:9
+          description: Host bridge
+          product: Matisse Device 24: Function 1
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 109
+          bus info: pci@0000:00:18.1
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:10
+          description: Host bridge
+          product: Matisse Device 24: Function 2
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 10a
+          bus info: pci@0000:00:18.2
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:11
+          description: Host bridge
+          product: Matisse Device 24: Function 3
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 10b
+          bus info: pci@0000:00:18.3
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+          configuration: driver=k10temp
+          resources: irq:0
+     *-pci:12
+          description: Host bridge
+          product: Matisse Device 24: Function 4
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 10c
+          bus info: pci@0000:00:18.4
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:13
+          description: Host bridge
+          product: Matisse Device 24: Function 5
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 10d
+          bus info: pci@0000:00:18.5
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:14
+          description: Host bridge
+          product: Matisse Device 24: Function 6
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 10e
+          bus info: pci@0000:00:18.6
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pci:15
+          description: Host bridge
+          product: Matisse Device 24: Function 7
+          vendor: Advanced Micro Devices, Inc. [AMD]
+          physical id: 10f
+          bus info: pci@0000:00:18.7
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+     *-pnp00:00
+          product: PnP device PNP0c01
+          physical id: 1
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:01
+          product: PnP device PNP0c02
+          physical id: 2
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:02
+          product: PnP device PNP0b00
+          physical id: 3
+          capabilities: pnp
+          configuration: driver=rtc_cmos
+     *-pnp00:03
+          product: PnP device PNP0c02
+          physical id: 4
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:04
+          product: PnP device PNP0c02
+          physical id: 5
+          capabilities: pnp
+          configuration: driver=system";s:8:"hostname";s:5:"perf3";s:3:"git";s:40:"8a375dcb453cdb92c419b34d989ffdf452b526a0";}s:8:"testInfo";s:402:"10M nginx logs
+
+Data collection: 
+* Source: https://www.kaggle.com/datasets/eliasdabbas/web-server-access-logs.
+* "Web sever logs contain information on any event that was registered/logged. This contains a lot of insights on website visitors, behavior, crawlers accessing the site, business insights, security issues, and more".
+
+Queries: curated list of typical queries that a random devops may run.
+";}
