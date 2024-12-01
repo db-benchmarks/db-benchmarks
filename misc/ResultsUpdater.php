@@ -55,6 +55,12 @@ class ResultsUpdater
                 $needToSave = false;
                 foreach ($results['queries'] as $k => $query) {
                     if (isset($query['result']['error'])) {
+
+                        if (sizeof($query['result']['error'])>=2
+                            && isset($query['result']['error']['type'])
+                            && isset($query['result']['error']['message'])){
+                            continue;
+                        }
                         if (isset($query['result']['error']['curlError'])) {
                             $results['queries'][$k]['result']['error']['type']
                                 = 'timeout';
