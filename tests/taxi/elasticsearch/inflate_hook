@@ -2,6 +2,7 @@
 
 workers=$(nproc)
 path=$(pwd)
+# We use here docker compose cause it usually has higher version (we need it for JSON formatting)
 network_name=$(docker compose -f ../../docker-compose.yml --env-file ../../.env config --format=json | jq .networks.default.name)
 
 cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
@@ -12,5 +13,5 @@ cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
          -v $path/data/:/data/ \
          -v $path/elasticsearch/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
          -v $path/elasticsearch/logstash$suffix/template.json:/template.json \
-         docker.elastic.co/logstash/logstash:7.15.2"
+         docker.elastic.co/logstash/logstash:8.14.1"
 eval "$cmd"

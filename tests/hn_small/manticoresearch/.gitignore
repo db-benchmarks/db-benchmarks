@@ -1,2 +1,3 @@
 *.conf
-idx*
+idx
+idx_*

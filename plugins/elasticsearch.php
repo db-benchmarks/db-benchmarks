@@ -31,6 +31,8 @@ class elasticsearch extends engine {
     public function getInfo() {
         $ret = [];
         $curl = curl_init();
+
+        curl_setopt($curl, CURLOPT_USERPWD, "elastic:elasticsearch_pwd");
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/_cluster/health?level=indices");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $o = curl_exec($curl);
@@ -51,7 +53,7 @@ class elasticsearch extends engine {
     }
 
     protected function canConnect() {
-        $j = @json_decode(file_get_contents("http://localhost:{$this->port}/_cluster/health"));
+        $j = @json_decode(file_get_contents("http://elastic:elasticsearch_pwd@localhost:{$this->port}/_cluster/health"));
         if (@$j->status == 'green' or @$j->status == 'yellow') return true;
         return false;
     }
@@ -62,6 +64,7 @@ class elasticsearch extends engine {
 
     protected function beforeQuery() {
         $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_USERPWD, "elastic:elasticsearch_pwd");
         curl_setopt($this->curl, CURLOPT_URL, "http://localhost:{$this->port}/_sql?format=json&pretty");
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, ["content-type: application/json"]);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
@@ -117,6 +120,7 @@ class elasticsearch extends engine {
     // sends a command to engine to drop its caches
     protected function dropEngineCache() {
         $curl = curl_init();
+        curl_setopt($curl, CURLOPT_USERPWD, "elastic:elasticsearch_pwd");
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/_cache/clear?request=true&query=true&fielddata=true");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, array());
