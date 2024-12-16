@@ -1,22 +1,52 @@
 {
-    "index_patterns" : "hn",
+  "index_patterns": "hn",
+  "template": {
     "settings": {
       "number_of_replicas": 0,
       "number_of_shards": 32,
       "index.queries.cache.enabled": false
     },
     "mappings": {
-        "properties": {
-           "story_id": {"type": "integer"},
-           "story_text": {"type": "text"},
-           "story_author": {"type": "text", "fields": {"raw": {"type":"keyword"}}},
-           "comment_id": {"type": "integer"},
-           "comment_text": {"type": "text"},
-           "comment_author": {"type": "text", "fields": {"raw": {"type":"keyword"}}},
-           "comment_ranking": {"type": "integer"},
-           "author_comment_count": {"type": "integer"},
-           "story_comment_count": {"type": "integer"}
+      "properties": {
+        "story_id": {
+          "type": "integer"
+        },
+        "story_text": {
+          "type": "text"
+        },
+        "story_author": {
+          "type": "text",
+          "fields": {
+            "raw": {
+              "type": "keyword"
+            }
+          }
+        },
+        "comment_id": {
+          "type": "integer"
+        },
+        "comment_text": {
+          "type": "text"
+        },
+        "comment_author": {
+          "type": "text",
+          "fields": {
+            "raw": {
+              "type": "keyword"
+            }
+          }
+        },
+        "comment_ranking": {
+          "type": "integer"
+        },
+        "author_comment_count": {
+          "type": "integer"
+        },
+        "story_comment_count": {
+          "type": "integer"
         }
+      }
     }
+  }
 }
 

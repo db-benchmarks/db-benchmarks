@@ -16,7 +16,7 @@ echo -e "\tStarting mysql_percona ($cmd)"
 eval "$cmd"
 
 echo -e "\tWaiting for MySQL percona service to be available on localhost:3307"
-timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_percona_engine 2>&1) >/dev/null
+timeout 30 grep -m2 "Plugin ready for connections" <(docker logs -f mysql_percona_engine)
 
 dot_count=0
 while ! [[ $(docker exec mysql_percona_engine mysql -uroot -h0 -e "SHOW DATABASES like 'default'" | wc -l) -eq 2 ]]; do

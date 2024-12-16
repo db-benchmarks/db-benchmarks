@@ -11,7 +11,7 @@ docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f quickwit
 
 suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d quickwit
 
-if timeout 10 docker logs -f quickwit_engine | grep -qm1 'REST server is ready'; then
+if timeout 30 docker logs -f quickwit_engine | grep -qm1 'REST server is ready'; then
   echo -e "\tQuickwit ready to accept connections"
 else
   echo -e "\tQuickwit timeout failed"
