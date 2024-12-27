@@ -16,7 +16,10 @@ class elasticsearch extends engine {
     public function __construct($type)
     {
         parent::__construct($type);
-        ini_set('default_socket_timeout', self::$commandLineArguments['query_timeout']);
+        if (isset(self::$commandLineArguments['query_timeout'])) {
+            ini_set('default_socket_timeout',
+                self::$commandLineArguments['query_timeout']);
+        }
     }
 
     protected function url() {
@@ -26,7 +29,7 @@ class elasticsearch extends engine {
     protected function description() {
         return "Elasticsearch is a distributed, free and open search and analytics engine for all types of data, including textual, numerical, geospatial, structured, and unstructured";
     }
-    
+
     // attempts to fetch info about engine and return it
     public function getInfo() {
         $ret = [];
@@ -124,6 +127,6 @@ class elasticsearch extends engine {
         curl_setopt($curl, CURLOPT_URL, "http://localhost:{$this->port}/_cache/clear?request=true&query=true&fielddata=true");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, array());
-        curl_exec($curl);       
+        curl_exec($curl);
     }
 }
