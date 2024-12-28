@@ -19,7 +19,7 @@ docker exec mysql_engine mysql \
     FULLTEXT(story_text,story_author,comment_text,comment_author),
     KEY(comment_ranking),
     KEY(comment_ranking asc, author_comment_count asc, story_comment_count asc, comment_id asc),
-    KEY story_author(700))"
+    KEY story_author(255))"
 
 docker exec mysql_engine mysql \
   -e "LOAD DATA INFILE '/input/data.csv'
