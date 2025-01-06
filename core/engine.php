@@ -418,8 +418,14 @@ abstract class engine
             $engineOptions = self::parseEngineName($engine);
             /** @var engine $engine */
             $engine = new $engineOptions['engine']($engineOptions['type']);
-            $engine->start(false, false,
-                false); // no memory constraint, no CPU constraint, no IO waiting
+
+            try {
+                // no memory constraint, no CPU constraint, no IO waiting
+                $engine->start(false, false, false);
+            } catch (Exception $exception) {
+                self::die($exception->getMessage(), 2);
+            }
+
             $t = microtime(true);
             self::log("Getting info about {$engineOptions['engine']}"
                 . ($engineOptions['type'] ? " (type {$engineOptions['type']})"
@@ -612,7 +618,16 @@ abstract class engine
                         // starting Engine
                         ob_start();
                         self::dropIOCache();
-                        $warmupTime = $engine->start($mem, $limited);
+
+                        $startError = false;
+                        $warmupTime = false;
+                        try {
+                            $warmupTime = $engine->start($mem, $limited);
+                        } catch (Exception $exception) {
+                            $startError = $exception->getMessage();
+                            self::log($startError, 2, 'red');
+                        }
+
                         if ($warmupTime === true or $warmupTime === false) {
                             $warmupTime = -1;
                         }
@@ -622,22 +637,46 @@ abstract class engine
                         // making initial connection to make sure the 1st real query doesn't spend extra time on connection
                         ob_start();
                         $t = microtime(true);
-                        while (true) {
-                            $canConnect = $engine->canConnect();
-                            if ($canConnect) {
-                                break;
+                        if (!$startError) {
+                            while (true) {
+                                $canConnect = $engine->canConnect();
+                                if ($canConnect) {
+                                    break;
+                                }
+                                if (microtime(true) - $t
+                                    > self::$commandLineArguments['probe_timeout']
+                                ) {
+                                    break;
+                                }
                             }
-                            if (microtime(true) - $t
-                                > self::$commandLineArguments['probe_timeout']
-                            ) {
-                                break;
+                            self::log(ob_get_clean(), 4);
+                            if (!$canConnect) {
+                                $message = "Couldn't connect to engine after " .
+                                    self::$commandLineArguments['probe_timeout']
+                                    . " seconds. ";
+                                $startError = $message;
+                                self::log('ERROR: ' . $message, 4);
                             }
                         }
-                        self::log(ob_get_clean(), 4);
-                        if (!$canConnect) {
-                            self::log("ERROR: couldn't connect to engine after ".
-                                self::$commandLineArguments['probe_timeout']." seconds. ".
-                                "Continue without connection", 4);
+
+                        if ($startError) {
+                            $normalizedResult = [
+                                'error' => [
+                                    'type' => self::UNEXPECTED_QUERY_ERROR,
+                                    'message' => $startError
+                                ]
+                            ];
+                            $queryTimes[] = [
+                                'originalQuery' => $originalQuery,
+                                'modifiedQuery' => $preparedQuery,
+                                'times' => 1,
+                                'result' => $normalizedResult,
+                                'stats' => '',
+                                'checksum' => self::checksum($normalizedResult),
+                                'warmupTime' => $warmupTime
+                            ];
+                            $engine->stop();
+                            continue;
                         }
 
                         self::log("Making queries", 4);
@@ -650,6 +689,7 @@ abstract class engine
                                 self::die("ERROR: can't check temperature. High risk of inaccuracy!",
                                     4);
                             }
+
                             $engine->beforeQuery();
                             /**
                              * Before we test we need to drop caches inside the engine,
@@ -891,7 +931,8 @@ abstract class engine
         exec($exec, $o, $r);
         self::log(implode("\n", $o), 2, 'bright_black');
         if ($r) {
-            self::die("ERROR: couldn't start $engine", 2);
+            $message = "ERROR: couldn't start $engine";
+            throw new RuntimeException($message);
         }
         self::log("Waiting for $engine to come up", 2);
         $t = microtime(true);
@@ -900,9 +941,10 @@ abstract class engine
             if (microtime(true) - $t
                 > self::$commandLineArguments['start_timeout']
             ) {
-                self::die("ERROR: $engine starting time exceeded timeout ("
+                $message = "ERROR: $engine starting time exceeded timeout ("
                     . self::$commandLineArguments['start_timeout']
-                    . " seconds)", 2);
+                    . " seconds)";
+                    throw new RuntimeException($message);
             }
         }
         self::log("$engine " . ($this->type ? "(type: {$this->type}) " : '')
@@ -925,8 +967,7 @@ abstract class engine
         while (true) {
             $o = [];
             if (!exec('dstat --noupdate --nocolor -d 3 3|tail -1', $o)) {
-                self::log("Dstat not installed", 1, 'red');
-                exit(1);
+                self::die("Dstat not installed", 1);
             }
             if (str_starts_with(trim($o[0]), '0')) {
                 break;
@@ -934,9 +975,10 @@ abstract class engine
             if (microtime(true) - $t
                 > self::$commandLineArguments['warmup_timeout']
             ) {
-                self::die("ERROR: warmup timeout ("
+                $message = "ERROR: warmup timeout ("
                     . self::$commandLineArguments['warmup_timeout']
-                    . " seconds) exceeded", 2);
+                    . " seconds) exceeded";
+                throw new RuntimeException($message);
             }
         }
         self::log("disks are calm", 2);
