@@ -669,7 +669,7 @@ abstract class engine
                             $queryTimes[] = [
                                 'originalQuery' => $originalQuery,
                                 'modifiedQuery' => $preparedQuery,
-                                'times' => 1,
+                                'times' => [0],
                                 'result' => $normalizedResult,
                                 'stats' => '',
                                 'checksum' => self::checksum($normalizedResult),
