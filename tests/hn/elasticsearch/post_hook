@@ -7,6 +7,6 @@ inserted=$(curl -u "elastic:elasticsearch_pwd" -s -X GET "localhost:9200/$test/_
 echo -e "\tCount of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 116543900 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 116543900)"
+  exit 98
 fi

@@ -7,7 +7,7 @@ inserted=$(docker exec clickhouse_engine clickhouse-client --query="SELECT count
 echo -e "Count of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 10365132 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 10365132)"
+  exit 98
 fi
 

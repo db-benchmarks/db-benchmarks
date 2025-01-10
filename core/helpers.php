@@ -70,4 +70,11 @@ trait Helpers
         self::log("$engineName is ok", 3);
         return 0;
     }
+
+
+    private function getFailedIngestionPath(): string
+    {
+        return 'results' . DIRECTORY_SEPARATOR . 'failed_ingestion'
+            . DIRECTORY_SEPARATOR;
+    }
 }

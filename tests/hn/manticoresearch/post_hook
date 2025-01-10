@@ -16,6 +16,6 @@ inserted=$(docker exec manticoresearch_engine mysql -h0 -P9306 -e "SELECT count(
 echo -e "\tCount of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 116543900 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 116543900)"
+  exit 98
 fi

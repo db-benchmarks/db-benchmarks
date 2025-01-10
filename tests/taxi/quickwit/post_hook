@@ -8,6 +8,6 @@ echo -e "\tCount of inserted documents: $inserted"
 # Should be 1732817071
 # But because of issue https://github.com/quickwit-oss/quickwit/issues/5465 we check for 1732817062
 if [[ ! $inserted -eq 1732817062 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 1732817062)"
+  exit 98
 fi

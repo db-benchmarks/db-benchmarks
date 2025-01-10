@@ -656,6 +656,13 @@ abstract class engine
                                     . " seconds. ";
                                 $startError = $message;
                                 self::log('ERROR: ' . $message, 4);
+                            } else {
+                                $failedIngestion
+                                    = $engine->checkFailedIngestion();
+                                if ($failedIngestion) {
+                                    $startError = $failedIngestion;
+                                    self::log('ERROR: ' . $failedIngestion, 4);
+                                }
                             }
                         }
 
@@ -1332,6 +1339,21 @@ Environment vairables:
                 $out['message'] = $mysqlError;
             }
             return $out;
+        }
+        return false;
+    }
+
+    protected function checkFailedIngestion(): bool|string
+    {
+        $info = $this->getInfo();
+        $fileName = self::$cwd . DIRECTORY_SEPARATOR .
+            $this->getFailedIngestionPath() .
+            self::$commandLineArguments['test'] . "_" .
+            get_class($this) . "_" .
+            $info['version'];
+
+        if (file_exists($fileName)) {
+            return file_get_contents($fileName);
         }
         return false;
     }

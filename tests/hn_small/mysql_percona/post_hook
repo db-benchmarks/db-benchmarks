@@ -7,6 +7,6 @@ inserted=$(docker exec mysql_percona_engine mysql -uroot -h0 -e "SELECT count(*)
 echo -e "\tCount of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 1165439 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 1165439)"
+  exit 98
 fi
