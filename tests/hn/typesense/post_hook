@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+echo -en "\tFinished loading to index at "
+date
+
+export TYPESENSE_API_KEY='manticore'
+export TYPESENSE_HOST='http://localhost:8108'
+inserted=$(curl -s ${TYPESENSE_HOST}/collections/$test \
+  -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" | jq .num_documents)
+echo -e "\tCount of inserted documents: $inserted"
+
+if [[ ! $inserted -eq 116543900 ]]; then
+  echo "Inserted count mismatch"
+  exit 1
+fi

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+export TYPESENSE_API_KEY='manticore'
+export TYPESENSE_HOST='http://localhost:8108'
+
+echo -en "\tStarting loading at "
+date
+for f in ./data/data_splitted.*; do
+  echo -e "\tUpload chunk $f"
+  curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
+    --data-binary @$f \
+    "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | grep -v '{"success":true}'
+
+  rm $f
+done
+echo -en "\tFinished loading to index at "
+date
+
+insertSize=$(cat data/data.jsonl | wc -l)
+
+sleep 5
+echo -e "\tWait until Typesense becomes available"
+for i in $(seq 1 120); do
+  if curl -s -I -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+    -X GET "${TYPESENSE_HOST}/collections/${test}" 2>&1 | grep "HTTP/1.1 200 OK" >/dev/null; then
+    break
+  fi
+  printf '%s' "."
+  sleep 1
+done
+
+echo -e "\tWait until Typesense process batch"
+for i in $(seq 1 300); do
+  if curl -s -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+    -X GET "${TYPESENSE_HOST}/collections/${test}" | jq .num_documents | grep $insertSize >/dev/null; then
+    echo -e "\tSuccess"
+    break
+  fi
+  printf '%s' "."
+  sleep 1
+done
+
+rm data/data.jsonl
+
+curl "${TYPESENSE_HOST}/operations/snapshot?snapshot_path=/data/typesense-data-snapshot" -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" >/dev/null
+
+echo -e "\tFinished"
