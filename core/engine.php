@@ -92,7 +92,7 @@ abstract class engine
 
         foreach ($iterator as $file) {
             if (is_file($file)) {
-                if (basename($file) == '.gitkeep') {
+                if (in_array(basename($file), ['.gitkeep','.gitignore']) ) {
                     continue;
                 }
                 self::log("Saving from file $file", 1, 'yellow');
