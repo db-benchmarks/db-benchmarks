@@ -7,7 +7,7 @@ echo -en "\tStarting loading at "
 date
 for f in ./data/data_splitted.*; do
   echo -e "\tUpload chunk $f"
-  curl -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
+  curl --max-time 300 -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -X POST \
     --data-binary @$f \
     "${TYPESENSE_HOST}/collections/${test}/documents/import?batch_size=100" | grep -v '{"success":true}'
 
