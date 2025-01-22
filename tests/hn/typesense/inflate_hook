@@ -31,7 +31,7 @@ done
 
 echo -e "\tWait until Typesense process batch"
 for i in $(seq 1 300); do
-  if curl -s -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+  if timeout 15 curl -s -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
     -X GET "${TYPESENSE_HOST}/collections/${test}" | jq .num_documents | grep $insertSize >/dev/null; then
     echo -e "\tSuccess"
     break
@@ -42,7 +42,9 @@ done
 
 rm data/data.jsonl
 
-curl "${TYPESENSE_HOST}/operations/snapshot?snapshot_path=/data/typesense-data-snapshot" -X POST \
+echo -e "\tCreating snapshot"
+
+timeout 1800 curl "${TYPESENSE_HOST}/operations/snapshot?snapshot_path=/data/typesense-data-snapshot" -X POST \
   -H "Content-Type: application/json" \
   -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" >/dev/null
 
