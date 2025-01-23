@@ -21,7 +21,6 @@ services:
       - "127.0.0.1:9200:9200"
     environment:
       - "ES_JAVA_OPTS=${ES_JAVA_OPTS}"
-      - "ELASTIC_PASSWORD=elasticsearch_pwd"
       - cluster.name=docker-cluster
       - discovery.type=single-node
       - xpack.security.http.ssl.enabled=false
