@@ -924,7 +924,7 @@ abstract class engine
         } // supposed to be in megabytes, let's set to 1 TB by default
 
         // "limited" can be set as --limited or as a "*limited*" in engine name
-        if ($limited or self::$commandLineArguments['limited']) {
+        if ($limited) {
             $limited = 'cpuset=0,1';
         } // only one core (perhaps virtual)
 
@@ -1161,8 +1161,8 @@ Environment vairables:
             } else {
                 self::$commandLineArguments['mysql'] = true;
             }
-            if (!isset(self::$commandLineArguments['limited'])) {
-                self::$commandLineArguments['limited'] = false;
+            if (isset(self::$commandLineArguments['limited'])) {
+                self::$commandLineArguments['limited'] = true;
             }
 
             if (isset(self::$commandLineArguments['memory'])) {
