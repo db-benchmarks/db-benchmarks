@@ -231,9 +231,9 @@
   },
   {
     "default": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
-    "manticoresearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
-    "elasticsearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
-    "clickhouse": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "manticoresearch": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
+    "elasticsearch": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
+    "clickhouse": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
     "meilisearch": "-",
     "quickwit": {
       "path": "/api/v1/logs10m/search/",
