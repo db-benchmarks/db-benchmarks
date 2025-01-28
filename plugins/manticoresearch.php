@@ -115,7 +115,7 @@ class manticoresearch extends engine {
     {
         $res = $this->mysql->query($query);
 
-        $errorResult = $this->parseMysqlError($this->mysql->errno, $this->mysql->error, 2006);
+        $errorResult = $this->parseMysqlError($this->mysql->errno, 2006);
         if ($errorResult){
             return $errorResult;
         }

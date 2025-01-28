@@ -13,7 +13,7 @@ abstract class engine
 
     use Helpers;
 
-    protected const UNSUPPORTED_QUERY_ERROR = 'unsupported query';
+    protected const UNSUPPORTED_QUERY_ERROR = 'unsupported';
     protected const TIMEOUT_QUERY_ERROR = 'timeout';
     protected const UNEXPECTED_QUERY_ERROR = 'error';
 
@@ -1314,29 +1314,33 @@ Environment vairables:
         if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
             $out = [
                 'error' => true,
-                'type' => 'error'
+                'type' => self::UNEXPECTED_QUERY_ERROR
             ];
             if ($curlErrorCode == 28
                 || preg_match('/timeout|timed out/', $curlError)
             ) {
-                $out['type'] = 'timeout';
-                $out['message'] = $curlError;
+                $out['type'] = self::TIMEOUT_QUERY_ERROR;
+                $out['message'] = 'Operation timed out after ' .
+                self::$commandLineArguments['query_timeout'] .
+                ' seconds with 0 bytes received';
             }
             return $out;
         }
         return false;
     }
 
-    protected function parseMysqlError($mysqlErrno, $mysqlError, $timeoutErrorCode): bool|array
+    protected function parseMysqlError($mysqlErrno, $timeoutErrorCode): bool|array
     {
         if ($mysqlErrno) {
             $out = [
                 'error' => true,
-                'type' => 'error'
+                'type' => self::UNEXPECTED_QUERY_ERROR
             ];
             if ($mysqlErrno == $timeoutErrorCode) {
-                $out['type'] = 'timeout';
-                $out['message'] = $mysqlError;
+                $out['type'] = self::TIMEOUT_QUERY_ERROR;
+                $out['message'] = 'Operation timed out after ' .
+                    self::$commandLineArguments['query_timeout'] .
+                    ' seconds with 0 bytes received';
             }
             return $out;
         }
