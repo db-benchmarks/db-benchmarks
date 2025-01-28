@@ -30,12 +30,12 @@ curl -s \
       "searchableAttributes": [
         "story_text",
         "comment_text",
-	"story_author",
-	"comment_author"
+	      "story_author",
+	      "comment_author"
       ],
       "filterableAttributes": [
         "comment_ranking",
-	"story_author"
+	      "story_author"
       ],
       "sortableAttributes": [
         "comment_ranking",
@@ -49,4 +49,4 @@ curl -s \
 sleep 5
 echo -e "Index settings:"
 curl -s "http://localhost:7700/indexes/$test/settings" | jq .
-init_meilisearch "$test" "$header" "100000" || exit 1
+init_meilisearch "$test" "$header" || exit 1
