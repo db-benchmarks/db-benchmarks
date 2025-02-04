@@ -5,6 +5,6 @@ inserted=$(curl -s -H "Content-type: application/json" -X POST http://localhost:
 echo -e "\tCount of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 1165439 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 1165439)"
+  exit 98
 fi

@@ -47,7 +47,7 @@
   {
     "default": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where match('@request_path settings logo') order by cnt desc limit 20",
     "manticoresearch": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where match('@request_path settings logo') order by cnt desc limit 20",
-    "elasticsearch": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where query('request_path settings logo') order by cnt desc limit 20",
+    "elasticsearch": "select count(*) as cnt, avg(runtime), avg(size) from logs10m WHERE match(request_path, 'settings') AND match(request_path, 'logo') order by cnt desc limit 20",
     "clickhouse": "select count(*) as cnt, avg(runtime), avg(size) from logs10m where (match(request_path, '(?i)(\\W|\\A)settings\\Wlogo(\\W|\\z)') or match(request_path, '(?i)(\\W|\\A)logo\\Wsettings(\\W|\\z)')) limit 20 FORMAT JSON",
     "meilisearch": "-",
     "quickwit": {
@@ -231,9 +231,9 @@
   },
   {
     "default": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
-    "manticoresearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
-    "elasticsearch": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
-    "clickhouse": "select avg(size) avg_size, status from logs10m group by status order by avg_size desc limit 20",
+    "manticoresearch": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
+    "elasticsearch": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
+    "clickhouse": "select status, count(*) from logs10m group by status order by count(*) desc limit 20",
     "meilisearch": "-",
     "quickwit": {
       "path": "/api/v1/logs10m/search/",

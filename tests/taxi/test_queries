@@ -211,7 +211,7 @@
   {
     "manticoresearch": "SELECT * FROM taxi where match('harlem east') LIMIT 20",
     "clickhouse": "SELECT * FROM taxi where match(dropoff_ntaname, '(?i)\\WHarlem\\WEast\\W') or match(pickup_ntaname, '(?i)\\WHarlem\\WEast\\W') LIMIT 20",
-    "elasticsearch": "SELECT * FROM taxi where query('harlem east') LIMIT 20",
+    "elasticsearch": "SELECT * FROM taxi where (match(dropoff_ntaname, 'harlem') AND match(dropoff_ntaname, 'east')) OR (match(pickup_ntaname, 'harlem') AND match(pickup_ntaname, 'east')) LIMIT 20",
     "quickwit": {
       "path": "/api/v1/taxi/search/",
       "query": {

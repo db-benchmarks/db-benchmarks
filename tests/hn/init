@@ -27,6 +27,10 @@ fi
 ../../init --engine=manticoresearch --type=columnar
 ../../init --engine=mysql --type=tuned
 
+#### non-tuned engines ####
+#../../init --engine=elasticsearch
+#../../init --engine=mysql
+###########################
 
 # Can't process dataset this size
 # ../../init --engine=typesense

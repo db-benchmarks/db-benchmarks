@@ -13,7 +13,7 @@ abstract class engine
 
     use Helpers;
 
-    protected const UNSUPPORTED_QUERY_ERROR = 'unsupported query';
+    protected const UNSUPPORTED_QUERY_ERROR = 'unsupported';
     protected const TIMEOUT_QUERY_ERROR = 'timeout';
     protected const UNEXPECTED_QUERY_ERROR = 'error';
 
@@ -92,7 +92,7 @@ abstract class engine
 
         foreach ($iterator as $file) {
             if (is_file($file)) {
-                if (basename($file) == '.gitkeep') {
+                if (in_array(basename($file), ['.gitkeep','.gitignore']) ) {
                     continue;
                 }
                 self::log("Saving from file $file", 1, 'yellow');
@@ -418,8 +418,14 @@ abstract class engine
             $engineOptions = self::parseEngineName($engine);
             /** @var engine $engine */
             $engine = new $engineOptions['engine']($engineOptions['type']);
-            $engine->start(false, false,
-                false); // no memory constraint, no CPU constraint, no IO waiting
+
+            try {
+                // no memory constraint, no CPU constraint, no IO waiting
+                $engine->start(false, false, false);
+            } catch (Exception $exception) {
+                self::die($exception->getMessage(), 2);
+            }
+
             $t = microtime(true);
             self::log("Getting info about {$engineOptions['engine']}"
                 . ($engineOptions['type'] ? " (type {$engineOptions['type']})"
@@ -612,7 +618,16 @@ abstract class engine
                         // starting Engine
                         ob_start();
                         self::dropIOCache();
-                        $warmupTime = $engine->start($mem, $limited);
+
+                        $startError = false;
+                        $warmupTime = false;
+                        try {
+                            $warmupTime = $engine->start($mem, $limited);
+                        } catch (Exception $exception) {
+                            $startError = $exception->getMessage();
+                            self::log($startError, 2, 'red');
+                        }
+
                         if ($warmupTime === true or $warmupTime === false) {
                             $warmupTime = -1;
                         }
@@ -622,22 +637,53 @@ abstract class engine
                         // making initial connection to make sure the 1st real query doesn't spend extra time on connection
                         ob_start();
                         $t = microtime(true);
-                        while (true) {
-                            $canConnect = $engine->canConnect();
-                            if ($canConnect) {
-                                break;
+                        if (!$startError) {
+                            while (true) {
+                                $canConnect = $engine->canConnect();
+                                if ($canConnect) {
+                                    break;
+                                }
+                                if (microtime(true) - $t
+                                    > self::$commandLineArguments['probe_timeout']
+                                ) {
+                                    break;
+                                }
                             }
-                            if (microtime(true) - $t
-                                > self::$commandLineArguments['probe_timeout']
-                            ) {
-                                break;
+                            self::log(ob_get_clean(), 4);
+                            if (!$canConnect) {
+                                $message = "Couldn't connect to engine after " .
+                                    self::$commandLineArguments['probe_timeout']
+                                    . " seconds. ";
+                                $startError = $message;
+                                self::log('ERROR: ' . $message, 4);
+                            } else {
+                                $failedIngestion
+                                    = $engine->checkFailedIngestion();
+                                if ($failedIngestion) {
+                                    $startError = $failedIngestion;
+                                    self::log('ERROR: ' . $failedIngestion, 4);
+                                }
                             }
                         }
-                        self::log(ob_get_clean(), 4);
-                        if (!$canConnect) {
-                            self::log("ERROR: couldn't connect to engine after ".
-                                self::$commandLineArguments['probe_timeout']." seconds. ".
-                                "Continue without connection", 4);
+
+                        if ($startError) {
+                            $normalizedResult = [
+                                'error' => [
+                                    'type' => self::UNEXPECTED_QUERY_ERROR,
+                                    'message' => $startError
+                                ]
+                            ];
+                            $queryTimes[] = [
+                                'originalQuery' => $originalQuery,
+                                'modifiedQuery' => $preparedQuery,
+                                'times' => [1],
+                                'result' => $normalizedResult,
+                                'stats' => '',
+                                'checksum' => self::checksum($normalizedResult),
+                                'warmupTime' => $warmupTime
+                            ];
+                            $engine->stop();
+                            continue;
                         }
 
                         self::log("Making queries", 4);
@@ -650,6 +696,7 @@ abstract class engine
                                 self::die("ERROR: can't check temperature. High risk of inaccuracy!",
                                     4);
                             }
+
                             $engine->beforeQuery();
                             /**
                              * Before we test we need to drop caches inside the engine,
@@ -877,7 +924,7 @@ abstract class engine
         } // supposed to be in megabytes, let's set to 1 TB by default
 
         // "limited" can be set as --limited or as a "*limited*" in engine name
-        if ($limited or self::$commandLineArguments['limited']) {
+        if ($limited) {
             $limited = 'cpuset=0,1';
         } // only one core (perhaps virtual)
 
@@ -891,7 +938,8 @@ abstract class engine
         exec($exec, $o, $r);
         self::log(implode("\n", $o), 2, 'bright_black');
         if ($r) {
-            self::die("ERROR: couldn't start $engine", 2);
+            $message = "ERROR: couldn't start $engine";
+            throw new RuntimeException($message);
         }
         self::log("Waiting for $engine to come up", 2);
         $t = microtime(true);
@@ -900,9 +948,10 @@ abstract class engine
             if (microtime(true) - $t
                 > self::$commandLineArguments['start_timeout']
             ) {
-                self::die("ERROR: $engine starting time exceeded timeout ("
+                $message = "ERROR: $engine starting time exceeded timeout ("
                     . self::$commandLineArguments['start_timeout']
-                    . " seconds)", 2);
+                    . " seconds)";
+                    throw new RuntimeException($message);
             }
         }
         self::log("$engine " . ($this->type ? "(type: {$this->type}) " : '')
@@ -925,8 +974,7 @@ abstract class engine
         while (true) {
             $o = [];
             if (!exec('dstat --noupdate --nocolor -d 3 3|tail -1', $o)) {
-                self::log("Dstat not installed", 1, 'red');
-                exit(1);
+                self::die("Dstat not installed", 1);
             }
             if (str_starts_with(trim($o[0]), '0')) {
                 break;
@@ -934,9 +982,10 @@ abstract class engine
             if (microtime(true) - $t
                 > self::$commandLineArguments['warmup_timeout']
             ) {
-                self::die("ERROR: warmup timeout ("
+                $message = "ERROR: warmup timeout ("
                     . self::$commandLineArguments['warmup_timeout']
-                    . " seconds) exceeded", 2);
+                    . " seconds) exceeded";
+                throw new RuntimeException($message);
             }
         }
         self::log("disks are calm", 2);
@@ -1112,8 +1161,8 @@ Environment vairables:
             } else {
                 self::$commandLineArguments['mysql'] = true;
             }
-            if (!isset(self::$commandLineArguments['limited'])) {
-                self::$commandLineArguments['limited'] = false;
+            if (isset(self::$commandLineArguments['limited'])) {
+                self::$commandLineArguments['limited'] = true;
             }
 
             if (isset(self::$commandLineArguments['memory'])) {
@@ -1265,31 +1314,50 @@ Environment vairables:
         if ($httpCode != 200 or $curlErrorCode != 0 or $curlError != '') {
             $out = [
                 'error' => true,
-                'type' => 'error'
+                'type' => self::UNEXPECTED_QUERY_ERROR
             ];
             if ($curlErrorCode == 28
                 || preg_match('/timeout|timed out/', $curlError)
             ) {
-                $out['type'] = 'timeout';
-                $out['message'] = $curlError;
+                $out['type'] = self::TIMEOUT_QUERY_ERROR;
+                $out['message'] = 'Operation timed out after ' .
+                self::$commandLineArguments['query_timeout'] .
+                ' seconds with 0 bytes received';
             }
             return $out;
         }
         return false;
     }
 
-    protected function parseMysqlError($mysqlErrno, $mysqlError, $timeoutErrorCode): bool|array
+    protected function parseMysqlError($mysqlErrno, $timeoutErrorCode): bool|array
     {
         if ($mysqlErrno) {
             $out = [
                 'error' => true,
-                'type' => 'error'
+                'type' => self::UNEXPECTED_QUERY_ERROR
             ];
             if ($mysqlErrno == $timeoutErrorCode) {
-                $out['type'] = 'timeout';
-                $out['message'] = $mysqlError;
+                $out['type'] = self::TIMEOUT_QUERY_ERROR;
+                $out['message'] = 'Operation timed out after ' .
+                    self::$commandLineArguments['query_timeout'] .
+                    ' seconds with 0 bytes received';
             }
             return $out;
+        }
+        return false;
+    }
+
+    protected function checkFailedIngestion(): bool|string
+    {
+        $info = $this->getInfo();
+        $fileName = self::$cwd . DIRECTORY_SEPARATOR .
+            $this->getFailedIngestionPath() .
+            self::$commandLineArguments['test'] . "_" .
+            get_class($this) . "_" .
+            $info['version'];
+
+        if (file_exists($fileName)) {
+            return file_get_contents($fileName);
         }
         return false;
     }

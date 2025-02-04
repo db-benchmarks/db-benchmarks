@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
     networks:
       - default
     container_name: "elasticsearch_engine"
@@ -21,14 +21,18 @@ services:
       - "127.0.0.1:9200:9200"
     environment:
       - "ES_JAVA_OPTS=${ES_JAVA_OPTS}"
+      - cluster.name=docker-cluster
       - discovery.type=single-node
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=trial
       - bootstrap.memory_lock=true # as said on https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_disable_swapping it needs to be done for performance
     volumes:
       - ./tests/${test}/elasticsearch/idx${suffix}:/usr/share/elasticsearch/data
-      - ./tests/${test}/elasticsearch/elasticsearch${suffix}.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./tests/${test}/elasticsearch/config${suffix}:/usr/share/elasticsearch/config/:rw
+
 
   clickhouse:
-    image: yandex/clickhouse-server:21.8.11.4
+    image: clickhouse/clickhouse-server:24.4.3.25
     networks:
       - default
     container_name: "clickhouse_engine"
@@ -51,7 +55,7 @@ services:
       - ./tests/${test}/clickhouse/data${suffix}:/var/lib/clickhouse
 
   mysql:
-    image: mysql:8.0.28
+    image: mysql:9.1.0
     platform: linux/x86_64
     networks:
       - default
@@ -80,7 +84,7 @@ services:
       - MYSQL_ROOT_PASSWORD=
 
   mysql_percona:
-    image: percona:8.0.28-19
+    image: percona:8.0.36-28
     platform: linux/x86_64
     networks:
       - default
@@ -98,7 +102,7 @@ services:
         soft: 262144
         hard: 262144
     ports:
-      - "127.0.0.1:3307:3306"
+      - "127.0.0.1:3302:3306"
     volumes:
       - ./tests/${test}/mysql_percona/data${suffix}:/var/lib/mysql
       - ./tests/${test}/data:/input
@@ -109,7 +113,7 @@ services:
       - MYSQL_ROOT_PASSWORD=
 
   manticoresearch:
-    image: manticoresearch/manticore:6.0.2-extra
+    image: manticoresearch/manticore:6.3.6
     networks:
       - default
     container_name: "manticoresearch_engine"
@@ -136,7 +140,7 @@ services:
       - ./tests/${test}/manticoresearch/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
 
   postgres:
-    image: postgres:15.2
+    image: postgres:17.0
     networks:
       - default
     container_name: "postgres_engine"
@@ -162,7 +166,7 @@ services:
       - POSTGRES_DB=default
 
   typesense:
-    image: typesense/typesense:26.0
+    image: typesense/typesense:27.1
     container_name: "typesense_engine"
     networks:
       - default
@@ -186,7 +190,7 @@ services:
       - ./tests/${test}/data:/input
 
   quickwit:
-    image: quickwit/quickwit:0.8.1
+    image: quickwit/quickwit:v0.8.2
     container_name: "quickwit_engine"
     networks:
       - default
@@ -210,7 +214,7 @@ services:
       - ./tests/${test}/quickwit/quickwit.yaml:/quickwit/config/quickwit.yaml
 
   meilisearch:
-    image: getmeili/meilisearch:v1.1.1
+    image: getmeili/meilisearch:v1.11.1
     networks:
       - default
     container_name: "meilisearch_engine"
@@ -243,3 +247,4 @@ services:
 networks:
   default:
     driver: bridge
+    name: test_engines_default

@@ -3,8 +3,9 @@
 echo -en "\tStarting loading at "
 date
 
-docker exec mysql_engine mysql \
-  -e "DROP TABLE IF EXISTS default.$test;
+if [[ "$suffix" == '_tuned' ]]; then
+  docker exec mysql_engine mysql \
+    -e "DROP TABLE IF EXISTS default.$test;
     CREATE TABLE default.$test(
     id bigint,
     story_id bigint,
@@ -16,7 +17,26 @@ docker exec mysql_engine mysql \
     comment_ranking bigint unsigned,
     author_comment_count bigint unsigned,
     story_comment_count bigint unsigned,
-    FULLTEXT(story_text,story_author,comment_text,comment_author))"
+    FULLTEXT(story_text,story_author,comment_text,comment_author),
+    KEY(comment_ranking),
+    KEY(comment_ranking asc, author_comment_count asc, story_comment_count asc, comment_id asc),
+    KEY(story_author(255)))"
+else
+  docker exec mysql_engine mysql \
+    -e "DROP TABLE IF EXISTS default.$test;
+      CREATE TABLE default.$test(
+      id bigint,
+      story_id bigint,
+      story_text text,
+      story_author varchar(1024),
+      comment_id bigint,
+      comment_text text,
+      comment_author varchar(1024),
+      comment_ranking bigint unsigned,
+      author_comment_count bigint unsigned,
+      story_comment_count bigint unsigned,
+      FULLTEXT(story_text,story_author,comment_text,comment_author)"
+fi
 
 docker exec mysql_engine mysql \
   -e "LOAD DATA INFILE '/input/data.csv'

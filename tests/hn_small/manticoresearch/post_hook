@@ -5,7 +5,7 @@ date
 
 suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env restart manticoresearch
 
-if timeout 30 grep -m2 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine) > /dev/null; then
+if timeout 60 grep -m2 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
   echo -e '\tAccepting connections';
 else
   echo -e '\tManticore failed to start properly in 60 seconds';
@@ -16,6 +16,6 @@ inserted=$(docker exec manticoresearch_engine mysql -h0 -P9306 -e "SELECT count(
 echo -e "\tCount of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 1165439 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 1165439)"
+  exit 98
 fi

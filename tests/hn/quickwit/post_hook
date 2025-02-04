@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-inserted=$(curl -s -H "Content-type: application/json" -X POST http://localhost:7280/api/v1/${test}/search/ \
+inserted=$(curl -s -H "Content-type: application/json" -X POST http://localhost:7280/api/v1/hn_full/search/ \
     -d '{"query":"*","max_hits":0,"aggs":{"count(*)":{"value_count":{"field":"id"}}}}' | jq .num_hits)
 echo -e "\tCount of inserted documents: $inserted"
 
 if [[ ! $inserted -eq 116543900 ]]; then
-  echo "Inserted count mismatch"
-  exit 1
+  >&2 echo "Inserted count mismatch ($inserted / 116543900)"
+  exit 98
 fi

@@ -129,11 +129,12 @@ class postgres extends engine
                 return ['error' => false, 'response' => $res];
             }
 
-            $errorDescription = pg_result_error($res);
 
             $out = [
                 'error' => true,
-                'message'=> trim($errorDescription)
+                'message' => 'Operation timed out after ' .
+                    self::$commandLineArguments['query_timeout'] .
+                    ' seconds with 0 bytes received'
             ];
 
             if ($state === "57014") {

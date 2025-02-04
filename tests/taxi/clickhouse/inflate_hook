@@ -7,7 +7,7 @@ docker exec clickhouse_engine clickhouse-client --query="CREATE TABLE default.$t
     id UInt64,
     vendor_id String,
     pickup_datetime DateTime,
-    dropoff_datetime DateTime,
+    dropoff_datetime String,
     store_and_fwd_flag String,
     rate_code_id UInt32,
     pickup_longitude Float32,
@@ -56,5 +56,14 @@ docker exec clickhouse_engine clickhouse-client --query="CREATE TABLE default.$t
     dropoff_ntaname String,
     dropoff_puma String) ENGINE = MergeTree() ORDER BY id;"
 
+# Here is a hack to address incorrect timestamp values.
+# ClickHouse (CH) cannot handle these properly, so we set them to NULL if something is wrong.
+# Later, we update them to 1970-01-01 00:00:00, which is the default behavior for other engines.
+
+docker exec -i clickhouse_engine clickhouse-client \
+  --query="SET input_format_null_as_default = 1"
+
 cat data/trips.csv* | docker exec -i clickhouse_engine clickhouse-client \
   --query="INSERT INTO default.$test FORMAT CSV"
+
+# We will finish this hack in post_hook to prevent measuring what doesnt related to CH ingestion

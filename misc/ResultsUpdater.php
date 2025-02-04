@@ -29,8 +29,19 @@ class ResultsUpdater
             $iterator = [$path];
         } else {
             if (is_dir($path)) {
-                $dir_iterator = new RecursiveDirectoryIterator($path);
-                $iterator = new RecursiveIteratorIterator($dir_iterator,
+                $dirIterator = new RecursiveDirectoryIterator($path);
+                $filter = new \RecursiveCallbackFilterIterator($dirIterator, function ($current, $key, $iterator) {
+                    if ($current->getFilename()[0] === '.') {
+                        return FALSE;
+                    }
+                    if ($current->isDir()) {
+                        return $current->getFilename() !== 'failed_ingestion';
+                    }
+                    return true;
+                });
+
+
+                $iterator = new RecursiveIteratorIterator($filter,
                     RecursiveIteratorIterator::SELF_FIRST);
             } else {
                 return false;
@@ -39,7 +50,7 @@ class ResultsUpdater
 
         foreach ($iterator as $file) {
             if (is_file($file)) {
-                if (basename($file) == '.gitkeep') {
+                if (in_array(basename($file),['.gitkeep', '.gitignore'])) {
                     continue;
                 }
 
@@ -55,39 +66,61 @@ class ResultsUpdater
                 $needToSave = false;
                 foreach ($results['queries'] as $k => $query) {
                     if (isset($query['result']['error'])) {
-                        if (isset($query['result']['error']['curlError'])) {
-                            $results['queries'][$k]['result']['error']['type']
-                                = 'timeout';
-                            if ($query['result']['error']['curlError']
-                                === 'Empty reply from server'
-                            ) {
-                                $results['queries'][$k]['result']['error']['type']
-                                    = 'error';
-                            }
 
-                            $results['queries'][$k]['result']['error']['message']
-                                = $query['result']['error']['curlError'];
-                            unset($results['queries'][$k]['result']['error']['httpCode']);
-                            unset($results['queries'][$k]['result']['error']['curlError']);
-                        } elseif (isset($query['result']['error']['timeout'])
-                            && sizeof($query['result']['error']) === 1
-                        ) {
-                            $results['queries'][$k]['result']['error']['type']
-                                = 'unsupported query';
-                            $results['queries'][$k]['result']['error']['message']
-                                = 'This query is not supported by the current engine';
-                            unset($results['queries'][$k]['result']['error']['timeout']);
-                        } elseif (isset($query['result']['error']['mysqlError'])) {
-                            $results['queries'][$k]['result']['error']['type']
-                                = 'error';
-                            $results['queries'][$k]['result']['error']['message']
-                                = $query['result']['error']['mysqlError'] . "("
-                                . $query['result']['error']['mysqlErrorCode']
-                                . ")";
-                            unset($results['queries'][$k]['result']['error']['mysqlError']);
-                            unset($results['queries'][$k]['result']['error']['mysqlErrorCode']);
+                        // # Rename errors in results https://github.com/db-benchmarks/db-benchmarks/issues/59
+                        if ($query['result']['error']['type'] === 'unsupported query'){
+                            $results['queries'][$k]['result']['error']  = [
+                                'type' => 'unsupported',
+                                'message'=>'This query is not supported in this engine'
+                            ];
+                            $needToSave = true;
+
+                        }elseif ($query['result']['error']['type'] === 'timeout'){
+
+                            $results['queries'][$k]['result']['error']['message'] = preg_replace_callback(
+                                '/(\d+) milliseconds/', fn($m) => 'after ' . round($m[1] / 1000) . ' seconds',
+                                $query['result']['error']['message']
+                            );
+                            $needToSave = true;
                         }
-                        $needToSave = true;
+//                        if (sizeof($query['result']['error'])>=2
+//                            && isset($query['result']['error']['type'])
+//                            && isset($query['result']['error']['message'])){
+//                            continue;
+//                        }
+//                        if (isset($query['result']['error']['curlError'])) {
+//                            $results['queries'][$k]['result']['error']['type']
+//                                = 'timeout';
+//                            if ($query['result']['error']['curlError']
+//                                === 'Empty reply from server'
+//                            ) {
+//                                $results['queries'][$k]['result']['error']['type']
+//                                    = 'error';
+//                            }
+//
+//                            $results['queries'][$k]['result']['error']['message']
+//                                = $query['result']['error']['curlError'];
+//                            unset($results['queries'][$k]['result']['error']['httpCode']);
+//                            unset($results['queries'][$k]['result']['error']['curlError']);
+//                        } elseif (isset($query['result']['error']['timeout'])
+//                            && sizeof($query['result']['error']) === 1
+//                        ) {
+//                            $results['queries'][$k]['result']['error']['type']
+//                                = 'unsupported query';
+//                            $results['queries'][$k]['result']['error']['message']
+//                                = 'This query is not supported by the current engine';
+//                            unset($results['queries'][$k]['result']['error']['timeout']);
+//                        } elseif (isset($query['result']['error']['mysqlError'])) {
+//                            $results['queries'][$k]['result']['error']['type']
+//                                = 'error';
+//                            $results['queries'][$k]['result']['error']['message']
+//                                = $query['result']['error']['mysqlError'] . "("
+//                                . $query['result']['error']['mysqlErrorCode']
+//                                . ")";
+//                            unset($results['queries'][$k]['result']['error']['mysqlError']);
+//                            unset($results['queries'][$k]['result']['error']['mysqlErrorCode']);
+//                        }
+//                        $needToSave = true;
                     }
                 }
                 if ($needToSave){

@@ -197,7 +197,7 @@ This will:
 
 * download the data collection from the Internet
 * build the tables/indices
-
+* measure the time spent uploading the dataset to the database and add a {engine_name}_init file to the corresponding results folder
 ### Run test
 
 Then run `../../test` (it's in the project root's folder) to see the options:
@@ -287,17 +287,20 @@ We will then:
 .
   |-core                                    <- Core directory, contains base files required for tests.
   |  |-engine.php                           <- Abstract class Engine. Manages test execution, result saving, and parsing of test attributes.
+  |  |-EsCompatible.php                     <- Helper for ElasticSearch compatible engines
   |  |-helpers.php                          <- Helper file with logging functions, attribute parsing, exit functions, etc.
   |-misc                                    <- Miscellaneous directory, intended for storing files useful during the initialization step.
   |  |-func.sh                              <- Meilisearch initialization helper script.
+  |  |-ResultsUpdater.php                   <- Helper that allows to update results (It should be unserialized and serialized again)
   |-plugins                                 <- Plugins directory: if you want to extend the framework by adding another database or search engine for testing, place it here.
+  |  |-clickhouse.php                       <- ClickHouse plugin.
   |  |-elasticsearch.php                    <- Elasticsearch plugin.
   |  |-manticoresearch.php                  <- Manticore Search plugin.
-  |  |-clickhouse.php                       <- ClickHouse plugin.
-  |  |-mysql.php                            <- MySQL plugin.
   |  |-meilisearch.php                      <- Meilisearch plugin.
+  |  |-mysql.php                            <- MySQL plugin.
   |  |-mysql_percona.php                    <- MySQL (Percona) plugin.
   |  |-postgres.php                         <- Postgres plugin.
+  |  |-quickwit.php                         <- Quickwit plugin.
   |  |-typesense.php                        <- Typesense plugin.
   |-results                                 <- Test results directory. The results shown on https://db-benchmarks.com/ are found here. You can also use `./test --save` to visualize them locally.
   |-tests                                   <- Directory containing test suites.
@@ -308,10 +311,17 @@ We will then:
   |  |  |  |-pre_hook                       <- Engine pre-check script. Determines if tables need to be rebuilt, starts the engine, and ensures availability.
   |  |  |-data                              <- Prepared data collection for the tests.
   |  |  |-elasticsearch                     <- Directory for "Hackernews test -> Elasticsearch".
+  |  |  |  |-config                         <- Elasticsearch configuration directory. 
+  |  |  |  |  |-elasticsearch.yml
+  |  |  |  |  |-jvm.options
+  |  |  |  |  |-log4j2.properties
+  |  |  |  |-config_tuned                   <- Elasticsearch configuration directory for the "tuned" type.
+  |  |  |  |-logstash                       <- Logstash configuration directory.
+  |  |  |  |  |-logstash.conf
+  |  |  |  |  |-template.json
   |  |  |  |-logstash_tuned                 <- Logstash configuration directory for the "tuned" type.
   |  |  |  |  |-logstash.conf
   |  |  |  |  |-template.json
-  |  |  |  |-elasticsearch_tuned.yml
   |  |  |  |-inflate_hook                   <- Engine initialization script for data ingestion.
   |  |  |  |-post_hook                      <- Verifies document count and data consistency.
   |  |  |  |-pre_hook                       <- Pre-check script for table rebuilding and engine initialization.
@@ -333,6 +343,18 @@ We will then:
   |  |  |  |-post_hook                      <- Verifies document count and data consistency.
   |  |  |  |-pre_hook                       <- Pre-check for table rebuilds and engine availability.
   |  |  |-prepare_csv                       <- Prepares the data collection, handled in `./tests/hn/init`.
+  |  |  |-quickwit                          <- Directory for "Hackernews test -> Quickwit".
+  |  |  |  |-csv_jsonl.php                  <- CSV to JSONl modification script
+  |  |  |  |-index-config.yaml              <- Quickwit index config
+  |  |  |  |-inflate_hook                   <- Data ingestion script.
+  |  |  |  |-post_hook                      <- Verifies document count and data consistency.
+  |  |  |  |-pre_hook                       <- Pre-check for table rebuilds and engine availability.
+  |  |  |  |-quickwit.yaml                  <- Quickwit config
+  |  |  |-typesense                          <- Directory for "Hackernews test -> Typesense".
+  |  |  |  |-csv_jsonl.php                  <- CSV to JSONl modification script
+  |  |  |  |-inflate_hook                   <- Data ingestion script.
+  |  |  |  |-post_hook                      <- Verifies document count and data consistency.
+  |  |  |  |-pre_hook                       <- Pre-check for table rebuilds and engine availability.
   |  |  |-description                       <- Test description, included in test results and used during result visualization.
   |  |  |-init                              <- Main initialization script for the test.
   |  |  |-test_info_queries                 <- Contains queries to retrieve information about the data collection.

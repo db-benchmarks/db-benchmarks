@@ -17,7 +17,9 @@ class clickhouse extends engine {
     public function __construct($type)
     {
         parent::__construct($type);
-        ini_set('default_socket_timeout', self::$commandLineArguments['query_timeout']);
+        if (isset(self::$commandLineArguments['query_timeout'])){
+            ini_set('default_socket_timeout', self::$commandLineArguments['query_timeout']);
+        }
     }
 
     protected function url(): string

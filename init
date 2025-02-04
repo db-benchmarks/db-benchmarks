@@ -22,6 +22,7 @@ class Init
     private string $type;
     private string $suffix;
     private string $measurementsLogPath;
+    private string $version;
 
 
     public function __construct(
@@ -40,7 +41,8 @@ class Init
         try {
             $this->preHook()
             && $this->inflateHook()
-            && $this->postHook();
+            && $this->postHook()
+            && $this->unsetFailedIngestionFile($testName, $engineName);
         } catch (Exception $exception) {
             self::die($exception->getMessage(), 1);
         }
@@ -394,6 +396,9 @@ class Init
 
     private function getVersion(): string
     {
+        if (!empty($this->version)){
+            return $this->version;
+        }
         include_once("../../core/engine.php");
 
         if ($this->engineName === 'mysql_percona') {
@@ -406,7 +411,8 @@ class Init
         /** @var engine $engine */
         $engine = new $engineClassName($this->type);
         $info = $engine->getInfo();
-        return $info['version'];
+        $this->version = $info['version'] ?? '';
+        return $this->version;
     }
 
 
@@ -453,6 +459,11 @@ class Init
             // If we don't need to rebuild this engine
             // pre_hook should return us exit code 10
             return false;
+        } elseif ($runStatus['code'] === 98) {
+            // If the inserted count mismatches,
+            // we also fail the ingestion process but exit with code 98.
+            $this->setFailedIngestion(trim($runStatus['error']));
+            exit(98);
         } elseif ($runStatus['code'] === 0) {
             return true;
         }
@@ -460,10 +471,36 @@ class Init
         $redColor = "\033[31m";
         $resetColor = "\033[0m";
 
-        echo $redColor . "$hookName unexpected exit: "
-            . $runStatus['code'] . "\n" . $runStatus['error'] . $resetColor;
+        $message = "$hookName unexpected exit: "
+            . $runStatus['code'] . "\n" . $runStatus['error'];
+        echo $redColor . $message . $resetColor;
+
+        $this->setFailedIngestion($message);
 
         exit(1);
+    }
+
+    private function unsetFailedIngestionFile(): bool
+    {
+        $version = $this->getVersion();
+        $fileName = "../../".$this->getFailedIngestionPath() .
+            $this->testName."_".
+            $this->engineName."_".
+            $version;
+
+        if (file_exists($fileName)){
+            return unlink($fileName);
+        }
+        return false;
+    }
+
+    private function setFailedIngestion($reason): void
+    {
+        $version = $this->getVersion();
+        $fileName = $this->testName."_".
+            $this->engineName."_".
+            $version;
+        file_put_contents("../../".$this->getFailedIngestionPath() . $fileName, $reason);
     }
 }
 
