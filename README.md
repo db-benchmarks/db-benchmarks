@@ -197,7 +197,7 @@ This will:
 
 * download the data collection from the Internet
 * build the tables/indices
-* Measure the time spent uploading the dataset to the database and add a {engine_name}_init file to the corresponding results folder
+* measure the time spent uploading the dataset to the database and add a {engine_name}_init file to the corresponding results folder
 ### Run test
 
 Then run `../../test` (it's in the project root's folder) to see the options:
