@@ -66,127 +66,127 @@ source csv1
 }
 
 source csv2 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -6|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -6 | tail -3 | xargs -I aa cat aa
 }
 
 source csv3 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -9|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -9 | tail -3 | xargs -I aa cat aa
 }
 
 source csv4 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -12|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -12 | tail -3 | xargs -I aa cat aa
 }
 
 source csv5 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -15|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -15 | tail -3 | xargs -I aa cat aa
 }
 
 source csv6 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -18|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -18 | tail -3 | xargs -I aa cat aa
 }
 
 source csv7 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -21|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -21 | tail -3 | xargs -I aa cat aa
 }
 
 source csv8 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -24|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -24 | tail -3 | xargs -I aa cat aa
 }
 
 source csv9 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -27|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -27 | tail -3 | xargs -I aa cat aa
 }
 
 source csv10 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -30|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -30 | tail -3 | xargs -I aa cat aa
 }
 
 source csv11 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -33|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -33 | tail -3 | xargs -I aa cat aa
 }
 
 source csv12 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -36|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -36 | tail -3 | xargs -I aa cat aa
 }
 
 source csv13 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -39|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -39 | tail -3 | xargs -I aa cat aa
 }
 
 source csv14 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -42|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -42 | tail -3 | xargs -I aa cat aa
 }
 
 source csv15 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -45|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -45 | tail -3 | xargs -I aa cat aa
 }
 
 source csv16 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -48|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -48 | tail -3 | xargs -I aa cat aa
 }
 
 source csv17 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -51|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -51 | tail -3 | xargs -I aa cat aa
 }
 
 source csv18 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -54|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -54 | tail -3 | xargs -I aa cat aa
 }
 
 source csv19 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -57|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -57 | tail -3 | xargs -I aa cat aa
 }
 
 source csv20 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -60|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -60 | tail -3 | xargs -I aa cat aa
 }
 
 source csv21 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -63|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -63 | tail -3 | xargs -I aa cat aa
 }
 
 source csv22 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -66|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -66 | tail -3 | xargs -I aa cat aa
 }
 
 source csv23 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -68|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -69 | tail -3 | xargs -I aa cat aa
 }
 
 source csv24 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -70|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -72 | tail -3 | xargs -I aa cat aa
 }
 
 source csv25 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -72|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -74 | tail -2 | xargs -I aa cat aa
 }
 
 source csv26 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -74|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -76 | tail -2 | xargs -I aa cat aa
 }
 
 source csv27 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -76|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -78 | tail -2 | xargs -I aa cat aa
 }
 
 source csv28 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -78|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -80 | tail -2 | xargs -I aa cat aa
 }
 
 source csv29 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -80|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -82 | tail -2 | xargs -I aa cat aa
 }
 
 source csv30 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -82|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -84 | tail -2 | xargs -I aa cat aa
 }
 
 source csv31 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -84|tail -2 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -86 | tail -2 | xargs -I aa cat aa
 }
 
 source csv32 : csv1 {
-        csvpipe_command = ls /input/*.csv.*|head -87|tail -3 |xargs -I aa cat aa
+        csvpipe_command = ls /input/*.csv.* | head -88 | tail -2 | xargs -I aa cat aa
 }
 
 ";
