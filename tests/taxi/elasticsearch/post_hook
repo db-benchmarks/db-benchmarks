@@ -6,7 +6,7 @@ date
 inserted=$(curl -s -X GET "localhost:9200/$test/_count" | jq .count)
 echo -e "\tCount of inserted documents: $inserted"
 
-if [[ ! $inserted -eq 1732817071 ]]; then
-  >&2 echo "Inserted count mismatch ($inserted / 1732817071)"
+if [[ ! $inserted -eq 1742894829 ]]; then
+  >&2 echo "Inserted count mismatch ($inserted / 1742894829)"
   exit 98
 fi
