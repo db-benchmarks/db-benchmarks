@@ -823,7 +823,9 @@ abstract class engine
         $limited = (!empty(self::$commandLineArguments['limited'])
             || $engineOptions['limited']);
         $fileName = self::$commandLineArguments['test']
-            . "_{$engine}_{$this->type}_{$memory}" . ($retest ? '_retest' : '');
+            . "_{$engine}_{$this->type}_{$memory}"
+            . ($limited ? '_limited' : '')
+            . ($retest ? '_retest' : '');
 
         $final = [
             'testName' => self::$commandLineArguments['test'],

@@ -1,8 +1,28 @@
 #!/bin/bash
 
+# Load environment variables from .env file if it exists
+if [ -f .env ]; then
+  source .env
+fi
+
 # Nightly Manticoresearch tests script
 
-set -e
+# Parse command line arguments
+TAG="dev"
+while getopts "t:" opt; do
+  case $opt in
+    t) TAG="$OPTARG" ;;
+    *) echo "Usage: $0 [-t tag]" >&2; exit 1 ;;
+  esac
+done
+
+# Validate tag
+if [[ "$TAG" != "dev" && "$TAG" != "latest" ]]; then
+  log "error" "Invalid tag: $TAG. Must be 'dev' or 'latest'."
+  exit 1
+fi
+
+# Removed set -e to allow proper error handling
 
 # Colors for output
 RED='\033[0;31m'
@@ -35,11 +55,24 @@ log() {
     esac
 }
 
-# Set nightly image (dev tag for nightly builds)
-export MANTICORE_IMAGE=manticoresearch/manticore:dev
+# Set nightly image based on tag
+export MANTICORE_IMAGE=manticoresearch/manticore:$TAG
 
-# Test to run (limit to hn_small for beginning)
-TEST="hn_small"
+# Check for jq
+if ! command -v jq &> /dev/null; then
+  log "error" "jq is required but not installed. Please install jq to use this script."
+  exit 1
+fi
+
+# Configuration file
+config_file="nightly_config.json"
+if [[ ! -f $config_file ]]; then
+  log "error" "Configuration file $config_file not found"
+  exit 1
+fi
+
+# Get unique tests from JSON config
+unique_tests=($(jq -r '.tests | keys[]' $config_file))
 
 log "info" "Pulling dev image..."
 docker pull $MANTICORE_IMAGE
@@ -57,48 +90,95 @@ SHORT_HASH="${HASH:0:5}"
 
 log "success" "Version: $VERSION, Hash: $SHORT_HASH"
 
-log "info" "Checking for existing results with this version and hash..."
-if find ./results/$TEST/manticoresearch -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q .; then
-  log "error" "Results for version $VERSION and hash $SHORT_HASH already exist. Skipping."
-  exit 0
-fi
+log "success" "Proceeding with tests."
 
-log "success" "No existing results found. Proceeding with tests."
+# Process each test
+for TEST in "${unique_tests[@]}"; do
+  log "info" "Checking for existing results for $TEST with version $VERSION and hash $SHORT_HASH..."
+  if find ./results/$TEST -path "*/manticoresearch*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null; then
+    log "warning" "Results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
+    continue
+  fi
 
-log "info" "Preparing data for $TEST..."
+  log "success" "No existing results found for $TEST. Proceeding."
 
-cd "tests/$TEST"
-./prepare_csv/prepare.sh
-if [ $? -ne 0 ]; then
-  log "error" "Couldn't prepare CSV"
-  exit 1
-fi
+  # Prepare data for this test
+  log "info" "Preparing data for $TEST..."
+  cd "tests/$TEST"
+  ./prepare_csv/prepare.sh
+  if [ $? -ne 0 ]; then
+    log "error" "Couldn't prepare CSV for $TEST"
+    exit 1
+  fi
+  cd ../..
 
-# Shut down Manticore
-log "info" "Shutting down Manticore..."
-suffix="" test=$TEST docker-compose down
+  # Step 1: Down all engines (once per test)
+  log "info" "Shutting down all engines for $TEST..."
+  cd "tests/$TEST"
+  suffix="" test=$TEST docker-compose down
+  cd ../..
 
-# Remove idx folder to force re-indexing
-log "info" "Removing idx folder..."
-rm -rf "manticoresearch/idx"
+  # Get init engines for this test
+  init_engines=($(jq -r ".init.\"$TEST\"[]" $config_file))
 
-# Run init again
-log "info" "Running init again for Manticoresearch..."
-../../init --test=$TEST --engine=manticoresearch
-if [ $? -ne 0 ]; then
-  log "error" "Init failed with exit code $?"
-  exit 1
-fi
-cd ../..
+  # Step 2-3: rm indexes + run init (combined block per engine)
+  cd "tests/$TEST"
+  for init_engine in "${init_engines[@]}"; do
+    # Determine idx_folder for this engine
+    if [[ $init_engine == "manticoresearch" ]]; then
+      idx_folder="idx"
+    elif [[ $init_engine == *:* ]]; then
+      idx_folder="idx_${init_engine#*:}"
+    else
+      idx_folder="idx"  # fallback
+    fi
 
-# Run tests
-log "info" "Running tests for $TEST..."
-./test --test="$TEST" --engines=manticoresearch --memory=6000 --dir="results/$TEST/manticoresearch" --skip_inaccuracy --probe_timeout=300 --query_timeout=30 --times=5
+    # Remove idx folder to force re-indexing
+    log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
+    rm -rf "manticoresearch/$idx_folder"
 
-#./test --test="$TEST" --engines=manticoresearch:columnar --memory=110000 --dir="results/$TEST/manticoresearch"
-#./test --test="$TEST" --engines=manticoresearch:rowwise --memory=110000 --dir="results/$TEST/manticoresearch"
+    # Run init
+    log "info" "Running init for $TEST with engine $init_engine..."
+    ../../init --test=$TEST --engine=$init_engine
+    if [ $? -ne 0 ]; then
+      log "error" "Init failed for $TEST with engine $init_engine"
+      cd ../..
+      exit 1
+    fi
+  done
+  cd ../..
 
+  # Step 4: Run test configurations
+  configs_json=$(jq -c ".tests.\"$TEST\"[]" $config_file)
+  while IFS= read -r config_json; do
+    engine=$(jq -r '.engine' <<< "$config_json")
+    memory=$(jq -r '.memory' <<< "$config_json")
+    query_timeout=$(jq -r '.query_timeout // 30' <<< "$config_json")
+    limited=$(jq -r '.limited // false' <<< "$config_json")
+    idx_folder=$(jq -r '.idx_folder // "idx"' <<< "$config_json")
+
+    # Determine directory suffix
+    suffix=""
+    if [[ $engine == *:* ]]; then
+      suffix="_${engine#*:}"
+    fi
+    dir="results/$TEST/manticoresearch$suffix"
+
+    log "info" "Running tests for $TEST with engine $engine, memory $memory, dir $dir..."
+
+    # Run tests (no more docker-compose down or rm here - already done)
+    log "info" "Running test command for $TEST..."
+    cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\""
+    if [[ $limited == "true" ]]; then
+      cmd="$cmd --limited"
+    fi
+    eval $cmd
+  done <<< "$configs_json"
+done
+
+# Saving results
 log "info" "Saving results to DB..."
-#./test --save=./results --host="$DB_HOST" --port="$DB_PORT" --username="$DB_USERNAME" --password="$DB_PASSWORD"
+
+./test --save=./results --host="$NIGHTLY_DB_HOST" --port=443 --username="$NIGHTLY_USER" --password="$NIGHTLY_PASSWORD"
 
 log "success" "Nightly tests completed."

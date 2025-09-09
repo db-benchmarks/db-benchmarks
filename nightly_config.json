@@ -1,0 +1,71 @@
+{
+  "init": {
+    "taxi": ["manticoresearch:columnar"],
+    "hn_small": ["manticoresearch"],
+    "hn": ["manticoresearch:columnar", "manticoresearch:rowwise"],
+    "logs10m": ["manticoresearch:columnar", "manticoresearch:rowwise"]
+  },
+  "tests": {
+    "taxi": [
+      {
+        "engine": "manticoresearch:columnar",
+        "memory": 110000,
+        "idx_folder": "idx_columnar"
+      }
+    ],
+    "hn_small": [
+      {
+        "engine": "manticoresearch",
+        "memory": 110000,
+        "idx_folder": "idx"
+      },
+      {
+        "engine": "manticoresearch",
+        "memory": 1024,
+        "idx_folder": "idx"
+      },
+      {
+        "engine": "manticoresearch",
+        "memory": 1024,
+        "limited": true,
+        "idx_folder": "idx"
+      }
+    ],
+    "hn": [
+      {
+        "engine": "manticoresearch:columnar",
+        "memory": 110000,
+        "idx_folder": "idx_columnar"
+      },
+      {
+        "engine": "manticoresearch:rowwise",
+        "memory": 110000,
+        "idx_folder": "idx_rowwise"
+      },
+      {
+        "engine": "manticoresearch:columnar",
+        "memory": 1024,
+        "idx_folder": "idx_columnar"
+      },
+      {
+        "engine": "manticoresearch:rowwise",
+        "memory": 1024,
+        "idx_folder": "idx_rowwise"
+      }
+    ],
+    "logs10m": [
+      {
+        "engine": "manticoresearch:columnar",
+        "memory": 110000,
+        "query_timeout": 600,
+        "idx_folder": "idx_columnar"
+      },
+      {
+        "engine": "manticoresearch:rowwise",
+        "memory": 110000,
+        "query_timeout": 600,
+        "idx_folder": "idx_rowwise"
+      }
+    ]
+  }
+}
