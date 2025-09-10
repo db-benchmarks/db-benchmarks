@@ -376,7 +376,7 @@ We will then:
 ## How to start a particular database / search engine with a particular dataset
 
 ```bash 
-test=logs10m cpuset="0,1" mem=32768 suffix=_tuned docker-compose up elasticsearch
+test=logs10m cpuset="0,1" mem=32768 suffix=_tuned docker compose up elasticsearch
 ```
 will:
 

@@ -3,7 +3,7 @@
 echo -en "\tFinished loading to index at "
 date
 
-suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env restart manticoresearch
+suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env restart manticoresearch
 
 if timeout 60 grep -m2 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
   echo -e '\tAccepting connections';

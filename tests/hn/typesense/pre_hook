@@ -2,11 +2,11 @@
 
 echo -e "Typesense (type $suffix):"
 
-docker-compose -f ../../docker-compose.yml --env-file ../../.env stop typesense
-docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f typesense
+docker compose -f ../../docker-compose.yml --env-file ../../.env stop typesense
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f typesense
 
 
-cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d typesense"
+cmd="test=$test suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d typesense"
 echo -e "\tStarting Typesense ($cmd)"
 eval "$cmd"
 

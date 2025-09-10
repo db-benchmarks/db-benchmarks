@@ -935,7 +935,7 @@ abstract class engine
         self::log("Starting $engine", 1, 'cyan');
         $o = [];
         $exec = "test=" . self::$commandLineArguments['test']
-            . " mem=$memory suffix=$suffix $limited docker-compose up -d $engine 2>&1";
+            . " mem=$memory suffix=$suffix $limited docker compose up -d $engine 2>&1";
         self::log($exec, 2);
         exec($exec, $o, $r);
         self::log(implode("\n", $o), 2, 'bright_black');
@@ -1002,12 +1002,12 @@ abstract class engine
         $suffix = $this->type ? "_" . $this->type
             : ""; // suffix defines some volumes in the docker-compose, e.g. ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore, it has to be set on stop too
         exec("test=" . self::$commandLineArguments['test']
-            . " suffix=$suffix docker-compose rm -fsv $engine > /dev/null 2>&1");
+            . " suffix=$suffix docker compose rm -fsv $engine > /dev/null 2>&1");
         self::waitForNoIO();
 
         self::log("Attempting to kill $engine in case it's still running", 2);
         exec("test=" . self::$commandLineArguments['test']
-            . " suffix=$suffix docker-compose kill $engine > /dev/null 2>&1");
+            . " suffix=$suffix docker compose kill $engine > /dev/null 2>&1");
     }
 
     // drops all global IO caches
@@ -1243,9 +1243,9 @@ Environment vairables:
     {
         self::log("Preparing environment for test", 1, 'cyan');
         system("test=" . self::$commandLineArguments['test']
-            . " docker-compose down > /dev/null 2>&1");
+            . " docker compose down > /dev/null 2>&1");
         system("test=" . self::$commandLineArguments['test']
-            . " docker-compose rm > /dev/null 2>&1");
+            . " docker compose rm > /dev/null 2>&1");
         system("docker stop $(docker ps -aq) > /dev/null 2>&1");
         system("docker ps -a|grep _engine|awk '{print $1}'|xargs docker rm > /dev/null 2>&1");
     }

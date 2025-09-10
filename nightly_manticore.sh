@@ -119,7 +119,7 @@ for TEST in "${unique_tests[@]}"; do
   # Step 1: Down all engines (once per test)
   log "info" "Shutting down all engines for $TEST..."
   cd "tests/$TEST"
-  suffix="" test=$TEST docker-compose down
+  suffix="" test=$TEST docker compose down
   cd ../..
 
   # Get init engines for this test
@@ -170,7 +170,7 @@ for TEST in "${unique_tests[@]}"; do
 
     log "info" "Running tests for $TEST with engine $engine, memory $memory, dir $dir..."
 
-    # Run tests (no more docker-compose down or rm here - already done)
+    # Run tests (no more docker compose down or rm here - already done)
     log "info" "Running test command for $TEST..."
     cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\""
     if [[ $limited == "true" ]]; then

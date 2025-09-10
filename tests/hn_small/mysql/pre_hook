@@ -6,12 +6,12 @@ if [[ -e mysql/data$suffix/default/$test.ibd ]]; then
   exit 10
 fi
 
-docker-compose -f ../../docker-compose.yml --env-file ../../.env stop mysql
-docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql
+docker compose -f ../../docker-compose.yml --env-file ../../.env stop mysql
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f mysql
 mkdir mysql/data$suffix/
 chmod 0777 -R mysql/data$suffix/
 
-cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql"
+cmd="test=$test suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d mysql"
 echo -e "\tStarting mysql ($cmd)"
 eval "$cmd"
 
