@@ -2,7 +2,11 @@
 
 # Load environment variables from .env file if it exists
 if [ -f .env ]; then
-  source .env
+  while IFS= read -r line; do
+    if [[ $line =~ ^[[:space:]]*([^=]+)=(.*)$ ]]; then
+      export "${BASH_REMATCH[1]}"="${BASH_REMATCH[2]}"
+    fi
+  done < .env
 fi
 
 # Nightly Manticoresearch tests script
