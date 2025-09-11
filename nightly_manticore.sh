@@ -143,7 +143,13 @@ for TEST in "${unique_tests[@]}"; do
 
     # Run init
     log "info" "Running init for $TEST with engine $init_engine..."
-    ../../init --test=$TEST --engine=$init_engine
+    if [[ $init_engine == *:* ]]; then
+        engine_part=${init_engine%%:*}
+        type_part=${init_engine#*:}
+        ../../init --test=$TEST --engine=$engine_part --type=$type_part
+    else
+        ../../init --test=$TEST --engine=$init_engine
+    fi
     if [ $? -ne 0 ]; then
       log "error" "Init failed for $TEST with engine $init_engine"
       cd ../..
