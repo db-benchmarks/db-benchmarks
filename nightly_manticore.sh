@@ -107,14 +107,21 @@ for TEST in "${unique_tests[@]}"; do
   log "success" "No existing results found for $TEST. Proceeding."
 
   # Prepare data for this test
-  log "info" "Preparing data for $TEST..."
-  cd "tests/$TEST"
-  ./prepare_csv/prepare.sh
-  if [ $? -ne 0 ]; then
-    log "error" "Couldn't prepare CSV for $TEST"
-    exit 1
-  fi
-  cd ../..
+   log "info" "Preparing data for $TEST..."
+   cd "tests/$TEST"
+   if [ -f "./prepare_csv/prepare.sh" ]; then
+     ./prepare_csv/prepare.sh
+     if [ $? -ne 0 ]; then
+       log "error" "Couldn't prepare CSV for $TEST"
+       cd ../..
+       exit 1
+     fi
+   else
+     log "warning" "No prepare.sh found for $TEST, skipping $TEST."
+     cd ../..
+     continue
+   fi
+   cd ../..
 
   # Step 1: Down all engines (once per test)
   log "info" "Shutting down all engines for $TEST..."
