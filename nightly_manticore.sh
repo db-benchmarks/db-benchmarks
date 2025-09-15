@@ -28,6 +28,36 @@ fi
 
 # Removed set -e to allow proper error handling
 
+# Lock file path
+LOCK_FILE="/tmp/db_benchmarks.lock"
+LOAD_THRESHOLD=0.1  # Low threshold for idle server
+
+# Function to check load
+check_load() {
+    currentLoad=$(uptime | awk -F'load average:' '{ print $2 }' | awk -F',' '{ print $1 }' | tr -d ' ')
+    highLoad=$(echo "$currentLoad > $LOAD_THRESHOLD" | bc)
+    if [ "$highLoad" -eq 1 ]; then
+        log "warning" "Server load ($currentLoad) is above threshold ($LOAD_THRESHOLD). Skipping nightly tests."
+        exit 0
+    fi
+}
+
+# Check for existing lock
+if [ -f "$LOCK_FILE" ]; then
+    # Read PID from lock file
+    LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
+    if [ -n "$LOCK_PID" ] && kill -0 "$LOCK_PID" 2>/dev/null; then
+        log "warning" "Lock file $LOCK_FILE exists and process $LOCK_PID is running. Another benchmark process may be running. Skipping."
+        exit 0
+    else
+        log "info" "Removing stale lock file $LOCK_FILE (process $LOCK_PID not running)."
+        rm -f "$LOCK_FILE"
+    fi
+fi
+
+# Check load
+check_load
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'

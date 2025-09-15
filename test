@@ -21,6 +21,27 @@ engine::init($cwd);
 engine::parseCommandLineArguments();
 engine::sanitize();
 
+// Acquire lock
+$lockFile = '/tmp/db_benchmarks.lock';
+if (file_exists($lockFile)) {
+    $lockPid = trim(file_get_contents($lockFile));
+    if ($lockPid && posix_kill($lockPid, 0)) {
+        die("Lock file $lockFile exists and process $lockPid is running. Another benchmark process may be running.\n");
+    } else {
+        unlink($lockFile); // Remove stale lock
+    }
+}
+touch($lockFile);
+// Write current PID to lock file
+file_put_contents($lockFile, getmypid());
+
+// Release lock at end
+register_shutdown_function(function() use ($lockFile) {
+    if (file_exists($lockFile)) {
+        unlink($lockFile);
+    }
+});
+
 if (engine::$mode == 'save') {
     $results = engine::saveResultsFromPath(engine::$commandLineArguments['save']);
 } else if (engine::$mode == 'test') engine::test($cwd);
