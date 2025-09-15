@@ -177,6 +177,31 @@ To install:
 4. Tune JVM limits `ES_JAVA_OPTS` for your tests. Usually it's size of allocated memory for Docker Machine
 
 
+## Nightly Tests
+
+The repository includes automated nightly test scripts for Manticoresearch to ensure continuous benchmarking.
+
+### Scripts
+
+- `nightly_manticore.sh`: Main script that runs tests for Manticoresearch using the dev image by default.
+- Supports `-t latest` flag to use the latest stable image instead of dev.
+
+### Setup Cron Job
+
+To run nightly tests automatically:
+
+1. Ensure scripts are executable: `chmod +x nightly_manticore.sh run_nightly.sh`
+2. Add the cron job from `nightly_cron` to your crontab: `crontab -e` and paste the contents, or copy to `/etc/cron.d/` for system-wide setup.
+3. The job runs `run_nightly.sh` at 2 AM daily, which executes both dev and latest versions sequentially.
+4. Logs are stored in `/var/log/db-benchmarks/` with dated filenames. Successful runs: `nightly_dev_YYYYMMDD.log`, failed runs: `nightly_dev_YYYYMMDD_failed.log` (same for latest).
+
+### Log Rotation
+
+Use `nightly_logrotate` for log management:
+- Copy to `/etc/logrotate.d/nightly_manticore` (requires sudo)
+- Rotates logs daily, keeps 30 days, compresses old logs
+- To verify: `logrotate -d /etc/logrotate.d/nightly_manticore` (dry run) or check `/var/lib/logrotate/status`
+
 ## Get started
 
 ### Prepare test

@@ -89,6 +89,27 @@ log() {
     esac
 }
 
+# Function to clean non-Manticore results from database
+clean_db() {
+    log "info" "Cleaning non-Manticore results from database..."
+    
+    # Delete from results table
+    curl -s -X POST "https://$NIGHTLY_DB_HOST/sql" \
+         -u "$NIGHTLY_USER:$NIGHTLY_PASSWORD" \
+         -H "Content-Type: application/x-www-form-urlencoded" \
+         -d "query=DELETE FROM results WHERE engine_name != 'manticoresearch'" \
+         > /dev/null
+    
+    # Delete from init_results table  
+    curl -s -X POST "https://$NIGHTLY_DB_HOST/sql" \
+         -u "$NIGHTLY_USER:$NIGHTLY_PASSWORD" \
+         -H "Content-Type: application/x-www-form-urlencoded" \
+         -d "query=DELETE FROM init_results WHERE engine_name != 'manticoresearch'" \
+         > /dev/null
+    
+    log "success" "Database cleanup completed."
+}
+
 # Set nightly image based on tag
 export MANTICORE_IMAGE=manticoresearch/manticore:$TAG
 
@@ -220,6 +241,9 @@ for TEST in "${unique_tests[@]}"; do
     eval $cmd
   done <<< "$configs_json"
 done
+
+# Clean database before saving new results
+clean_db
 
 # Saving results
 log "info" "Saving results to DB..."

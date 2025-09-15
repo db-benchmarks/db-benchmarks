@@ -1,0 +1,8 @@
+/var/log/db-benchmarks/nightly_*.log {
+    daily
+    rotate 30
+    compress
+    missingok
+    notifempty
+    create 0644 djklim87 djklim87
+}
