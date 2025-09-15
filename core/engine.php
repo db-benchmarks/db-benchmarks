@@ -100,6 +100,13 @@ abstract class engine
                 if (!$results) {
                     self::die("ERROR: can't read from the file", 1);
                 }
+                // Check engine filter if specified
+                if (isset(self::$commandLineArguments['engine']) &&
+                    self::$commandLineArguments['engine'] &&
+                    $results['engine'] !== self::$commandLineArguments['engine']) {
+                    self::log("Skipping $file (engine: {$results['engine']}, filter: " . self::$commandLineArguments['engine'] . ")", 2);
+                    continue;
+                }
                 if (self::saveToDB($results) === true
                     && self::$commandLineArguments['rm']
                 ) {
@@ -1063,13 +1070,14 @@ abstract class engine
 \t[--info_timeout=N] - how long to wait for getting info from a db/engine
 \t[--limited] - emulate one physical CPU core
 \t[--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
-To save to db all results it finds by path
+ To save to db all results it finds by path
 \t" . __FILE__ . "
 \t--save=path/to/file/or/dir, all files in the dir recursively will be saved
 \t--host=HOSTNAME
 \t--port=PORT
 \t--username=USERNAME
 \t--password=PASSWORD
+\t[--engine=ENGINE_NAME] - filter by engine name (e.g., manticoresearch, elasticsearch)
 \t--rm - remove after successful saving to database
 \t--skip_calm - avoid waiting until discs become calm
 ----------------------
@@ -1176,7 +1184,7 @@ Environment vairables:
             return true;
         }
         self::$commandLineArguments = self::getopt([
-            "save:", "host:", "port:", "username:", "password:", "rm::"
+            "save:", "host:", "port:", "username:", "password:", "rm::", "engine::"
         ]);
         if (@self::$commandLineArguments['save']) {
             self::$mode = 'save';
