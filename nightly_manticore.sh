@@ -242,8 +242,7 @@ for TEST in "${unique_tests[@]}"; do
   done <<< "$configs_json"
 done
 
-# Clean database before saving new results
-clean_db
+
 
 # Saving results
 log "info" "Saving results to DB..."
@@ -251,3 +250,6 @@ log "info" "Saving results to DB..."
 ./test --save=./results --host="$NIGHTLY_DB_HOST" --port=443 --username="$NIGHTLY_USER" --password="$NIGHTLY_PASSWORD"
 
 log "success" "Nightly tests completed."
+
+# Clean database before saving new results
+clean_db
