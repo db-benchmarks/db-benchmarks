@@ -129,7 +129,7 @@ class Converter
                 $v = '"'.str_replace('"','""',$v).'"';
                 $fields[$k] = $v;
             }
-            fputcsv($mem, $fields, ',', "\0");
+            fputcsv($mem, $fields, ',', "\0", '\\');
             rewind($mem);
             fwrite($csv, str_replace(chr(0), '', stream_get_contents($mem)));
             ftruncate($mem, 0);
