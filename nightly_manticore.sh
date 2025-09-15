@@ -94,17 +94,17 @@ clean_db() {
     log "info" "Cleaning non-Manticore results from database..."
     
     # Delete from results table
-    curl -s -X POST "https://$NIGHTLY_DB_HOST/sql" \
+    curl -s -X POST "https://$NIGHTLY_DB_HOST/sql?mode=raw" \
          -u "$NIGHTLY_USER:$NIGHTLY_PASSWORD" \
          -H "Content-Type: application/x-www-form-urlencoded" \
-         -d "query=DELETE FROM results WHERE engine_name != 'manticoresearch'" \
+         -d "DELETE FROM results WHERE engine_name != 'manticoresearch'" \
          > /dev/null
     
     # Delete from init_results table  
-    curl -s -X POST "https://$NIGHTLY_DB_HOST/sql" \
+    curl -s -X POST "https://$NIGHTLY_DB_HOST/sql?mode=raw" \
          -u "$NIGHTLY_USER:$NIGHTLY_PASSWORD" \
          -H "Content-Type: application/x-www-form-urlencoded" \
-         -d "query=DELETE FROM init_results WHERE engine_name != 'manticoresearch'" \
+         -d "DELETE FROM init_results WHERE engine_name != 'manticoresearch'" \
          > /dev/null
     
     log "success" "Database cleanup completed."
