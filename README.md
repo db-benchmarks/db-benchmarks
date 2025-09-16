@@ -387,15 +387,18 @@ We will then:
   |  |-taxi                                 <- Taxi rides test suite, with a similar structure.
   |  |-hn_small                             <- Test for a smaller, non-multiplied Hackernews dataset, similar structure.
   |  |-logs10m                              <- Test for Nginx logs, similar structure.
-  |-.env.example                            <- Example environment file. Update the "mem" and "cpuset" values as needed.
-  |-LICENSE                                 <- License file.
-  |-NOTICE                                  <- Notice file.
-  |-README.md                               <- You're reading this file.
-  |-docker-compose.yml                      <- Docker Compose configuration for starting and stopping databases and search engines.
-  |-important_tests.sh
-  |-init                                    <- Initialization script. Handles data ingestion and tracks the time taken.
-  |-logo.svg                                <- Logo file.
-  |-test                                    <- The executable file to run and save test results.
+   |-.env.example                            <- Example environment file. Update the "mem" and "cpuset" values as needed.
+   |-local_hooks                             <- Directory for local development hooks (see Local Development Hooks section).
+   |  |-.gitignore                           <- Ignores hook files while keeping structure tracked.
+   |  |-README.md                            <- Documentation for local hooks.
+   |-LICENSE                                 <- License file.
+   |-NOTICE                                  <- Notice file.
+   |-README.md                               <- You're reading this file.
+   |-docker-compose.yml                      <- Docker Compose configuration for starting and stopping databases and search engines.
+   |-important_tests.sh
+   |-init                                    <- Initialization script. Handles data ingestion and tracks the time taken.
+   |-logo.svg                                <- Logo file.
+   |-test                                    <- The executable file to run and save test results.
 ```
 
 ## How to start a particular database / search engine with a particular dataset

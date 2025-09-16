@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Source local hook if it exists
+if [ -f ../../local_hooks/hn_hook.sh ]; then
+  source ../../local_hooks/hn_hook.sh
+fi
+
 echo -e "Manticore Search (type $suffix):"
 if [ -f manticoresearch/idx$suffix/$test.*sph ]; then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
