@@ -22,7 +22,7 @@ done
 
 # Validate tag
 if [[ "$TAG" != "dev" && "$TAG" != "latest" ]]; then
-  log "error" "Invalid tag: $TAG. Must be 'dev' or 'latest'."
+  script_log "error" "Invalid tag: $TAG. Must be 'dev' or 'latest'."
   exit 1
 fi
 
@@ -37,7 +37,7 @@ check_load() {
     currentLoad=$(uptime | awk -F'load average:' '{ print $2 }' | awk -F',' '{ print $1 }' | tr -d ' ')
     highLoad=$(echo "$currentLoad > $LOAD_THRESHOLD" | bc)
     if [ "$highLoad" -eq 1 ]; then
-        log "warning" "Server load ($currentLoad) is above threshold ($LOAD_THRESHOLD). Skipping nightly tests."
+        script_log "warning" "Server load ($currentLoad) is above threshold ($LOAD_THRESHOLD). Skipping nightly tests."
         exit 0
     fi
 }
@@ -47,10 +47,10 @@ if [ -f "$LOCK_FILE" ]; then
     # Read PID from lock file
     LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
     if [ -n "$LOCK_PID" ] && kill -0 "$LOCK_PID" 2>/dev/null; then
-        log "warning" "Lock file $LOCK_FILE exists and process $LOCK_PID is running. Another benchmark process may be running. Skipping."
+        script_log "warning" "Lock file $LOCK_FILE exists and process $LOCK_PID is running. Another benchmark process may be running. Skipping."
         exit 0
     else
-        log "info" "Removing stale lock file $LOCK_FILE (process $LOCK_PID not running)."
+        script_log "info" "Removing stale lock file $LOCK_FILE (process $LOCK_PID not running)."
         rm -f "$LOCK_FILE"
     fi
 fi
@@ -66,7 +66,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Logging function
-log() {
+script_log() {
     local level="$1"
     local message="$2"
 
@@ -95,65 +95,65 @@ export MANTICORE_IMAGE=manticoresearch/manticore:$TAG
 
 # Check for jq
 if ! command -v jq &> /dev/null; then
-  log "error" "jq is required but not installed. Please install jq to use this script."
+  script_log "error" "jq is required but not installed. Please install jq to use this script."
   exit 1
 fi
 
 # Configuration file
 config_file="nightly_config.json"
 if [[ ! -f $config_file ]]; then
-  log "error" "Configuration file $config_file not found"
+  script_log "error" "Configuration file $config_file not found"
   exit 1
 fi
 
 # Get unique tests from JSON config
 unique_tests=($(jq -r '.tests | keys[]' $config_file))
 
-log "info" "Pulling dev image..."
+script_log "info" "Pulling dev image..."
 docker pull $MANTICORE_IMAGE
 
-log "info" "Getting Manticoresearch version and hash from dev image..."
+script_log "info" "Getting Manticoresearch version and hash from dev image..."
 OUTPUT=$(docker run --rm $MANTICORE_IMAGE searchd --version)
 VERSION=$(echo "$OUTPUT" | awk '/Manticore/ {for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\.[0-9]+\.[0-9]+$/) print $i}' | head -1)
 HASH=$(echo "$OUTPUT" | awk '{for(i=1;i<=NF;i++) if($i ~ /@/ && $i !~ /columnar/) {split($i,a,"@"); print a[1]; exit}}')
 if [ -z "$VERSION" ] || [ -z "$HASH" ]; then
-  log "error" "Failed to get version or hash"
+  script_log "error" "Failed to get version or hash"
   exit 1
 fi
 
 SHORT_HASH="${HASH:0:5}"
 
-log "success" "Version: $VERSION, Hash: $SHORT_HASH"
+script_log "success" "Version: $VERSION, Hash: $SHORT_HASH"
 
-log "success" "Proceeding with tests."
+script_log "success" "Proceeding with tests."
 
 # Process each test
 for TEST in "${unique_tests[@]}"; do
-  log "info" "Checking for existing results for $TEST with version $VERSION and hash $SHORT_HASH..."
+  script_log "info" "Checking for existing results for $TEST with version $VERSION and hash $SHORT_HASH..."
   if find ./results/$TEST -path "*/manticoresearch*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null; then
-    log "warning" "Results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
+    script_log "warning" "Results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
     continue
   fi
 
-  log "success" "No existing results found for $TEST. Proceeding."
+  script_log "success" "No existing results found for $TEST. Proceeding."
 
    # Prepare data for this test
-    log "info" "Preparing data for $TEST..."
+    script_log "info" "Preparing data for $TEST..."
     cd "tests/$TEST"
     if [ -f "./prepare_csv/prepare.sh" ]; then
       ./prepare_csv/prepare.sh
       if [ $? -ne 0 ]; then
-        log "error" "Couldn't prepare CSV for $TEST"
+        script_log "error" "Couldn't prepare CSV for $TEST"
         cd ../..
         exit 1
       fi
     else
-      log "warning" "No prepare.sh found for $TEST, skipping prepare.sh."
+      script_log "warning" "No prepare.sh found for $TEST, skipping prepare.sh."
     fi
     cd ../..
 
   # Step 1: Down all engines (once per test)
-  log "info" "Shutting down all engines for $TEST..."
+  script_log "info" "Shutting down all engines for $TEST..."
   cd "tests/$TEST"
   suffix="" test=$TEST docker compose down
   cd ../..
@@ -174,11 +174,11 @@ for TEST in "${unique_tests[@]}"; do
     fi
 
     # Remove idx folder to force re-indexing
-    log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
+    script_log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
     rm -rf "manticoresearch/$idx_folder"
 
     # Run init
-    log "info" "Running init for $TEST with engine $init_engine..."
+    script_log "info" "Running init for $TEST with engine $init_engine..."
     if [[ $init_engine == *:* ]]; then
         engine_part=${init_engine%%:*}
         type_part=${init_engine#*:}
@@ -187,7 +187,7 @@ for TEST in "${unique_tests[@]}"; do
         ../../init --test=$TEST --engine=$init_engine
     fi
     if [ $? -ne 0 ]; then
-      log "error" "Init failed for $TEST with engine $init_engine"
+      script_log "error" "Init failed for $TEST with engine $init_engine"
       cd ../..
       exit 1
     fi
@@ -210,10 +210,10 @@ for TEST in "${unique_tests[@]}"; do
     fi
     dir="results/$TEST/manticoresearch$suffix"
 
-    log "info" "Running tests for $TEST with engine $engine, memory $memory, dir $dir..."
+    script_log "info" "Running tests for $TEST with engine $engine, memory $memory, dir $dir..."
 
     # Run tests (no more docker compose down or rm here - already done)
-    log "info" "Running test command for $TEST..."
+    script_log "info" "Running test command for $TEST..."
     cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\""
     if [[ $limited == "true" ]]; then
       cmd="$cmd --limited"
@@ -225,8 +225,8 @@ done
 
 
 # Saving results
-log "info" "Saving Manticoresearch results to DB..."
+script_log "info" "Saving Manticoresearch results to DB..."
 
 ./test --save=./results --engine=manticoresearch --host="$NIGHTLY_DB_HOST" --port=443 --username="$NIGHTLY_USER" --password="$NIGHTLY_PASSWORD"
 
-log "success" "Nightly tests completed."
+script_log "success" "Nightly tests completed."

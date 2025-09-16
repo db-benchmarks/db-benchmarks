@@ -10,10 +10,16 @@
 
 class manticoresearch extends engine {
 
-    private $mysqlPort = 9306;
-    private $HTTPPort = 9308;
+    private $mysqlPort;
+    private $HTTPPort;
     private $mysql = null; // mysql connection
     private $curl = null; // curl connection
+
+    public function __construct($type) {
+        parent::__construct($type);
+        $this->mysqlPort = getenv('MANTICORE_MYSQL_PORT') ?: 9306;
+        $this->HTTPPort = getenv('MANTICORE_HTTP_PORT') ?: 9308;
+    }
 
     protected function url() {
         return "https://manticoresearch.com/";
