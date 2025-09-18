@@ -26,6 +26,9 @@ if [[ "$TAG" != "dev" && "$TAG" != "latest" ]]; then
   exit 1
 fi
 
+# Flag to track if any tests were executed
+export TESTS_EXECUTED=false
+
 # Removed set -e to allow proper error handling
 
 # Lock file path
@@ -136,6 +139,7 @@ for TEST in "${unique_tests[@]}"; do
   fi
 
   script_log "success" "No existing results found for $TEST. Proceeding."
+  export TESTS_EXECUTED=true
 
    # Prepare data for this test
     script_log "info" "Preparing data for $TEST..."
@@ -228,5 +232,10 @@ done
 script_log "info" "Saving Manticoresearch results to DB..."
 
 ./test --save=./results --engine=manticoresearch --host="$NIGHTLY_DB_HOST" --port=443 --username="$NIGHTLY_USER" --password="$NIGHTLY_PASSWORD"
+
+# Source local hook if it exists
+if [ -f local_hooks/nightly_hook.sh ]; then
+  source local_hooks/nightly_hook.sh
+fi
 
 script_log "success" "Nightly tests completed."
