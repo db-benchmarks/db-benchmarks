@@ -58,9 +58,6 @@ if [ -f "$LOCK_FILE" ]; then
     fi
 fi
 
-# Check load
-check_load
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -91,6 +88,9 @@ script_log() {
             ;;
     esac
 }
+
+# Check load
+check_load
 
 
 # Set nightly image based on tag
