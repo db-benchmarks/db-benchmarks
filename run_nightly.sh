@@ -33,8 +33,8 @@ run_test() {
     fi
 }
 
-# Run dev version
-run_test "dev"
-
 # Run latest version
 run_test "latest"
+
+# Run dev version
+run_test "dev"
