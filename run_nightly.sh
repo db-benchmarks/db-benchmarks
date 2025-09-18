@@ -33,6 +33,17 @@ run_test() {
     fi
 }
 
+#################################### IMPORTANT ####################################
+#
+# The sequence here is critical because links are sent in local_hooks/nightly.sh.
+# If we pull the dev image first, the release version might change before we’ve
+# actually run tests, which would result in broken links to non-existent tests.
+#
+# Therefore, we must run **latest** first, and only then run **dev**.
+# (Links are sent only after the dev execution.)
+#
+###################################################################################
+
 # Run latest version
 run_test "latest"
 
