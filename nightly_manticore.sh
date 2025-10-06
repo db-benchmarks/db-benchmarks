@@ -45,6 +45,32 @@ check_load() {
     fi
 }
 
+# Function to wait for server to settle after initial tests
+wait_for_settle() {
+    script_log "info" "Waiting for server to settle before starting retest phase..."
+    local stable_count=0
+    local required_stable=3
+    
+    while [ $stable_count -lt $required_stable ]; do
+        currentLoad=$(uptime | awk -F'load average:' '{ print $2 }' | awk -F',' '{ print $1 }' | tr -d ' ')
+        highLoad=$(echo "$currentLoad > $LOAD_THRESHOLD" | bc)
+        
+        if [ "$highLoad" -eq 0 ]; then
+            stable_count=$((stable_count + 1))
+            script_log "info" "Load check $stable_count/$required_stable passed (load: $currentLoad)"
+        else
+            stable_count=0
+            script_log "info" "Load still high ($currentLoad > $LOAD_THRESHOLD), resetting counter"
+        fi
+        
+        if [ $stable_count -lt $required_stable ]; then
+            sleep 30
+        fi
+    done
+    
+    script_log "success" "Server load settled. Starting retest phase..."
+}
+
 # Check for existing lock
 if [ -f "$LOCK_FILE" ]; then
     # Read PID from lock file
@@ -217,8 +243,8 @@ for TEST in "${unique_tests[@]}"; do
     script_log "info" "Running tests for $TEST with engine $engine, memory $memory, dir $dir..."
 
     # Run tests (no more docker compose down or rm here - already done)
-    script_log "info" "Running test command for $TEST..."
-    cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\""
+    script_log "info" "Running initial test command for $TEST..."
+    cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\" --no-retest"
     if [[ $limited == "true" ]]; then
       cmd="$cmd --limited"
     fi
@@ -226,7 +252,48 @@ for TEST in "${unique_tests[@]}"; do
   done <<< "$configs_json"
 done
 
+# Wait for server to settle before retests
+wait_for_settle
 
+# Phase 2: Run retests for all completed tests
+script_log "info" "Starting retest phase for all tests..."
+
+for TEST in "${unique_tests[@]}"; do
+  script_log "info" "Checking for existing results for $TEST with version $VERSION and hash $SHORT_HASH..."
+  if find ./results/$TEST -path "*/manticoresearch*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null; then
+    script_log "warning" "Results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping retests for $TEST."
+    continue
+  fi
+
+  script_log "success" "Running retests for $TEST."
+
+  # Step 4: Run retest configurations
+  configs_json=$(jq -c ".tests.\"$TEST\"[]" $config_file)
+  while IFS= read -r config_json; do
+    engine=$(jq -r '.engine' <<< "$config_json")
+    memory=$(jq -r '.memory' <<< "$config_json")
+    query_timeout=$(jq -r '.query_timeout // 30' <<< "$config_json")
+    limited=$(jq -r '.limited // false' <<< "$config_json")
+    idx_folder=$(jq -r '.idx_folder // "idx"' <<< "$config_json")
+
+    # Determine directory suffix
+    suffix=""
+    if [[ $engine == *:* ]]; then
+      suffix="_${engine#*:}"
+    fi
+    dir="results/$TEST/manticoresearch$suffix"
+
+    script_log "info" "Running retests for $TEST with engine $engine, memory $memory, dir $dir..."
+
+    # Run retests only
+    script_log "info" "Running retest command for $TEST..."
+    cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\" --retest-only"
+    if [[ $limited == "true" ]]; then
+      cmd="$cmd --limited"
+    fi
+    eval $cmd
+  done <<< "$configs_json"
+done
 
 # Saving results
 script_log "info" "Saving Manticoresearch results to DB..."

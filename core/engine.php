@@ -571,7 +571,20 @@ abstract class engine
                     self::log("CPU: limited (1 physical core)", 2);
                 }
                 $engine = new $engineOptions['engine']($engineOptions['type']);
-                for ($attempt = 0; $attempt <= 1; $attempt++) {
+                
+                // Determine attempt range based on flags
+                $startAttempt = 0;
+                $endAttempt = 1;
+                
+                if (isset(self::$commandLineArguments['no_retest'])) {
+                    $endAttempt = 0; // Only run attempt 0 (initial test)
+                }
+                if (isset(self::$commandLineArguments['retest_only'])) {
+                    $startAttempt = 1; // Only run attempt 1 (retest)
+                    $endAttempt = 1;
+                }
+                
+                for ($attempt = $startAttempt; $attempt <= $endAttempt; $attempt++) {
                     $queryTimes = [];
                     foreach (self::$queries as $qn => $query) {
                         $queryStats = [];
@@ -1110,7 +1123,9 @@ Environment vairables:
                 "query_timeout::",
                 "info_timeout::",
                 "rm::",
-                "skip_inaccuracy::"
+                "skip_inaccuracy::",
+                "no_retest::",
+                "retest_only::"
             ]);
         if (@self::$commandLineArguments['test']
             and @self::$commandLineArguments['engines']
