@@ -6,6 +6,35 @@ trait Helpers
 {
     protected static function log($message, $depth, $color = false, $noTime = false, $modifyMode = false): void
     {
+        // In quiet mode, only show essential test progress messages
+        if (isset(self::$commandLineArguments['quiet']) && self::$commandLineArguments['quiet']) {
+            $allowedPatterns = [
+                'Starting testing',
+                'Memory:',
+                'Engine:',
+                'CPU:',
+                'Original query',
+                'Loaded',
+                'queries to test',
+                'Saving data for engine',
+                'Saved to',
+                'ERROR:',
+                'WARNING:'
+            ];
+            
+            $isAllowed = false;
+            foreach ($allowedPatterns as $pattern) {
+                if (strpos($message, $pattern) !== false) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+            
+            if (!$isAllowed) {
+                return;
+            }
+        }
+
         $depth--;
         $colors = ['black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'white' => 37, 'bright_black' => 90];
         $lines = preg_split('/\r\n|\n\r|\r|\n/', trim($message));

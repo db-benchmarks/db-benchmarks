@@ -554,6 +554,7 @@ abstract class engine
         if (!self::$queries) {
             self::die("ERROR: empty queries", 1);
         }
+        self::log("Loaded " . count(self::$queries) . " queries to test", 1);
 
         $limited = !empty(self::$commandLineArguments['limited']);
         // let's test in all memory modes
@@ -1081,9 +1082,10 @@ abstract class engine
 \t[--warmup_timeout=N] - how long to wait for a db/engine to warmup after start, 300 seconds by default
 \t[--query_timeout=N] - max time a query can run, 900 seconds by default
 \t[--info_timeout=N] - how long to wait for getting info from a db/engine
-\t[--limited] - emulate one physical CPU core
-\t[--no-retest] - skip retest phase, run only initial tests
-\t[--retest-only] - run only retest phase
+ \t[--limited] - emulate one physical CPU core
+ \t[--no-retest] - skip retest phase, run only initial tests
+ \t[--retest-only] - run only retest phase
+ \t[--quiet] - reduce verbose logging for cleaner output
 \t[--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
  To save to db all results it finds by path
 \t" . __FILE__ . "
@@ -1127,7 +1129,8 @@ Environment vairables:
                 "rm::",
                 "skip_inaccuracy::",
                 "no-retest",
-                "retest-only"
+                "retest-only",
+                "quiet"
             ]);
 
 
@@ -1192,6 +1195,9 @@ Environment vairables:
             }
             if (isset(self::$commandLineArguments['limited'])) {
                 self::$commandLineArguments['limited'] = true;
+            }
+            if (isset(self::$commandLineArguments['quiet'])) {
+                self::$commandLineArguments['quiet'] = true;
             }
 
             if (isset(self::$commandLineArguments['memory'])) {

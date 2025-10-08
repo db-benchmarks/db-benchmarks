@@ -242,9 +242,9 @@ for TEST in "${unique_tests[@]}"; do
 
     script_log "info" "Running tests for $TEST with engine $engine, memory $memory, dir $dir..."
 
-    # Run tests (no more docker compose down or rm here - already done)
-    script_log "info" "Running initial test command for $TEST..."
-    cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\" --no-retest"
+     # Run tests (no more docker compose down or rm here - already done)
+     script_log "info" "Running initial test command for $TEST..."
+     cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\" --no-retest --quiet"
     if [[ $limited == "true" ]]; then
       cmd="$cmd --limited"
     fi
@@ -285,9 +285,9 @@ for TEST in "${unique_tests[@]}"; do
 
     script_log "info" "Running retests for $TEST with engine $engine, memory $memory, dir $dir..."
 
-    # Run retests only
-    script_log "info" "Running retest command for $TEST..."
-    cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\" --retest-only"
+     # Run retests only
+     script_log "info" "Running retest command for $TEST..."
+     cmd="./test --test=\"$TEST\" --engines=\"$engine\" --memory=\"$memory\" --dir=\"$dir\" --retest-only --quiet"
     if [[ $limited == "true" ]]; then
       cmd="$cmd --limited"
     fi
