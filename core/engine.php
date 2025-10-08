@@ -575,11 +575,11 @@ abstract class engine
                 // Determine attempt range based on flags
                 $startAttempt = 0;
                 $endAttempt = 1;
-                
-                if (isset(self::$commandLineArguments['no_retest'])) {
+
+                if (isset(self::$commandLineArguments['no-retest'])) {
                     $endAttempt = 0; // Only run attempt 0 (initial test)
                 }
-                if (isset(self::$commandLineArguments['retest_only'])) {
+                if (isset(self::$commandLineArguments['retest-only'])) {
                     $startAttempt = 1; // Only run attempt 1 (retest)
                     $endAttempt = 1;
                 }
@@ -1082,6 +1082,8 @@ abstract class engine
 \t[--query_timeout=N] - max time a query can run, 900 seconds by default
 \t[--info_timeout=N] - how long to wait for getting info from a db/engine
 \t[--limited] - emulate one physical CPU core
+\t[--no-retest] - skip retest phase, run only initial tests
+\t[--retest-only] - run only retest phase
 \t[--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
  To save to db all results it finds by path
 \t" . __FILE__ . "
@@ -1124,9 +1126,11 @@ Environment vairables:
                 "info_timeout::",
                 "rm::",
                 "skip_inaccuracy::",
-                "no_retest::",
-                "retest_only::"
+                "no-retest",
+                "retest-only"
             ]);
+
+
         if (@self::$commandLineArguments['test']
             and @self::$commandLineArguments['engines']
         ) {
