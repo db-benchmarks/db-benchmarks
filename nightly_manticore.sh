@@ -259,9 +259,9 @@ wait_for_settle
 script_log "info" "Starting retest phase for all tests..."
 
 for TEST in "${unique_tests[@]}"; do
-  script_log "info" "Checking for existing results for $TEST with version $VERSION and hash $SHORT_HASH..."
-  if find ./results/$TEST -path "*/manticoresearch*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null; then
-    script_log "warning" "Results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping retests for $TEST."
+  script_log "info" "Checking for existing retest results for $TEST with version $VERSION and hash $SHORT_HASH..."
+  if find ./results/$TEST -path "*/manticoresearch*" -name "*_retest*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null; then
+    script_log "warning" "Retest results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping retests for $TEST."
     continue
   fi
 
