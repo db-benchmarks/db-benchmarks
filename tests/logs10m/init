@@ -9,8 +9,8 @@ export test="$current_dir"
 COLORED='\033[0;33m'
 NC='\033[0m' # No Color
 
-docker-compose -f ../../docker-compose.yml --env-file ../../.env down
-docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
+docker compose -f ../../docker-compose.yml --env-file ../../.env down
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 
 echo -e "${COLORED}Preparing CSV:${NC}"
 ./prepare_csv/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done

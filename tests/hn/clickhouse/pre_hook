@@ -6,10 +6,10 @@ if [[ -L clickhouse/data$suffix/data/default/$test ]] || [[ -e clickhouse/data$s
   exit 10
 fi
 
-docker-compose -f ../../docker-compose.yml --env-file ../../.env stop clickhouse
-docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f clickhouse
+docker compose -f ../../docker-compose.yml --env-file ../../.env stop clickhouse
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f clickhouse
 
-cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d clickhouse"
+cmd="test=$test suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d clickhouse"
 echo -e "\tStarting clickhouse ($cmd)"
 eval "$cmd"
 

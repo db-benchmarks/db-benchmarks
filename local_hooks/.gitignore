@@ -1,0 +1,6 @@
+# Ignore all hook files - these are local customizations
+*.sh
+
+# But keep the README and this .gitignore tracked
+!.gitignore
+!README.md

@@ -6,12 +6,12 @@ if [ "$(ls elasticsearch/idx$suffix)" ]; then
   exit 10
 fi
 
-docker-compose -f ../../docker-compose.yml --env-file ../../.env stop elasticsearch
-docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f elasticsearch
+docker compose -f ../../docker-compose.yml --env-file ../../.env stop elasticsearch
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f elasticsearch
 mkdir -p elasticsearch/idx$suffix
 chmod -R 777 elasticsearch/idx$suffix # otherwise elasticsearch in docker won't start
 chmod -R 777 data          # otherwise logstash may not be able to read the files
-cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d elasticsearch"
+cmd="test=$test suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d elasticsearch"
 echo -e "\tStarting elasticsearch ($cmd)"
 eval "$cmd"
 echo -e "\tWaiting for elasticsearch to come up"

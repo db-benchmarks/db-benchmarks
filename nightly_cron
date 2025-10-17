@@ -1,0 +1,4 @@
+# Cron job for nightly Manticoresearch tests
+# Run the wrapper script at 2 AM daily
+0 2 * * * root cd /nightly && ./run_nightly.sh
+

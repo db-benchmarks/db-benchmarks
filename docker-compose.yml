@@ -6,7 +6,7 @@ services:
       - default
     container_name: "elasticsearch_engine"
     mem_limit: ${mem}m # used for testing with limited capabilities, e.g. RAM capped at 256MB
-    cpuset: "${cpuset}" # used for testing with limited capabilities, e.g. single physical core
+    cpuset: ${cpuset} # used for testing with limited capabilities, e.g. single physical core
     privileged: true # we give containers all privileges since otherwise (as previous tests showed) in-docker and on-host performances can differe significantly
     mem_swappiness: 0 # we disable swappiness since it can lower test results quality
     ulimits:
@@ -37,7 +37,7 @@ services:
       - default
     container_name: "clickhouse_engine"
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ulimits:
@@ -61,7 +61,7 @@ services:
       - default
     container_name: "mysql_engine"
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ulimits:
@@ -90,7 +90,7 @@ services:
       - default
     container_name: "mysql_percona_engine"
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ulimits:
@@ -113,12 +113,12 @@ services:
       - MYSQL_ROOT_PASSWORD=
 
   manticoresearch:
-    image: manticoresearch/manticore:7.0.0
+    image: ${MANTICORE_IMAGE:-manticoresearch/manticore:7.0.0}
     networks:
       - default
     container_name: "manticoresearch_engine"
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ulimits:
@@ -130,8 +130,8 @@ services:
         soft: 262144
         hard: 262144
     ports:
-      - "127.0.0.1:9306:9306"
-      - "127.0.0.1:9308:9308"
+      - "127.0.0.1:${MANTICORE_MYSQL_PORT:-9306}:9306"
+      - "127.0.0.1:${MANTICORE_HTTP_PORT:-9308}:9308"
     environment:
       - EXTRA=1
     volumes:
@@ -145,7 +145,7 @@ services:
       - default
     container_name: "postgres_engine"
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ulimits:
@@ -171,7 +171,7 @@ services:
     networks:
       - default
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ports:
@@ -195,7 +195,7 @@ services:
     networks:
       - default
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ports:
@@ -219,7 +219,7 @@ services:
       - default
     container_name: "meilisearch_engine"
     mem_limit: ${mem}m
-    cpuset: "${cpuset}"
+    cpuset: ${cpuset}
     privileged: true
     mem_swappiness: 0
     ulimits:

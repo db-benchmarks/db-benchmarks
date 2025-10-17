@@ -23,6 +23,8 @@ class Init
     private string $suffix;
     private string $measurementsLogPath;
     private string $version;
+    private array $info;
+    private string $lockFile;
 
 
     public function __construct(
@@ -36,6 +38,7 @@ class Init
 
         $this->checkHooksExist();
         $this->getSuffix();
+        $this->acquireLock();
         $this->measurementsLogPath = "/tmp/inflate_$this->engineName.txt";
 
         try {
@@ -46,6 +49,11 @@ class Init
         } catch (Exception $exception) {
             self::die($exception->getMessage(), 1);
         }
+    }
+
+    public function __destruct()
+    {
+        $this->releaseLock();
     }
 
     private function checkHooksExist(): void
@@ -68,6 +76,31 @@ class Init
         $this->suffix = ($this->type === "")
             ? ""
             : "_$this->type";
+    }
+
+    private function acquireLock(): void
+    {
+        $this->lockFile = '/tmp/db_benchmarks.lock';
+        if (file_exists($this->lockFile)) {
+            $lockPid = trim(file_get_contents($this->lockFile));
+            if ($lockPid && posix_kill($lockPid, 0)) {
+                self::die("Lock file {$this->lockFile} exists and process $lockPid is running. Another benchmark process may be running.", 1);
+            } else {
+                unlink($this->lockFile); // Remove stale lock
+            }
+        }
+        if (!touch($this->lockFile)) {
+            self::die("Failed to create lock file {$this->lockFile}", 1);
+        }
+        // Write current PID to lock file
+        file_put_contents($this->lockFile, getmypid());
+    }
+
+    private function releaseLock(): void
+    {
+        if (!empty($this->lockFile) && file_exists($this->lockFile)) {
+            unlink($this->lockFile);
+        }
     }
 
     public function preHook(): bool
@@ -387,7 +420,8 @@ class Init
                 'test' => $this->testName,
                 'type' => $this->type,
                 'formatVersion' => 1,
-                'version' => $this->getVersion()
+                'version' => $this->getVersion(),
+                'info' => $this->getFullInfo()
             ]));
 
         unlink($this->measurementsLogPath);
@@ -396,8 +430,8 @@ class Init
 
     private function getVersion(): string
     {
-        if (!empty($this->version)){
-            return $this->version;
+        if (!empty($this->info)){
+            return $this->info['version'] ?? '';
         }
         include_once("../../core/engine.php");
 
@@ -410,9 +444,15 @@ class Init
         $engineClassName = $this->engineName;
         /** @var engine $engine */
         $engine = new $engineClassName($this->type);
-        $info = $engine->getInfo();
-        $this->version = $info['version'] ?? '';
+        $this->info = $engine->getInfo();
+        $this->version = $this->info['version'] ?? '';
         return $this->version;
+    }
+
+    private function getFullInfo(): array
+    {
+        $this->getVersion();
+        return $this->info;
     }
 
 

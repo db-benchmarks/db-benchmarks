@@ -6,12 +6,19 @@ if [ -f manticoresearch/idx$suffix/$test.*sph ]; then
   exit 10
 fi
 
-docker-compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
-docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
+docker compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
 php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
+
+# Source local hook if it exists
+if [ -f ../../local_hooks/hn_hook.sh ]; then
+  source ../../local_hooks/hn_hook.sh
+fi
+
+
 mkdir -p manticoresearch/idx$suffix/data/binlog
 chmod 777 manticoresearch/idx$suffix/data/binlog
-suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
+suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
 
 if timeout 120 grep -qm1 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
   echo -e '\tAccepting connections';

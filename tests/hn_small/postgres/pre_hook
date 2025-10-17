@@ -2,10 +2,10 @@
 
 echo -e "Postgres (type $suffix):"
 
-docker-compose -f ../../docker-compose.yml --env-file ../../.env stop postgres
-docker-compose -f ../../docker-compose.yml --env-file ../../.env rm -f postgres
+docker compose -f ../../docker-compose.yml --env-file ../../.env stop postgres
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f postgres
 
-cmd="test=$test suffix=$suffix docker-compose -f ../../docker-compose.yml --env-file ../../.env up -d postgres"
+cmd="test=$test suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d postgres"
 echo -e "\tStarting postgres ($cmd)"
 eval "$cmd"
 

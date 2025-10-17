@@ -100,6 +100,13 @@ abstract class engine
                 if (!$results) {
                     self::die("ERROR: can't read from the file", 1);
                 }
+                // Check engine filter if specified
+                if (isset(self::$commandLineArguments['engine']) &&
+                    self::$commandLineArguments['engine'] &&
+                    $results['engine'] !== self::$commandLineArguments['engine']) {
+                    self::log("Skipping $file (engine: {$results['engine']}, filter: " . self::$commandLineArguments['engine'] . ")", 2);
+                    continue;
+                }
                 if (self::saveToDB($results) === true
                     && self::$commandLineArguments['rm']
                 ) {
@@ -547,6 +554,7 @@ abstract class engine
         if (!self::$queries) {
             self::die("ERROR: empty queries", 1);
         }
+        self::log("Loaded " . count(self::$queries) . " queries to test", 1);
 
         $limited = !empty(self::$commandLineArguments['limited']);
         // let's test in all memory modes
@@ -564,7 +572,20 @@ abstract class engine
                     self::log("CPU: limited (1 physical core)", 2);
                 }
                 $engine = new $engineOptions['engine']($engineOptions['type']);
-                for ($attempt = 0; $attempt <= 1; $attempt++) {
+                
+                // Determine attempt range based on flags
+                $startAttempt = 0;
+                $endAttempt = 1;
+
+                if (isset(self::$commandLineArguments['no-retest'])) {
+                    $endAttempt = 0; // Only run attempt 0 (initial test)
+                }
+                if (isset(self::$commandLineArguments['retest-only'])) {
+                    $startAttempt = 1; // Only run attempt 1 (retest)
+                    $endAttempt = 1;
+                }
+                
+                for ($attempt = $startAttempt; $attempt <= $endAttempt; $attempt++) {
                     $queryTimes = [];
                     foreach (self::$queries as $qn => $query) {
                         $queryStats = [];
@@ -823,7 +844,9 @@ abstract class engine
         $limited = (!empty(self::$commandLineArguments['limited'])
             || $engineOptions['limited']);
         $fileName = self::$commandLineArguments['test']
-            . "_{$engine}_{$this->type}_{$memory}" . ($retest ? '_retest' : '');
+            . "_{$engine}_{$this->type}_{$memory}"
+            . ($limited ? '_limited' : '')
+            . ($retest ? '_retest' : '');
 
         $final = [
             'testName' => self::$commandLineArguments['test'],
@@ -933,7 +956,7 @@ abstract class engine
         self::log("Starting $engine", 1, 'cyan');
         $o = [];
         $exec = "test=" . self::$commandLineArguments['test']
-            . " mem=$memory suffix=$suffix $limited docker-compose up -d $engine 2>&1";
+            . " mem=$memory suffix=$suffix $limited docker compose up -d $engine 2>&1";
         self::log($exec, 2);
         exec($exec, $o, $r);
         self::log(implode("\n", $o), 2, 'bright_black');
@@ -1000,12 +1023,12 @@ abstract class engine
         $suffix = $this->type ? "_" . $this->type
             : ""; // suffix defines some volumes in the docker-compose, e.g. ./tests/${test}/manticore/idx${suffix}:/var/lib/manticore, it has to be set on stop too
         exec("test=" . self::$commandLineArguments['test']
-            . " suffix=$suffix docker-compose rm -fsv $engine > /dev/null 2>&1");
+            . " suffix=$suffix docker compose rm -fsv $engine > /dev/null 2>&1");
         self::waitForNoIO();
 
         self::log("Attempting to kill $engine in case it's still running", 2);
         exec("test=" . self::$commandLineArguments['test']
-            . " suffix=$suffix docker-compose kill $engine > /dev/null 2>&1");
+            . " suffix=$suffix docker compose kill $engine > /dev/null 2>&1");
     }
 
     // drops all global IO caches
@@ -1059,15 +1082,19 @@ abstract class engine
 \t[--warmup_timeout=N] - how long to wait for a db/engine to warmup after start, 300 seconds by default
 \t[--query_timeout=N] - max time a query can run, 900 seconds by default
 \t[--info_timeout=N] - how long to wait for getting info from a db/engine
-\t[--limited] - emulate one physical CPU core
+ \t[--limited] - emulate one physical CPU core
+ \t[--no-retest] - skip retest phase, run only initial tests
+ \t[--retest-only] - run only retest phase
+ \t[--quiet] - reduce verbose logging for cleaner output
 \t[--queries=/path/to/queries] - queries to test, ./tests/<test name>/test_queries by default
-To save to db all results it finds by path
+ To save to db all results it finds by path
 \t" . __FILE__ . "
 \t--save=path/to/file/or/dir, all files in the dir recursively will be saved
 \t--host=HOSTNAME
 \t--port=PORT
 \t--username=USERNAME
 \t--password=PASSWORD
+\t[--engine=ENGINE_NAME] - filter by engine name (e.g., manticoresearch, elasticsearch)
 \t--rm - remove after successful saving to database
 \t--skip_calm - avoid waiting until discs become calm
 ----------------------
@@ -1100,8 +1127,13 @@ Environment vairables:
                 "query_timeout::",
                 "info_timeout::",
                 "rm::",
-                "skip_inaccuracy::"
+                "skip_inaccuracy::",
+                "no-retest",
+                "retest-only",
+                "quiet"
             ]);
+
+
         if (@self::$commandLineArguments['test']
             and @self::$commandLineArguments['engines']
         ) {
@@ -1164,6 +1196,9 @@ Environment vairables:
             if (isset(self::$commandLineArguments['limited'])) {
                 self::$commandLineArguments['limited'] = true;
             }
+            if (isset(self::$commandLineArguments['quiet'])) {
+                self::$commandLineArguments['quiet'] = true;
+            }
 
             if (isset(self::$commandLineArguments['memory'])) {
                 self::$commandLineArguments['memory'] = explode(',',
@@ -1174,7 +1209,7 @@ Environment vairables:
             return true;
         }
         self::$commandLineArguments = self::getopt([
-            "save:", "host:", "port:", "username:", "password:", "rm::"
+            "save:", "host:", "port:", "username:", "password:", "rm::", "engine::"
         ]);
         if (@self::$commandLineArguments['save']) {
             self::$mode = 'save';
@@ -1241,9 +1276,9 @@ Environment vairables:
     {
         self::log("Preparing environment for test", 1, 'cyan');
         system("test=" . self::$commandLineArguments['test']
-            . " docker-compose down > /dev/null 2>&1");
+            . " docker compose down > /dev/null 2>&1");
         system("test=" . self::$commandLineArguments['test']
-            . " docker-compose rm > /dev/null 2>&1");
+            . " docker compose rm > /dev/null 2>&1");
         system("docker stop $(docker ps -aq) > /dev/null 2>&1");
         system("docker ps -a|grep _engine|awk '{print $1}'|xargs docker rm > /dev/null 2>&1");
     }
