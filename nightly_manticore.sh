@@ -37,14 +37,31 @@ export TESTS_EXECUTED=false
 LOCK_FILE="/tmp/db_benchmarks.lock"
 LOAD_THRESHOLD=0.1  # Low threshold for idle server
 
-# Function to check load
+# Function to check load with 3-minute retry
 check_load() {
-    currentLoad=$(uptime | awk -F'load average:' '{ print $2 }' | awk -F',' '{ print $1 }' | tr -d ' ')
-    highLoad=$(echo "$currentLoad > $LOAD_THRESHOLD" | bc)
-    if [ "$highLoad" -eq 1 ]; then
-        script_log "warning" "Server load ($currentLoad) is above threshold ($LOAD_THRESHOLD). Skipping nightly tests."
-        exit 0
-    fi
+    script_log "info" "Checking server load..."
+    local wait_count=0
+    local max_wait=18  # 3 minutes = 18 * 10 seconds
+    
+    while [ $wait_count -lt $max_wait ]; do
+        currentLoad=$(uptime | awk -F'load average:' '{ print $2 }' | awk -F',' '{ print $1 }' | tr -d ' ')
+        highLoad=$(echo "$currentLoad > $LOAD_THRESHOLD" | bc)
+        
+        if [ "$highLoad" -eq 0 ]; then
+            script_log "success" "Server load is acceptable ($currentLoad <= $LOAD_THRESHOLD). Proceeding with tests."
+            return 0
+        fi
+        
+        wait_count=$((wait_count + 1))
+        script_log "warning" "Server load ($currentLoad) is above threshold ($LOAD_THRESHOLD). Waiting... ($wait_count/$max_wait)"
+        
+        if [ $wait_count -lt $max_wait ]; then
+            sleep 10
+        fi
+    done
+    
+    script_log "error" "Server load remained high for 3 minutes. Skipping tests."
+    exit 0
 }
 
 # Function to wait for server to settle after initial tests
