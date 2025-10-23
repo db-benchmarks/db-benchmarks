@@ -13,10 +13,12 @@ fi
 
 # Parse command line arguments
 TAG="dev"
-while getopts "t:" opt; do
+SKIP_INIT=false
+while getopts "t:s" opt; do
   case $opt in
     t) TAG="$OPTARG" ;;
-    *) echo "Usage: $0 [-t tag]" >&2; exit 1 ;;
+    s) SKIP_INIT=true ;;
+    *) echo "Usage: $0 [-t tag] [-s]" >&2; echo "  -t tag: specify tag (dev or latest)" >&2; echo "  -s: skip initialization (reuse existing indexes)" >&2; exit 1 ;;
   esac
 done
 
@@ -192,37 +194,41 @@ for TEST in "${unique_tests[@]}"; do
   init_engines=($(jq -r ".init.\"$TEST\"[]" $config_file))
 
   # Step 2-3: rm indexes + run init (combined block per engine)
-  cd "tests/$TEST"
-  for init_engine in "${init_engines[@]}"; do
-    # Determine idx_folder for this engine
-    if [[ $init_engine == "manticoresearch" ]]; then
-      idx_folder="idx"
-    elif [[ $init_engine == *:* ]]; then
-      idx_folder="idx_${init_engine#*:}"
-    else
-      idx_folder="idx"  # fallback
-    fi
+  if [ "$SKIP_INIT" = true ]; then
+    script_log "info" "Skipping initialization for $TEST (--skip-init flag enabled)"
+  else
+    cd "tests/$TEST"
+    for init_engine in "${init_engines[@]}"; do
+      # Determine idx_folder for this engine
+      if [[ $init_engine == "manticoresearch" ]]; then
+        idx_folder="idx"
+      elif [[ $init_engine == *:* ]]; then
+        idx_folder="idx_${init_engine#*:}"
+      else
+        idx_folder="idx"  # fallback
+      fi
 
-    # Remove idx folder to force re-indexing
-    script_log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
-    rm -rf "manticoresearch/$idx_folder"
+      # Remove idx folder to force re-indexing
+      script_log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
+      rm -rf "manticoresearch/$idx_folder"
 
-    # Run init
-    script_log "info" "Running init for $TEST with engine $init_engine..."
-    if [[ $init_engine == *:* ]]; then
-        engine_part=${init_engine%%:*}
-        type_part=${init_engine#*:}
-        ../../init --test=$TEST --engine=$engine_part --type=$type_part
-    else
-        ../../init --test=$TEST --engine=$init_engine
-    fi
-    if [ $? -ne 0 ]; then
-      script_log "error" "Init failed for $TEST with engine $init_engine"
-      cd ../..
-      exit 1
-    fi
-  done
-  cd ../..
+      # Run init
+      script_log "info" "Running init for $TEST with engine $init_engine..."
+      if [[ $init_engine == *:* ]]; then
+          engine_part=${init_engine%%:*}
+          type_part=${init_engine#*:}
+          ../../init --test=$TEST --engine=$engine_part --type=$type_part
+      else
+          ../../init --test=$TEST --engine=$init_engine
+      fi
+      if [ $? -ne 0 ]; then
+        script_log "error" "Init failed for $TEST with engine $init_engine"
+        cd ../..
+        exit 1
+      fi
+    done
+    cd ../..
+  fi
 
   # Step 4: Run test configurations
   configs_json=$(jq -c ".tests.\"$TEST\"[]" $config_file)
