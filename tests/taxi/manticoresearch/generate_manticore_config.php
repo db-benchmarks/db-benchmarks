@@ -6,6 +6,11 @@ if (!isset($options['test'])) exit(1);
 
 $type = $options['type'];
 $test = $options['test'];
+$reportedVersion = getenv('MANTICORE_REPORTED_VERSION') ?: '';
+$disableCachesInConfig = true;
+if ($reportedVersion && version_compare($reportedVersion, '17.0.0', '>=')) {
+    $disableCachesInConfig = false;
+}
 
 echo "
 source csv1
@@ -251,8 +256,16 @@ searchd
         listen = 9306:mysql
         listen = 9308:http
         pid_file = /var/run/manticore/searchd.pid
+";
+
+if ($disableCachesInConfig) {
+    echo "
         qcache_max_bytes = 0
         docstore_cache_size = 0
+";
+}
+
+echo "
 	binlog_path = /tmp/ # this doesn't disable binary logging, just leaves the log inside container to make each test run independent
         secondary_indexes = 1
 }

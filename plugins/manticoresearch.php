@@ -14,6 +14,7 @@ class manticoresearch extends engine {
     private $HTTPPort;
     private $mysql = null; // mysql connection
     private $curl = null; // curl connection
+    private $reportedVersion = null;
 
     public function __construct($type) {
         parent::__construct($type);
@@ -223,6 +224,44 @@ class manticoresearch extends engine {
 
     // sends a command to engine to drop its caches
     protected function dropEngineCache() {
+        if (!$this->shouldDropCache()) {
+            return;
+        }
 
+        if (@self::$commandLineArguments['http']) {
+            if ($this->curl) {
+                curl_setopt($this->curl, CURLOPT_POSTFIELDS,
+                    'query=' . urlencode('DROP CACHE'));
+                curl_exec($this->curl);
+            }
+            return;
+        }
+
+        if ($this->mysql) {
+            $this->mysql->query('DROP CACHE');
+        }
+    }
+
+    private function shouldDropCache(): bool
+    {
+        $version = $this->getReportedVersion();
+        if (!$version) {
+            return false;
+        }
+        return version_compare($version, '17.0.0', '>=');
+    }
+
+    private function getReportedVersion(): ?string
+    {
+        if ($this->reportedVersion !== null) {
+            return $this->reportedVersion;
+        }
+        $info = $this->getInfo();
+        if (!is_array($info) || empty($info['version'])) {
+            $this->reportedVersion = null;
+            return null;
+        }
+        $this->reportedVersion = $info['version'];
+        return $this->reportedVersion;
     }
 }
