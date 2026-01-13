@@ -63,11 +63,6 @@ class manticoresearch extends engine {
 
     // returns true when it's possible to connect to engine and it can run a simple query
     protected function canConnect() {
-        if (@self::$commandLineArguments['http']) return $this->canConnectHTTP();
-        else return $this->canConnectMysql();
-    }
-
-    private function canConnectMysql() {
         $m = new mysqli();
         mysqli_report(MYSQLI_REPORT_OFF); // Set MySQLi to throw exceptions
 
@@ -79,23 +74,7 @@ class manticoresearch extends engine {
         return false;
     }
 
-    private function canConnectHTTP() {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "http://localhost:".$this->HTTPPort."/sql?mode=raw&query=".urlencode("show status"));
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 1);
-        $curlResult = curl_exec($curl);
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($httpCode == 200) return true; 
-        return false;
-    }
-
     protected function beforeQuery() {
-        if (@self::$commandLineArguments['http']) $this->beforeHTTP();
-        else $this->beforeMysql();
-    }
-
-    private function beforeMysql() {
         $this->mysql = new mysqli();
         mysqli_report(MYSQLI_REPORT_OFF);
         $this->mysql->options(MYSQL_OPT_READ_TIMEOUT, self::$commandLineArguments['query_timeout']);
@@ -103,23 +82,10 @@ class manticoresearch extends engine {
         @$this->mysql->real_connect('127.0.0.1', '', '', '', $this->mysqlPort);
     }
 
-    private function beforeHTTP() {
-        $this->curl = curl_init();
-        curl_setopt($this->curl, CURLOPT_URL, "http://localhost:".$this->HTTPPort."/sql");
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->curl, CURLOPT_TIMEOUT, self::$commandLineArguments['query_timeout']);
-    }
-
     // runs one query against engine
     // must respect self::$commandLineArguments['query_timeout']
     // must return ['timeout' => true] in case of timeout
     protected function testOnce($query):array {
-        if (@self::$commandLineArguments['http']) return $this->testHTTP($query);
-        else return $this->testMysql($query);
-    }
-
-    private function testMysql($query): array
-    {
         $res = $this->mysql->query($query);
 
         $errorResult = $this->parseMysqlError($this->mysql->errno, 2006);
@@ -129,48 +95,17 @@ class manticoresearch extends engine {
         return ['error' => false, 'response' => $res];
     }
 
-    private function testHTTP($query): array
-    {
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
-        $curlResult = curl_exec($this->curl);
-        $httpCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-        $curlErrorCode = curl_errno($this->curl);
-        $curlError = curl_error($this->curl);
-
-        $errorResult = $this->parseCurlError($httpCode, $curlErrorCode, $curlError);
-        if ($errorResult){
-            return $errorResult;
-        }
-        return ['error' => false, 'response' => $curlResult];
-    }
-
-
     // To run SHOW META and collect other stats after a query is made
     protected function afterQuery() {
-        if (@self::$commandLineArguments['http']) return $this->afterHTTP();
-        else return $this->afterMysql();
-    }
-
-    // Runs SHOW META
-    private function afterMysql() {
         $res = $this->mysql->query('SHOW META');
         $ar = [];
         if ($res and $res->num_rows > 0) while ($row = $res->fetch_row()) $ar[] = '"'.$row[0].'": "'.$row[1].'"';
         return "{\n".implode(",\n", $ar)."\n}";
     }
 
-    // Returns empty array, because in HTTP it's problematic to run SHOW META after a query
-    private function afterHTTP() {
-        return '';
-    }
-
     // parses query result and returns it in the format that should be common across all engines
     protected function parseResult($result) {
-        if (@self::$commandLineArguments['http']) return $this->parseHTTPResult($result);
-        else return $this->parseMysqlResult($result);
-    }
 
-    private function parseMysqlResult($result) {
         $res = [];
         if ($result and $result->num_rows > 0) {
             while ($hit = $result->fetch_assoc()) {
@@ -203,43 +138,13 @@ class manticoresearch extends engine {
         return $res;
     }
 
-    private function parseHTTPResult($curlResult) {
-        $res = [];
-        if ($curlResult and $curlResult = @json_decode($curlResult) and isset($curlResult->hits->hits)) {
-            foreach ($curlResult->hits->hits as $hit) {
-//              $ar = ['id' => $hit->_id];
-                $ar = [];
-                foreach ($hit->_source as $k=>$v) {
-                    if ($k == 'id') continue; // removing id from the output sice Elasticsearch can't return it https://github.com/elastic/elasticsearch/issues/30266
-                    if (is_float($v)) $v = round($v, 4); // this is a workaround against different floating point calculations in different engines
-                    if (is_array($v)) $v = implode(',',$v);
-                    $ar[$k] = $v;
-                }
-                ksort($ar);
-                $res[] = $ar;
-            }
-        }
-        return $res;
-    }
-
     // sends a command to engine to drop its caches
     protected function dropEngineCache() {
         if (!$this->shouldDropCache()) {
             return;
         }
 
-        if (@self::$commandLineArguments['http']) {
-            if ($this->curl) {
-                curl_setopt($this->curl, CURLOPT_POSTFIELDS,
-                    'query=' . urlencode('DROP CACHE'));
-                curl_exec($this->curl);
-            }
-            return;
-        }
-
-        if ($this->mysql) {
-            $this->mysql->query('DROP CACHE');
-        }
+        $this->mysql->query('DROP CACHE');
     }
 
     private function shouldDropCache(): bool
