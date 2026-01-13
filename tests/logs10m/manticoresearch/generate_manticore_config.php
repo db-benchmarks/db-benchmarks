@@ -10,6 +10,11 @@ if ( ! isset($options['test'])) {
 
 $test = $options['test'];
 $type    = $options['type'];
+$reportedVersion = getenv('MANTICORE_REPORTED_VERSION') ?: '';
+$disableCachesInConfig = true;
+if ($reportedVersion && version_compare($reportedVersion, '17.0.0', '>=')) {
+    $disableCachesInConfig = false;
+}
 
 echo "
 source $test
@@ -42,8 +47,16 @@ searchd
         listen = 9306:mysql
         listen = 9308:http
         pid_file = /var/run/manticore/searchd.pid
+";
+
+if ($disableCachesInConfig) {
+    echo "
         qcache_max_bytes = 0
         docstore_cache_size = 0
+";
+}
+
+echo "
         " . (strstr($type, '_ps0') ? "pseudo_sharding = 0" : "") . "
 	binlog_path = /tmp/
         secondary_indexes = 1

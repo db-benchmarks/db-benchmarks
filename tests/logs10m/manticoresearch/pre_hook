@@ -8,6 +8,16 @@ fi
 
 docker compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
+cat "" > manticoresearch/manticore$suffix.conf
+
+if [ -z "$MANTICORE_REPORTED_VERSION" ]; then
+  MANTICORE_REPORTED_VERSION=$(
+    docker compose -f ../../docker-compose.yml --env-file ../../.env \
+      run --rm --no-deps manticoresearch searchd --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1
+  )
+  export MANTICORE_REPORTED_VERSION
+fi
+echo "Manticore version: $MANTICORE_REPORTED_VERSION"
 php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
 mkdir -p manticoresearch/idx$suffix/data/binlog
 chmod 777 manticoresearch/idx$suffix/data/binlog
