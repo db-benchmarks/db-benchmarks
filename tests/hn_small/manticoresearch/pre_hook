@@ -9,7 +9,7 @@ fi
 docker compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
 
-cat "" > manticoresearch/manticore$suffix.conf
+echo "" > manticoresearch/manticore$suffix.conf
 
 if [ -z "$MANTICORE_REPORTED_VERSION" ]; then
   MANTICORE_REPORTED_VERSION=$(
