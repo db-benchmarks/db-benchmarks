@@ -41,16 +41,6 @@
         "engine": "manticoresearch:rowwise",
         "memory": 110000,
         "idx_folder": "idx_rowwise"
-      },
-      {
-        "engine": "manticoresearch:columnar",
-        "memory": 1024,
-        "idx_folder": "idx_columnar"
-      },
-      {
-        "engine": "manticoresearch:rowwise",
-        "memory": 1024,
-        "idx_folder": "idx_rowwise"
       }
     ],
     "logs10m": [
