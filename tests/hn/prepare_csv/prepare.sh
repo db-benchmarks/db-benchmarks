@@ -2,6 +2,6 @@
 
 cd "$(dirname "$0")"
 [ -f "../data/data.csv" ] && echo "The csv is already prepared, no need to rebuild" && exit 0
-docker build --force-rm -t test_engines_hn_prepare_csv -f Dockerfile_prepare_csv . \
+docker build --load --force-rm -t test_engines_hn_prepare_csv -f Dockerfile_prepare_csv . \
 && docker run -v `pwd`/../data:/data test_engines_hn_prepare_csv
 
