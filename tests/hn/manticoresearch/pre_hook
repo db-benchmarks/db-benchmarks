@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
 echo -e "Manticore Search (type $suffix):"
-if [ -f manticoresearch/idx$suffix/$test.*sph ]; then
-  echo -e "${COLORED}\tNo need to rebuild${NC}"
-  exit 10
-fi
 
 docker compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
@@ -21,6 +17,11 @@ fi
 echo "Manticore version: $MANTICORE_REPORTED_VERSION"
 
 php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
+
+if [ -f manticoresearch/idx$suffix/$test.*sph ]; then
+  echo -e "${COLORED}\tNo need to rebuild${NC}"
+  exit 10
+fi
 
 # Source local hook if it exists
 if [ -f ../../local_hooks/hn_hook.sh ]; then
