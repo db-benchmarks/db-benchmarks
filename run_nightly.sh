@@ -18,9 +18,9 @@ run_test() {
 
     echo "$(date): Starting ${tag} tests" >> "$temp_log"
     if [ "$tag" = "dev" ]; then
-        ./nightly_manticore.sh -s >> "$temp_log" 2>&1
+        ./nightly_manticore.sh -k >> "$temp_log" 2>&1
     else
-        ./nightly_manticore.sh -t "$tag" -s >> "$temp_log" 2>&1
+        ./nightly_manticore.sh -t "$tag" -k >> "$temp_log" 2>&1
     fi
     local exit_code=$?
 

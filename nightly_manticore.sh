@@ -14,17 +14,23 @@ fi
 # Parse command line arguments
 TAG="dev"
 SKIP_INIT=false
-while getopts "t:s" opt; do
+KEEP_INDEXES=false
+while getopts "t:sk" opt; do
   case $opt in
     t) TAG="$OPTARG" ;;
     s) SKIP_INIT=true ;;
-    *) echo "Usage: $0 [-t tag] [-s]" >&2; echo "  -t tag: specify tag (dev or latest)" >&2; echo "  -s: skip initialization (reuse existing indexes)" >&2; exit 1 ;;
+    k) KEEP_INDEXES=true ;;
+    *) echo "Usage: $0 [-t tag] [-s] [-k]" >&2; echo "  -t tag: specify tag (dev or latest)" >&2; echo "  -s: skip initialization (reuse existing indexes)" >&2; echo "  -k: keep existing indexes when running init (do not remove idx folders)" >&2; exit 1 ;;
   esac
 done
 
 # Validate tag
 if [[ "$TAG" != "dev" && "$TAG" != "latest" ]]; then
   script_log "error" "Invalid tag: $TAG. Must be 'dev' or 'latest'."
+  exit 1
+fi
+if [[ "$SKIP_INIT" = true && "$KEEP_INDEXES" = true ]]; then
+  script_log "error" "-k cannot be used with -s (init is skipped, so indexes are not removed anyway)."
   exit 1
 fi
 
@@ -225,9 +231,13 @@ for TEST in "${unique_tests[@]}"; do
         idx_folder="idx"  # fallback
       fi
 
-      # Remove idx folder to force re-indexing
-      script_log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
-      rm -rf "manticoresearch/$idx_folder"
+      if [ "$KEEP_INDEXES" = true ]; then
+        script_log "info" "Keeping $idx_folder folder for $TEST engine $init_engine..."
+      else
+        # Remove idx folder to force re-indexing
+        script_log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
+        rm -rf "manticoresearch/$idx_folder"
+      fi
 
       # Run init
       script_log "info" "Running init for $TEST with engine $init_engine..."
