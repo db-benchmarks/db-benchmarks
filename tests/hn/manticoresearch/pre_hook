@@ -5,9 +5,8 @@ echo -e "Manticore Search (type $suffix):"
 docker compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
 
-echo "" > manticoresearch/manticore$suffix.conf
-
 if [ -z "$MANTICORE_REPORTED_VERSION" ]; then
+  echo "" > manticoresearch/manticore$suffix.conf
   MANTICORE_REPORTED_VERSION=$(
     docker compose -f ../../docker-compose.yml --env-file ../../.env \
       run --rm --no-deps manticoresearch searchd --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1
