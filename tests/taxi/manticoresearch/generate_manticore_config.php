@@ -262,12 +262,12 @@ if ($disableCachesInConfig) {
     echo "
         qcache_max_bytes = 0
         docstore_cache_size = 0
+        skiplist_cache_size = 0
 ";
 }
 
 echo "
 	binlog_path = /tmp/ # this doesn't disable binary logging, just leaves the log inside container to make each test run independent
-        secondary_indexes = 1
 }
 
 ";
