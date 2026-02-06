@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+echo -en "\tStarting loading at "
+date
+batch_rows="${MANTICORE_BATCH_ROWS:-100}"
+batch_bytes="${MANTICORE_BATCH_BYTES:-200000}"
+query_timeout="${MANTICORE_QUERY_TIMEOUT:-600}"
+
+count_cores_from_cpuset() {
+  local spec="$1"
+  spec=$(echo "$spec" | tr -d " \"'\r\n")
+  if [ -z "$spec" ]; then
+    echo "0"
+    return 0
+  fi
+
+  local total=0
+  local part
+  local -a parts
+  IFS=',' read -r -a parts <<< "$spec"
+  for part in "${parts[@]}"; do
+    if [[ "$part" == *-* ]]; then
+      local start="${part%-*}"
+      local end="${part#*-}"
+      if [[ "$start" =~ ^[0-9]+$ ]] && [[ "$end" =~ ^[0-9]+$ ]] && (( end >= start )); then
+        total=$(( total + (end - start + 1) ))
+      fi
+    else
+      if [[ "$part" =~ ^[0-9]+$ ]]; then
+        total=$(( total + 1 ))
+      fi
+    fi
+  done
+  echo "$total"
+}
+
+detect_workers_from_env() {
+  local env_file="../../.env"
+  local cpuset=""
+  if [ -f "$env_file" ]; then
+    cpuset=$(
+      awk '
+        BEGIN{FS="="}
+        $0 ~ /^[[:space:]]*cpuset[[:space:]]*=/ {
+          sub(/^[[:space:]]*cpuset[[:space:]]*=[[:space:]]*/, "", $0);
+          sub(/[[:space:]]*#.*/, "", $0);
+          print $0;
+          exit
+        }
+      ' "$env_file" | tr -d " \"'\r\n"
+    )
+  fi
+
+  local cores
+  cores=$(count_cores_from_cpuset "$cpuset")
+  if [[ "$cores" =~ ^[0-9]+$ ]] && (( cores > 0 )); then
+    echo "$cores"
+    return 0
+  fi
+
+  if command -v nproc >/dev/null 2>&1; then
+    nproc
+    return 0
+  fi
+  if command -v sysctl >/dev/null 2>&1; then
+    sysctl -n hw.ncpu 2>/dev/null || true
+    return 0
+  fi
+  echo "1"
+}
+
+if [ -n "${MANTICORE_WORKERS:-}" ]; then
+  workers="${MANTICORE_WORKERS}"
+else
+  workers="$(detect_workers_from_env)"
+fi
+
+echo -e "\tWorkers: $workers"
+php manticoresearch/load_rt.php --test="$test" --batch_rows="$batch_rows" --batch_bytes="$batch_bytes" --query_timeout="$query_timeout" --workers="$workers"
