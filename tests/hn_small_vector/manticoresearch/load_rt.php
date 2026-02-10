@@ -13,6 +13,10 @@ final class HnSmallVectorRtLoader
     private const DEFAULT_QUERY_TIMEOUT_SEC = 600;
     private const DEFAULT_CONNECT_TIMEOUT_SEC = 10;
 
+    private static string $runId = '';
+    private static string $logDir = '';
+    private static string $logFile = '';
+
     public static function main(array $argv): int
     {
         $options = getopt('', [
@@ -24,7 +28,8 @@ final class HnSmallVectorRtLoader
             'batch_rows::',
             'query_timeout::',
             'max_rows::',
-            'workers::'
+            'workers::',
+            'log_dir::'
         ]);
         $test = $options['test'] ?? getenv('test') ?: '';
         if ($test === '') {
@@ -33,10 +38,14 @@ final class HnSmallVectorRtLoader
         }
 
         $rootDir = dirname(__DIR__); // tests/<test>
+        self::initRunLogger(
+            $rootDir,
+            (string)($options['log_dir'] ?? getenv('MANTICORE_LOAD_LOG_DIR') ?: '')
+        );
         $csvPath = $options['csv'] ?? ($rootDir . '/data/data.csv');
         $csvReal = realpath($csvPath);
         if ($csvReal === false || !is_file($csvReal)) {
-            fwrite(STDERR, "CSV not found: $csvPath\n");
+            self::logLine("ERROR: CSV not found: $csvPath", true);
             return 2;
         }
 
@@ -68,6 +77,8 @@ final class HnSmallVectorRtLoader
             return 2;
         }
 
+        self::logLine("Starting load: test=$test host=$host port=$port workers=$workers csv=$csvReal log_dir=" . self::$logDir, false);
+
         $mysql = new mysqli();
         mysqli_report(MYSQLI_REPORT_OFF);
         $mysql->options(MYSQLI_OPT_CONNECT_TIMEOUT, self::DEFAULT_CONNECT_TIMEOUT_SEC);
@@ -75,7 +86,7 @@ final class HnSmallVectorRtLoader
         @ini_set('mysqlnd.net_read_timeout', (string)$queryTimeoutSec);
         @$mysql->real_connect($host, '', '', '', $port);
         if ($mysql->connect_error) {
-            fwrite(STDERR, "MySQL connect error: {$mysql->connect_error}\n");
+            self::logLine("ERROR: MySQL connect error: {$mysql->connect_error}", true);
             return 1;
         }
 
@@ -102,15 +113,17 @@ final class HnSmallVectorRtLoader
 
         fwrite(STDOUT, "Loading $csvReal into RT table `$test` with $workers workers (auto-embeddings from `comment_text`)\n");
         fflush(STDOUT);
+        self::logLine("Forking $workers workers", false);
 
         $pids = [];
         for ($workerId = 0; $workerId < $workers; $workerId++) {
             $pid = pcntl_fork();
             if ($pid === -1) {
-                fwrite(STDERR, "Failed to fork worker $workerId\n");
+                self::logLine("ERROR: Failed to fork worker $workerId", true);
                 return 1;
             }
             if ($pid === 0) {
+                self::initWorkerLogger($workerId);
                 $res = self::loadPartition(
                     $test,
                     $csvReal,
@@ -134,20 +147,59 @@ final class HnSmallVectorRtLoader
             if (pcntl_wifexited($status)) {
                 $code = pcntl_wexitstatus($status);
                 if ($code !== 0) {
-                    fwrite(STDERR, "Worker $workerId exited with code $code\n");
+                    self::logLine("ERROR: Worker $workerId exited with code $code", true);
                     $exitCode = 1;
                 }
             } else {
-                fwrite(STDERR, "Worker $workerId terminated abnormally\n");
+                self::logLine("ERROR: Worker $workerId terminated abnormally", true);
                 $exitCode = 1;
             }
         }
 
         if ($exitCode === 0) {
             fwrite(STDOUT, "Done. All workers completed.\n");
+            self::logLine("Done. All workers completed.", false);
         }
 
         return $exitCode;
+    }
+
+    private static function initRunLogger(string $rootDir, string $logDirOpt): void
+    {
+        self::$runId = date('Ymd_His') . '_pid' . getmypid();
+
+        $dir = trim($logDirOpt);
+        if ($dir === '') {
+            $dir = $rootDir . '/manticoresearch';
+        }
+        self::$logDir = $dir;
+        @mkdir($dir, 0777, true);
+
+        self::$logFile = rtrim($dir, '/') . '/load_rt_' . self::$runId . '.log';
+        self::logLine('Log file: ' . self::$logFile, false);
+    }
+
+    private static function initWorkerLogger(int $workerId): void
+    {
+        $base = rtrim(self::$logDir, '/');
+        self::$logFile = $base . '/load_rt_' . self::$runId . '_w' . $workerId . '_pid' . getmypid() . '.log';
+        self::logLine('Worker log file: ' . self::$logFile, false);
+    }
+
+    private static function logLine(string $message, bool $alsoStdout): void
+    {
+        $prefix = '[' . date('c') . ' pid=' . getmypid() . '] ';
+        $line = $prefix . rtrim($message, "\n") . "\n";
+        if (self::$logFile !== '') {
+            @file_put_contents(self::$logFile, $line, FILE_APPEND);
+        }
+        if ($alsoStdout) {
+            fwrite(STDOUT, rtrim($message, "\n") . "\n");
+            if (self::$logFile !== '') {
+                fwrite(STDOUT, "See log: " . self::$logFile . "\n");
+            }
+            fflush(STDOUT);
+        }
     }
 
     private static function createTableSql(string $test): string
@@ -214,8 +266,8 @@ final class HnSmallVectorRtLoader
         if ($ok === false) {
             $err = $mysql->error ?: 'unknown error';
             $errno = $mysql->errno;
-            fwrite(STDERR, "SQL failed (errno=$errno): $err\n");
-            fwrite(STDERR, "SQL: $sql\n");
+            self::logLine("ERROR: SQL failed (errno=$errno): $err", true);
+            self::logLine("SQL: $sql", false);
             exit(1);
         }
     }
@@ -242,7 +294,7 @@ final class HnSmallVectorRtLoader
         @ini_set('mysqlnd.net_read_timeout', (string)$queryTimeoutSec);
         @$mysql->real_connect($host, '', '', '', $port);
         if ($mysql->connect_error) {
-            fwrite(STDERR, "[w$workerId] MySQL connect error: {$mysql->connect_error}\n");
+            self::logLine("[w$workerId] ERROR: MySQL connect error: {$mysql->connect_error}", true);
             return ['exitCode' => 1];
         }
 
@@ -265,7 +317,7 @@ final class HnSmallVectorRtLoader
 
         $handle = fopen($csvReal, 'rb');
         if ($handle === false) {
-            fwrite(STDERR, "[w$workerId] Failed to open CSV: $csvReal\n");
+            self::logLine("[w$workerId] ERROR: Failed to open CSV: $csvReal", true);
             return ['exitCode' => 1];
         }
 
@@ -283,9 +335,9 @@ final class HnSmallVectorRtLoader
             }
 
             if (count($row) !== self::EXPECTED_COLUMNS) {
-                fwrite(
-                    STDERR,
-                    "[w$workerId] Unexpected CSV columns at record $recordNo: got " . count($row) . ", expected " . self::EXPECTED_COLUMNS . "\n"
+                self::logLine(
+                    "[w$workerId] ERROR: Unexpected CSV columns at record $recordNo: got " . count($row) . ", expected " . self::EXPECTED_COLUMNS,
+                    true
                 );
                 fclose($handle);
                 return ['exitCode' => 1];
