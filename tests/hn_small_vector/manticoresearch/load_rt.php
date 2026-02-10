@@ -349,11 +349,15 @@ final class HnSmallVectorRtLoader
             if ($pending > 0 && (($sqlBytes + $chunkBytes) >= $maxSqlBytes || $pending >= $maxRowsPerBatch)) {
                 $batches++;
                 $batchStartedAt = microtime(true);
-                fwrite(STDOUT, ($workers === 1 ? "  " : "[w$workerId] ") . "executing batch $batches (rows=$pending bytes=$sqlBytes)\n");
+                $line = ($workers === 1 ? "  " : "[w$workerId] ") . "executing batch $batches (rows=$pending bytes=$sqlBytes)";
+                fwrite(STDOUT, $line . "\n");
+                self::logLine($line, false);
                 fflush(STDOUT);
                 self::exec($mysql, $sql);
                 $batchElapsed = microtime(true) - $batchStartedAt;
-                fwrite(STDOUT, ($workers === 1 ? "  " : "[w$workerId] ") . "finished batch $batches (sec=" . number_format($batchElapsed, 3, '.', '') . ")\n");
+                $line = ($workers === 1 ? "  " : "[w$workerId] ") . "finished batch $batches (sec=" . number_format($batchElapsed, 3, '.', '') . ")";
+                fwrite(STDOUT, $line . "\n");
+                self::logLine($line, false);
                 fflush(STDOUT);
                 $sql = $insertPrefix;
                 $sqlBytes = strlen($sql);
@@ -369,7 +373,9 @@ final class HnSmallVectorRtLoader
             if (($rows % 10000) === 0) {
                 $elapsed = microtime(true) - $startedAt;
                 $rate = $elapsed > 0 ? (int)round($rows / $elapsed) : 0;
-                fwrite(STDOUT, ($workers === 1 ? "  " : "[w$workerId] ") . "queued: $rows (rows/s: $rate)\n");
+                $line = ($workers === 1 ? "  " : "[w$workerId] ") . "queued: $rows (rows/s: $rate)";
+                fwrite(STDOUT, $line . "\n");
+                self::logLine($line, false);
                 fflush(STDOUT);
             }
         }
@@ -378,17 +384,23 @@ final class HnSmallVectorRtLoader
         if ($pending > 0) {
             $batches++;
             $batchStartedAt = microtime(true);
-            fwrite(STDOUT, ($workers === 1 ? "  " : "[w$workerId] ") . "executing batch $batches (rows=$pending bytes=$sqlBytes)\n");
+            $line = ($workers === 1 ? "  " : "[w$workerId] ") . "executing batch $batches (rows=$pending bytes=$sqlBytes)";
+            fwrite(STDOUT, $line . "\n");
+            self::logLine($line, false);
             fflush(STDOUT);
             self::exec($mysql, $sql);
             $batchElapsed = microtime(true) - $batchStartedAt;
-            fwrite(STDOUT, ($workers === 1 ? "  " : "[w$workerId] ") . "finished batch $batches (sec=" . number_format($batchElapsed, 3, '.', '') . ")\n");
+            $line = ($workers === 1 ? "  " : "[w$workerId] ") . "finished batch $batches (sec=" . number_format($batchElapsed, 3, '.', '') . ")";
+            fwrite(STDOUT, $line . "\n");
+            self::logLine($line, false);
             fflush(STDOUT);
         }
 
         $elapsed = microtime(true) - $startedAt;
         $rate = $elapsed > 0 ? (int)round($rows / $elapsed) : 0;
-        fwrite(STDOUT, ($workers === 1 ? "" : "[w$workerId] ") . "Done. Inserted $rows rows (rows/s: $rate)\n");
+        $line = ($workers === 1 ? "" : "[w$workerId] ") . "Done. Inserted $rows rows (rows/s: $rate)";
+        fwrite(STDOUT, $line . "\n");
+        self::logLine($line, false);
         fflush(STDOUT);
 
         return ['exitCode' => 0];
