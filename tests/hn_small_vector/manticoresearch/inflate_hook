@@ -6,6 +6,24 @@ batch_rows="${MANTICORE_BATCH_ROWS:-100}"
 batch_bytes="${MANTICORE_BATCH_BYTES:-200000}"
 query_timeout="${MANTICORE_QUERY_TIMEOUT:-600}"
 
+read_env_value() {
+  local env_file="$1"
+  local key="$2"
+  if [ ! -f "$env_file" ]; then
+    return 0
+  fi
+  awk -v k="$key" '
+    BEGIN{FS="="}
+    $0 ~ "^[[:space:]]*" k "[[:space:]]*=" {
+      sub(/^[[:space:]]*[^=]+[[:space:]]*=[[:space:]]*/, "", $0);
+      sub(/[[:space:]]*#.*/, "", $0);
+      gsub(/^[\"'\\'' ]+|[\"'\\'' ]+$/, "", $0);
+      print $0;
+      exit
+    }
+  ' "$env_file"
+}
+
 count_cores_from_cpuset() {
   local spec="$1"
   spec=$(echo "$spec" | tr -d " \"'\r\n")
@@ -76,4 +94,15 @@ else
 fi
 
 echo -e "\tWorkers: $workers"
-php manticoresearch/load_rt.php --test="$test" --batch_rows="$batch_rows" --batch_bytes="$batch_bytes" --query_timeout="$query_timeout" --workers="$workers"
+
+env_file="../../.env"
+manticore_host="${MANTICORE_HOST:-127.0.0.1}"
+manticore_port="${MANTICORE_MYSQL_PORT:-}"
+if [ -z "$manticore_port" ]; then
+  manticore_port="$(read_env_value "$env_file" "MANTICORE_MYSQL_PORT")"
+fi
+if [ -z "$manticore_port" ]; then
+  manticore_port="9306"
+fi
+
+php manticoresearch/load_rt.php --test="$test" --host="$manticore_host" --port="$manticore_port" --batch_rows="$batch_rows" --batch_bytes="$batch_bytes" --query_timeout="$query_timeout" --workers="$workers"
