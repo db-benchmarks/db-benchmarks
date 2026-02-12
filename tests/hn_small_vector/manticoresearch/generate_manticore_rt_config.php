@@ -22,8 +22,9 @@ searchd {
 
 if ($disableCachesInConfig) {
     echo "
-        qcache_max_bytes = 0
-        docstore_cache_size = 0
+	    qcache_max_bytes = 0
+   		docstore_cache_size = 0
+		skiplist_cache_size = 0
 ";
 }
 
