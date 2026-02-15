@@ -108,4 +108,15 @@ fi
 
 echo -e "\tEnv file: $env_file"
 echo -e "\tManticore MySQL (resolved): $manticore_host:$manticore_port"
-php manticoresearch/load_rt.php --test="$test" --host="$manticore_host" --port="$manticore_port" --batch_rows="$batch_rows" --batch_bytes="$batch_bytes" --query_timeout="$query_timeout" --workers="$workers"
+
+extra_args=()
+if [ -n "${MANTICORE_RESUME:-}" ]; then
+  echo -e "\tResume: skip DDL + skip existing ids"
+  extra_args+=(--skip_ddl --skip_existing)
+fi
+if [ -n "${MANTICORE_MAX_ID:-}" ]; then
+  extra_args+=(--max_id="$MANTICORE_MAX_ID")
+fi
+
+# Merge stderr into stdout so `init` output always contains PHP fatals / warnings.
+php manticoresearch/load_rt.php --test="$test" --host="$manticore_host" --port="$manticore_port" --batch_rows="$batch_rows" --batch_bytes="$batch_bytes" --query_timeout="$query_timeout" --workers="$workers" "${extra_args[@]}" 2>&1

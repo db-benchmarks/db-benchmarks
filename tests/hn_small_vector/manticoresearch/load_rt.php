@@ -7,11 +7,15 @@ final class HnSmallVectorRtLoader
     private const DEFAULT_HOST = '127.0.0.1';
     private const DEFAULT_PORT = 9306;
     private const EXPECTED_COLUMNS = 10;
+    private const DEFAULT_MAX_ID_FALLBACK = 1_200_000;
     private const DEFAULT_MODEL = 'sentence-transformers/all-MiniLM-L6-v2';
     private const DEFAULT_MAX_SQL_BYTES = 200_000; // keep small: auto-embeddings can make first batch very slow
     private const DEFAULT_MAX_ROWS_PER_BATCH = 200;
     private const DEFAULT_QUERY_TIMEOUT_SEC = 600;
     private const DEFAULT_CONNECT_TIMEOUT_SEC = 10;
+
+    private static string $existingIdBitset = '';
+    private static int $existingMaxId = 0;
 
     public static function main(array $argv): int
     {
@@ -24,7 +28,14 @@ final class HnSmallVectorRtLoader
             'batch_rows::',
             'query_timeout::',
             'max_rows::',
-            'workers::'
+            'workers::',
+            'skip_ddl',
+            'skip_existing',
+            'no_skip_existing',
+            'max_id::',
+            'mode::',
+            'total_workers::',
+            'worker_id::'
         ]);
         $test = $options['test'] ?? getenv('test') ?: '';
         if ($test === '') {
@@ -47,6 +58,12 @@ final class HnSmallVectorRtLoader
         $queryTimeoutSec = (int)($options['query_timeout'] ?? getenv('MANTICORE_QUERY_TIMEOUT') ?: self::DEFAULT_QUERY_TIMEOUT_SEC);
         $maxRowsTotal = (int)($options['max_rows'] ?? 0);
         $workers = (int)($options['workers'] ?? getenv('MANTICORE_WORKERS') ?: 1);
+        $skipDdl = array_key_exists('skip_ddl', $options);
+        $skipExisting = !array_key_exists('no_skip_existing', $options);
+        $maxId = (int)($options['max_id'] ?? getenv('MANTICORE_MAX_ID') ?: 0);
+        $mode = (string)($options['mode'] ?? 'insert');
+        $totalWorkersOpt = isset($options['total_workers']) ? (int)$options['total_workers'] : null;
+        $workerIdOpt = isset($options['worker_id']) ? (int)$options['worker_id'] : null;
         if ($maxSqlBytes < 100_000) {
             fwrite(STDOUT, "batch_bytes too small: $maxSqlBytes\n");
             return 2;
@@ -67,6 +84,29 @@ final class HnSmallVectorRtLoader
             fwrite(STDOUT, "workers too small: $workers\n");
             return 2;
         }
+        if ($mode !== 'insert' && $mode !== 'replace') {
+            fwrite(STDOUT, "mode must be insert|replace, got: $mode\n");
+            return 2;
+        }
+        if ($skipExisting && $maxId < 1) {
+            $maxId = self::detectMaxIdFromCsv($csvReal);
+            if ($maxId < 1) {
+                $maxId = self::DEFAULT_MAX_ID_FALLBACK;
+                fwrite(STDOUT, "WARNING: couldn't detect max id from CSV, falling back to max_id=$maxId\n");
+            } else {
+                fwrite(STDOUT, "Detected max_id from CSV: $maxId\n");
+            }
+        }
+        if ($workerIdOpt !== null) {
+            if ($totalWorkersOpt === null || $totalWorkersOpt < 1) {
+                fwrite(STDOUT, "worker_id requires --total_workers\n");
+                return 2;
+            }
+            if ($workerIdOpt < 0 || $workerIdOpt >= $totalWorkersOpt) {
+                fwrite(STDOUT, "worker_id out of range: $workerIdOpt for total_workers=$totalWorkersOpt\n");
+                return 2;
+            }
+        }
         fwrite(STDOUT, "Starting load: test=$test host=$host port=$port workers=$workers csv=$csvReal\n");
         fflush(STDOUT);
 
@@ -83,11 +123,41 @@ final class HnSmallVectorRtLoader
         }
         fwrite(STDOUT, "Connected.\n");
 
-        self::exec($mysql, "DROP TABLE IF EXISTS `$test`", 'drop');
+        if (!$skipDdl && $workerIdOpt === null) {
+            self::exec($mysql, "DROP TABLE IF EXISTS `$test`", 'drop');
 
-        $create = self::createTableSql($test);
-        self::exec($mysql, $create, 'create');
-        self::debugAfterCreate($mysql, $test);
+            $create = self::createTableSql($test);
+            self::exec($mysql, $create, 'create');
+            self::debugAfterCreate($mysql, $test);
+        } elseif ($workerIdOpt === null) {
+            fwrite(STDOUT, "Skipping DDL as requested (--skip_ddl)\n");
+        }
+
+        if ($skipExisting) {
+            self::existingInit($mysql, $test, $maxId);
+        }
+
+        if ($workerIdOpt !== null) {
+            $totalWorkers = (int)$totalWorkersOpt;
+            $workerId = (int)$workerIdOpt;
+            fwrite(STDOUT, "Single-worker mode: worker_id=$workerId total_workers=$totalWorkers mode=$mode skip_ddl=" . ($skipDdl ? 'yes' : 'no') . "\n");
+            fflush(STDOUT);
+            $result = self::loadPartition(
+                $test,
+                $csvReal,
+                $host,
+                $port,
+                $maxSqlBytes,
+                $maxRowsPerBatch,
+                $queryTimeoutSec,
+                $maxRowsTotal,
+                $totalWorkers,
+                $workerId,
+                $mode,
+                $skipExisting
+            );
+            return $result['exitCode'];
+        }
 
         if ($workers === 1) {
             $result = self::loadPartition(
@@ -100,7 +170,9 @@ final class HnSmallVectorRtLoader
                 $queryTimeoutSec,
                 $maxRowsTotal,
                 1,
-                0
+                0,
+                $mode,
+                $skipExisting
             );
             return $result['exitCode'];
         }
@@ -124,14 +196,16 @@ final class HnSmallVectorRtLoader
                     $host,
                     $port,
                     $maxSqlBytes,
-                    $maxRowsPerBatch,
-                    $queryTimeoutSec,
-                    $maxRowsTotal,
-                    $workers,
-                    $workerId
-                );
-                exit($res['exitCode']);
-            }
+                $maxRowsPerBatch,
+                $queryTimeoutSec,
+                $maxRowsTotal,
+                $workers,
+                $workerId,
+                $mode,
+                $skipExisting
+            );
+            exit($res['exitCode']);
+        }
             $pids[$pid] = $workerId;
         }
 
@@ -221,9 +295,11 @@ final class HnSmallVectorRtLoader
         if ($ok === false) {
             $err = $mysql->error ?: 'unknown error';
             $errno = $mysql->errno;
+            $sqlstate = @$mysql->sqlstate ?: '';
             $sqlPrefix = substr(preg_replace('/\\s+/', ' ', trim($sql)), 0, 200);
-            fwrite(STDOUT, "ERROR: SQL failed ($context) (errno=$errno): $err\n");
+            fwrite(STDOUT, "ERROR: SQL failed ($context) (errno=$errno sqlstate=$sqlstate): $err\n");
             fwrite(STDOUT, "ERROR: SQL prefix: $sqlPrefix\n");
+            fflush(STDOUT);
             exit(1);
         }
     }
@@ -257,6 +333,94 @@ final class HnSmallVectorRtLoader
         fwrite(STDOUT, "Debug: SHOW TABLES rows=" . count($tables) . " contains `$test`=$has\n");
     }
 
+    private static function existingInit(mysqli $mysql, string $test, int $maxId): void
+    {
+        $probe = $mysql->query("SELECT id FROM `$test` LIMIT 1 OPTION max_matches=1");
+        if ($probe === false) {
+            $err = $mysql->error ?: 'unknown error';
+            fwrite(STDOUT, "ERROR: failed to probe existing ids: $err\n");
+            exit(1);
+        }
+        if ($probe->fetch_row() === null) {
+            $probe->free();
+            fwrite(STDOUT, "Resume: table is empty, nothing to skip\n");
+            fflush(STDOUT);
+            self::$existingIdBitset = '';
+            self::$existingMaxId = 0;
+            return;
+        }
+        $probe->free();
+
+        self::$existingMaxId = $maxId;
+        $bytes = intdiv(($maxId + 8), 8);
+        self::$existingIdBitset = str_repeat("\0", $bytes);
+
+        fwrite(STDOUT, "Resume: loading existing ids into bitset (max_id=$maxId)\n");
+        fflush(STDOUT);
+
+        $rangeSize = 50_000;
+        $limit = $rangeSize;
+        $totalMarked = 0;
+
+        for ($start = 1; $start <= $maxId; $start += $rangeSize) {
+            $end = min($maxId, $start + $rangeSize - 1);
+            $sql = "SELECT id FROM `$test` WHERE id >= $start AND id <= $end LIMIT $limit OPTION max_matches=$limit";
+            $res = $mysql->query($sql);
+            if ($res === false) {
+                $err = $mysql->error ?: 'unknown error';
+                fwrite(STDOUT, "ERROR: failed to load existing ids (start=$start end=$end): $err\n");
+                exit(1);
+            }
+            while (($row = $res->fetch_row()) !== null) {
+                $id = isset($row[0]) ? (int)$row[0] : 0;
+                if ($id > 0 && $id <= $maxId && !self::existingHas($id)) {
+                    self::existingSet($id);
+                    $totalMarked++;
+                }
+            }
+            $res->free();
+        }
+
+        fwrite(STDOUT, "Resume: loaded $totalMarked existing ids\n");
+        fflush(STDOUT);
+    }
+
+    private static function detectMaxIdFromCsv(string $csvReal): int
+    {
+        $handle = fopen($csvReal, 'rb');
+        if ($handle === false) {
+            return 0;
+        }
+        $maxId = 0;
+        while (($row = fgetcsv($handle, 0, ',', '"', '')) !== false) {
+            if ($row === [null] || !isset($row[0])) {
+                continue;
+            }
+            $id = (int)$row[0];
+            if ($id > $maxId) {
+                $maxId = $id;
+            }
+        }
+        fclose($handle);
+        return $maxId;
+    }
+
+    private static function existingHas(int $id): bool
+    {
+        if ($id <= 0 || $id > self::$existingMaxId || self::$existingIdBitset === '') return false;
+        $byteIndex = intdiv($id, 8);
+        $mask = 1 << ($id % 8);
+        return ((ord(self::$existingIdBitset[$byteIndex]) & $mask) !== 0);
+    }
+
+    private static function existingSet(int $id): void
+    {
+        $byteIndex = intdiv($id, 8);
+        $mask = 1 << ($id % 8);
+        $byte = ord(self::$existingIdBitset[$byteIndex]);
+        self::$existingIdBitset[$byteIndex] = chr($byte | $mask);
+    }
+
     /**
      * @return array{exitCode:int}
      */
@@ -270,7 +434,9 @@ final class HnSmallVectorRtLoader
         int $queryTimeoutSec,
         int $maxRowsTotal,
         int $workers,
-        int $workerId
+        int $workerId,
+        string $mode,
+        bool $skipExisting
     ): array {
         $mysql = new mysqli();
         mysqli_report(MYSQLI_REPORT_OFF);
@@ -287,7 +453,8 @@ final class HnSmallVectorRtLoader
         fwrite(STDOUT, $prefix . "Connected.\n");
 
         $columns = '(`id`,`story_id`,`story_text`,`story_author`,`comment_id`,`comment_text`,`comment_author`,`comment_ranking`,`author_comment_count`,`story_comment_count`)';
-        $insertPrefix = "INSERT INTO `$test` $columns VALUES ";
+        $verb = ($mode === 'replace') ? 'REPLACE' : 'INSERT';
+        $insertPrefix = "$verb INTO `$test` $columns VALUES ";
 
         $rows = 0;
         $batches = 0;
@@ -328,6 +495,11 @@ final class HnSmallVectorRtLoader
                 fwrite(STDOUT, "[w$workerId] ERROR: Unexpected CSV columns at record $recordNo: got " . count($row) . ", expected " . self::EXPECTED_COLUMNS . "\n");
                 fclose($handle);
                 return ['exitCode' => 1];
+            }
+
+            $id = (int)$row[0];
+            if ($skipExisting && self::existingHas($id)) {
+                continue;
             }
 
             $values = self::rowToSqlValues($mysql, $row);
