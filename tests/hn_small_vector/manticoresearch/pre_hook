@@ -24,8 +24,12 @@ if [ -d "$rt_dir" ] && (
   [ -f "$rt_dir/$test.settings" ] ||
   ls -1 "$rt_dir/$test".*.sph >/dev/null 2>&1
 ); then
-  echo -e "\tNo need to rebuild"
-  exit 10
+  if [ -n "${MANTICORE_RESUME:-}" ] || [ -n "${MANTICORE_FORCE_INFLATE:-}" ]; then
+    echo -e "\tIndex exists; continuing due to MANTICORE_RESUME/MANTICORE_FORCE_INFLATE"
+  else
+    echo -e "\tNo need to rebuild"
+    exit 10
+  fi
 fi
 
 mkdir -p manticoresearch/idx$suffix/data/binlog
