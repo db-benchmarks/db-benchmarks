@@ -195,7 +195,14 @@ for TEST in "${unique_tests[@]}"; do
    # Prepare data for this test
     script_log "info" "Preparing data for $TEST..."
     cd "tests/$TEST"
-    if [ -f "./prepare_csv/prepare.sh" ]; then
+    if [ -f "./prepare_sql/prepare.sh" ]; then
+      ./prepare_sql/prepare.sh
+      if [ $? -ne 0 ]; then
+        script_log "error" "Couldn't prepare SQL for $TEST"
+        cd ../..
+        exit 1
+      fi
+    elif [ -f "./prepare_csv/prepare.sh" ]; then
       ./prepare_csv/prepare.sh
       if [ $? -ne 0 ]; then
         script_log "error" "Couldn't prepare CSV for $TEST"
@@ -203,7 +210,7 @@ for TEST in "${unique_tests[@]}"; do
         exit 1
       fi
     else
-      script_log "warning" "No prepare.sh found for $TEST, skipping prepare.sh."
+      script_log "warning" "No prepare.sh found for $TEST, skipping prepare step."
     fi
     cd ../..
 

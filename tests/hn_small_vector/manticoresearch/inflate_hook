@@ -1,122 +1,16 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
 
 echo -en "\tStarting loading at "
 date
-batch_rows="${MANTICORE_BATCH_ROWS:-100}"
-batch_bytes="${MANTICORE_BATCH_BYTES:-200000}"
-query_timeout="${MANTICORE_QUERY_TIMEOUT:-600}"
 
-read_env_value() {
-  local env_file="$1"
-  local key="$2"
-  if [ ! -f "$env_file" ]; then
-    return 0
-  fi
-  awk -v k="$key" '
-    BEGIN{FS="="}
-    $0 ~ "^[[:space:]]*" k "[[:space:]]*=" {
-      v=$0
-      sub(/^[^=]*=/, "", v)
-      sub(/[[:space:]]*#.*/, "", v)
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", v)
-      print v
-      exit
-    }
-  ' "$env_file" | tr -d " \"'\r\n"
-}
-
-count_cores_from_cpuset() {
-  local spec="$1"
-  spec=$(echo "$spec" | tr -d " \"'\r\n")
-  if [ -z "$spec" ]; then
-    echo "0"
-    return 0
-  fi
-
-  local total=0
-  local part
-  local -a parts
-  IFS=',' read -r -a parts <<< "$spec"
-  for part in "${parts[@]}"; do
-    if [[ "$part" == *-* ]]; then
-      local start="${part%-*}"
-      local end="${part#*-}"
-      if [[ "$start" =~ ^[0-9]+$ ]] && [[ "$end" =~ ^[0-9]+$ ]] && (( end >= start )); then
-        total=$(( total + (end - start + 1) ))
-      fi
-    else
-      if [[ "$part" =~ ^[0-9]+$ ]]; then
-        total=$(( total + 1 ))
-      fi
-    fi
-  done
-  echo "$total"
-}
-
-detect_workers_from_env() {
-  local env_file="../../.env"
-  local cpuset=""
-  if [ -f "$env_file" ]; then
-    cpuset=$(
-      awk '
-        BEGIN{FS="="}
-        $0 ~ /^[[:space:]]*cpuset[[:space:]]*=/ {
-          sub(/^[[:space:]]*cpuset[[:space:]]*=[[:space:]]*/, "", $0);
-          sub(/[[:space:]]*#.*/, "", $0);
-          print $0;
-          exit
-        }
-      ' "$env_file" | tr -d " \"'\r\n"
-    )
-  fi
-
-  local cores
-  cores=$(count_cores_from_cpuset "$cpuset")
-  if [[ "$cores" =~ ^[0-9]+$ ]] && (( cores > 0 )); then
-    echo "$cores"
-    return 0
-  fi
-
-  if command -v nproc >/dev/null 2>&1; then
-    nproc
-    return 0
-  fi
-  if command -v sysctl >/dev/null 2>&1; then
-    sysctl -n hw.ncpu 2>/dev/null || true
-    return 0
-  fi
-  echo "1"
-}
-
-if [ -n "${MANTICORE_WORKERS:-}" ]; then
-  workers="${MANTICORE_WORKERS}"
-else
-  workers="$(detect_workers_from_env)"
+dump_sql="data/hn_small_vector_dump.sql"
+if [ ! -s "$dump_sql" ]; then
+  echo -e "\tERROR: missing SQL dump: $dump_sql (run ./prepare_sql/prepare.sh or ./init)"
+  exit 1
 fi
 
-echo -e "\tWorkers: $workers"
-
-env_file="../../.env"
-manticore_host="${MANTICORE_HOST:-127.0.0.1}"
-manticore_port="${MANTICORE_MYSQL_PORT:-}"
-if [ -z "$manticore_port" ]; then
-  manticore_port="$(read_env_value "$env_file" "MANTICORE_MYSQL_PORT")"
-fi
-if [ -z "$manticore_port" ]; then
-  manticore_port="9306"
-fi
-
-echo -e "\tEnv file: $env_file"
-echo -e "\tManticore MySQL (resolved): $manticore_host:$manticore_port"
-
-extra_args=()
-if [ -n "${MANTICORE_RESUME:-}" ]; then
-  echo -e "\tResume: skip DDL + skip existing ids"
-  extra_args+=(--skip_ddl --skip_existing)
-fi
-if [ -n "${MANTICORE_MAX_ID:-}" ]; then
-  extra_args+=(--max_id="$MANTICORE_MAX_ID")
-fi
-
-# Merge stderr into stdout so `init` output always contains PHP fatals / warnings.
-php manticoresearch/load_rt.php --test="$test" --host="$manticore_host" --port="$manticore_port" --batch_rows="$batch_rows" --batch_bytes="$batch_bytes" --query_timeout="$query_timeout" --workers="$workers" "${extra_args[@]}" 2>&1
+echo -e "\tLoading SQL dump into Manticore: $dump_sql"
+docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 < "$dump_sql"

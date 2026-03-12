@@ -187,6 +187,7 @@ abstract class engine
                 = "create table if not exists init_results (" .
                 "test_name string, " .
                 "init_time float, " .
+                "postprocess_time float, " .
                 "format_version int, " .
                 "engine_name string engine='rowwise', " .
                 "type string engine='rowwise', " .
@@ -316,6 +317,7 @@ abstract class engine
                 'id',
                 'test_name',
                 'init_time',
+                'postprocess_time',
                 'format_version',
                 'engine_name',
                 'type',
@@ -335,6 +337,7 @@ abstract class engine
                 $id,
                 "'" . self::mres($results['test']) . "'",
                 $results['elapsedTime'],
+                $results['postprocessElapsedTime'] ?? -1,
                 self::$formatVersion,
                 "'{$results['engine']}'",
                 "'{$results['type']}'",

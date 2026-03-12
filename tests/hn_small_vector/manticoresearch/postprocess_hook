@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo -e "\tStarting post-processing (OPTIMIZE TABLE $test OPTION sync=1, cutoff=1)"
+docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 -N \
+  -e "OPTIMIZE TABLE $test OPTION sync=1, cutoff=1" >/dev/null
+
+final_disk_chunks=$(
+  docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 -N \
+    -e "SHOW TABLE $test STATUS LIKE '%disk_chunks%'" | awk '{ print $2 }'
+)
+
+echo -e "\tFinal disk chunks count: $final_disk_chunks"
+
+if [[ "$final_disk_chunks" != "1" ]]; then
+  >&2 echo "Unexpected final disk chunks count for $test ($final_disk_chunks / 1)"
+  exit 1
+fi

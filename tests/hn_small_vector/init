@@ -13,10 +13,10 @@ NC='\033[0m' # No Color
 docker compose -f ../../docker-compose.yml --env-file ../../.env down
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 
-echo -e "${COLORED}Preparing CSV:${NC}"
-./prepare_csv/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done
+echo -e "${COLORED}Preparing dump:${NC}"
+./prepare_sql/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done
 if [ $? -ne 0 ]; then
-  echo -e "\tCouldn't prepare CSV"
+  echo -e "\tCouldn't prepare dump"
   exit 1
 fi
 
