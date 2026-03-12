@@ -360,24 +360,43 @@ abstract class engine
 
     private static function saveRow(string $query, $curl, $id, $hashBase): void
     {
-        curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
-        $curlResult = curl_exec($curl);
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $curlResult = @json_decode($curlResult);
-        if (is_array($curlResult)) {
-            $curlResult = array_shift($curlResult);
-        }
-        $errorMessage
-            = "ERROR: can't save results to db: http code: $httpCode";
-        if (isset($curlResult->error) and $curlResult->error) {
-            $errorMessage .= "; error: " . $curlResult->error;
-        }
-        if ($httpCode != 200 or (isset($curlResult->error)
-                and $curlResult->error)
-        ) {
+        $maxAttempts = 5;
+        $retryableHttpCodes = [408, 429, 500, 502, 503, 504];
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
+            $rawResult = curl_exec($curl);
+            $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($curl);
+
+            $curlResult = @json_decode($rawResult);
+            if (is_array($curlResult)) {
+                $curlResult = array_shift($curlResult);
+            }
+
+            $hasDbError = isset($curlResult->error) && $curlResult->error;
+            if ($httpCode == 200 && !$hasDbError) {
+                self::log("Saved $id (doc $hashBase)", 3);
+                return;
+            }
+
+            $errorMessage = "ERROR: can't save results to db: http code: $httpCode";
+            if ($curlError) {
+                $errorMessage .= "; curl error: $curlError";
+            }
+            if ($hasDbError) {
+                $errorMessage .= "; error: " . $curlResult->error;
+            }
+
+            $shouldRetry = !$hasDbError && ($rawResult === false || in_array($httpCode, $retryableHttpCodes));
+            if ($shouldRetry && $attempt < $maxAttempts) {
+                $delaySeconds = $attempt * 5;
+                self::log("$errorMessage; retrying in {$delaySeconds}s (attempt $attempt/$maxAttempts)", 2, 'yellow');
+                sleep($delaySeconds);
+                continue;
+            }
+
             self::die($errorMessage, 3);
-        } else {
-            self::log("Saved $id (doc $hashBase)", 3);
         }
     }
 

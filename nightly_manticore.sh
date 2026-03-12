@@ -339,6 +339,10 @@ done
 script_log "info" "Saving Manticoresearch results to DB..."
 
 ./test --save=./results --engine=manticoresearch --host="$NIGHTLY_DB_HOST" --port=443 --username="$NIGHTLY_USER" --password="$NIGHTLY_PASSWORD"
+if [ $? -ne 0 ]; then
+  script_log "error" "Saving Manticoresearch results to DB failed. Stopping nightly flow."
+  exit 1
+fi
 
 # Source local hook if it exists
 if [ -f local_hooks/nightly_hook.sh ]; then
