@@ -2,12 +2,13 @@
 set -euo pipefail
 
 echo -e "\tStarting post-processing (OPTIMIZE TABLE $test OPTION sync=1, cutoff=1)"
-docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 -N \
+docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 -s -N \
   -e "OPTIMIZE TABLE $test OPTION sync=1, cutoff=1" >/dev/null
 
 final_disk_chunks=$(
-  docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 -N \
-    -e "SHOW TABLE $test STATUS LIKE '%disk_chunks%'" | awk '{ print $2 }'
+  docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 -s -N \
+    -e "SHOW TABLE $test STATUS LIKE '%disk_chunks%'" |
+    grep disk_chunks | grep -oE '[0-9]+'
 )
 
 echo -e "\tFinal disk chunks count: $final_disk_chunks"

@@ -424,12 +424,16 @@ class Init
             mkdir($folderPath);
         }
 
+        $elapsedTime = $this->inflateElapsedTime + max(
+            $this->postprocessElapsedTime,
+            0
+        );
+
         file_put_contents(
             $folderPath . $fileName,
             serialize([
                 'stage' => 'init',
-                'elapsedTime' => $this->inflateElapsedTime + max($this->postprocessElapsedTime, 0),
-                'inflateElapsedTime' => $this->inflateElapsedTime,
+                'elapsedTime' => $elapsedTime,
                 'postprocessElapsedTime' => $this->postprocessElapsedTime,
                 'metrics' => $this->calculateStats(),
                 'engine' => $this->engineName,
