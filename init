@@ -451,7 +451,7 @@ class Init
 
     private function getVersion(): string
     {
-        if (!empty($this->info)){
+		if (!empty($this->info) && is_array($this->info)) {
             return $this->info['version'] ?? '';
         }
         include_once("../../core/engine.php");
