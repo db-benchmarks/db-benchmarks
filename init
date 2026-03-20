@@ -573,6 +573,8 @@ class Init
     }
 }
 
+Init::loadDotEnv(__DIR__ . '/.env');
+
 $arguments = Init::getopt([
     "test:",
     "engine:",

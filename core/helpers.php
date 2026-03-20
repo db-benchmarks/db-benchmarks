@@ -4,6 +4,58 @@ use JetBrains\PhpStorm\NoReturn;
 
 trait Helpers
 {
+    public static function loadDotEnv(string $path): void
+    {
+        if (!is_file($path) || !is_readable($path)) {
+            return;
+        }
+
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            return;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#')) {
+                continue;
+            }
+
+            if (str_starts_with($line, 'export ')) {
+                $line = trim(substr($line, 7));
+            }
+
+            $parts = explode('=', $line, 2);
+            if (count($parts) !== 2) {
+                continue;
+            }
+
+            $name = trim($parts[0]);
+            if ($name === '' || preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name) !== 1) {
+                continue;
+            }
+
+            if (getenv($name) !== false) {
+                continue;
+            }
+
+            $value = trim($parts[1]);
+            if (
+                strlen($value) >= 2 &&
+                (
+                    ($value[0] === '"' && $value[strlen($value) - 1] === '"') ||
+                    ($value[0] === "'" && $value[strlen($value) - 1] === "'")
+                )
+            ) {
+                $value = substr($value, 1, -1);
+            }
+
+            putenv("$name=$value");
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
+        }
+    }
+
     protected static function log($message, $depth, $color = false, $noTime = false, $modifyMode = false): void
     {
         // In quiet mode, only show essential test progress messages
