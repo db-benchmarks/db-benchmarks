@@ -210,13 +210,14 @@ abstract class engine
         curl_setopt($curl, CURLOPT_URL, "$protocol://$host:$port/sql?mode=raw");
         curl_setopt($curl, CURLOPT_USERPWD, "$userName:$password");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
-        $curlResult = curl_exec($curl);
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($httpCode != 200) {
-            self::die("ERROR: can't create or verify table to save results: http code: $httpCode",
-                3);
-        }
+
+        self::runSaveQueryWithRetries(
+            $curl,
+            $query,
+            "can't create or verify table to save results",
+            'Verified destination table',
+            true
+        );
 
         if ($stage === 'saveResults') {
             $fields = [
@@ -360,6 +361,21 @@ abstract class engine
 
     private static function saveRow(string $query, $curl, $id, $hashBase): void
     {
+        self::runSaveQueryWithRetries(
+            $curl,
+            $query,
+            "can't save results to db",
+            "Saved $id (doc $hashBase)"
+        );
+    }
+
+    private static function runSaveQueryWithRetries(
+        $curl,
+        string $query,
+        string $errorPrefix,
+        ?string $successMessage = null,
+        bool $retryDbErrors = false
+    ): void {
         $maxAttempts = 5;
         $retryableHttpCodes = [408, 429, 500, 502, 503, 504];
 
@@ -376,11 +392,13 @@ abstract class engine
 
             $hasDbError = isset($curlResult->error) && $curlResult->error;
             if ($httpCode == 200 && !$hasDbError) {
-                self::log("Saved $id (doc $hashBase)", 3);
+                if ($successMessage) {
+                    self::log($successMessage, 3);
+                }
                 return;
             }
 
-            $errorMessage = "ERROR: can't save results to db: http code: $httpCode";
+            $errorMessage = "ERROR: $errorPrefix: http code: $httpCode";
             if ($curlError) {
                 $errorMessage .= "; curl error: $curlError";
             }
@@ -388,10 +406,13 @@ abstract class engine
                 $errorMessage .= "; error: " . $curlResult->error;
             }
 
-            $shouldRetry = !$hasDbError && ($rawResult === false || in_array($httpCode, $retryableHttpCodes));
+            self::log("$errorMessage (attempt $attempt/$maxAttempts)", 2, 'yellow');
+
+            $shouldRetry = ($rawResult === false || in_array($httpCode, $retryableHttpCodes))
+                || ($retryDbErrors && $hasDbError);
             if ($shouldRetry && $attempt < $maxAttempts) {
                 $delaySeconds = $attempt * 5;
-                self::log("$errorMessage; retrying in {$delaySeconds}s (attempt $attempt/$maxAttempts)", 2, 'yellow');
+                self::log("Retrying in {$delaySeconds}s", 2, 'yellow');
                 sleep($delaySeconds);
                 continue;
             }
