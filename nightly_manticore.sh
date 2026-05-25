@@ -140,6 +140,94 @@ script_log() {
     esac
 }
 
+is_port_listening() {
+    local port="$1"
+
+    if command -v lsof &> /dev/null; then
+        lsof -nP -iTCP:"$port" -sTCP:LISTEN &> /dev/null
+        return $?
+    fi
+
+    if command -v ss &> /dev/null; then
+        ss -ltn "sport = :$port" | awk 'NR > 1 { found = 1 } END { exit found ? 0 : 1 }'
+        return $?
+    fi
+
+    if command -v netstat &> /dev/null; then
+        netstat -ltn 2> /dev/null | awk -v port="$port" '$4 ~ ":" port "$" { found = 1 } END { exit found ? 0 : 1 }'
+        return $?
+    fi
+
+    script_log "warning" "Cannot check port $port: lsof, ss, and netstat are unavailable."
+    return 1
+}
+
+manticore_container_owns_port() {
+    local port="$1"
+    local container="manticoresearch_engine"
+
+    if ! docker inspect "$container" &> /dev/null; then
+        return 1
+    fi
+
+    docker port "$container" 2> /dev/null | awk -v port="$port" '
+        $0 ~ "127\\.0\\.0\\.1:" port "$" { found = 1 }
+        $0 ~ "0\\.0\\.0\\.0:" port "$" { found = 1 }
+        $0 ~ "\\[::\\]:" port "$" { found = 1 }
+        $0 ~ ":::" port "$" { found = 1 }
+        END { exit found ? 0 : 1 }
+    '
+}
+
+describe_port_listener() {
+    local port="$1"
+
+    if command -v lsof &> /dev/null; then
+        lsof -nP -iTCP:"$port" -sTCP:LISTEN 2> /dev/null | tail -n +2 | head -1
+        return
+    fi
+
+    if command -v ss &> /dev/null; then
+        ss -ltnp "sport = :$port" 2> /dev/null | tail -n +2 | head -1
+        return
+    fi
+
+    if command -v netstat &> /dev/null; then
+        netstat -ltnp 2> /dev/null | awk -v port="$port" '$4 ~ ":" port "$" { print; exit }'
+    fi
+}
+
+check_manticore_ports_available() {
+    local mysql_port="${MANTICORE_MYSQL_PORT:-9306}"
+    local http_port="${MANTICORE_HTTP_PORT:-9308}"
+    local port_name
+    local port
+    local listener
+
+    for port_name in "MANTICORE_MYSQL_PORT:$mysql_port" "MANTICORE_HTTP_PORT:$http_port"; do
+        port="${port_name#*:}"
+
+        if ! is_port_listening "$port"; then
+            continue
+        fi
+
+        if manticore_container_owns_port "$port"; then
+            script_log "info" "${port_name%%:*} $port is already used by manticoresearch_engine. Continuing."
+            continue
+        fi
+
+        listener=$(describe_port_listener "$port")
+        script_log "warning" "${port_name%%:*} $port is already listening. Skipping tests."
+        if [ -n "$listener" ]; then
+            script_log "warning" "Listener: $listener"
+        fi
+        exit 0
+    done
+}
+
+# Check Manticore ports before starting/pulling containers.
+check_manticore_ports_available
+
 # Check load
 check_load
 
