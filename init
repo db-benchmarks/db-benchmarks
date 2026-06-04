@@ -25,6 +25,8 @@ class Init
     private string $version;
     private array $info;
     private string $lockFile;
+    private float $inflateElapsedTime = 0.0;
+    private float $postprocessElapsedTime = -1.0;
 
 
     public function __construct(
@@ -45,6 +47,8 @@ class Init
             $this->preHook()
             && $this->inflateHook()
             && $this->postHook()
+            && $this->postProcessHook()
+            && $this->saveStats()
             && $this->unsetFailedIngestionFile($testName, $engineName);
         } catch (Exception $exception) {
             self::die($exception->getMessage(), 1);
@@ -130,7 +134,7 @@ class Init
                 pcntl_wait($status);
 
                 if ($runStatus['code'] === 0) {
-                    $this->saveStats($startTime);
+                    $this->inflateElapsedTime = microtime(true) - $startTime;
                     return true;
                 }
 
@@ -147,6 +151,18 @@ class Init
         echo "Run Post-hook $this->engineName\n";
         $result = $this->processHook("post_hook", "Post hook");
         echo "End Post-hook $this->engineName\n";
+        return $result;
+    }
+
+    public function postProcessHook(): bool
+    {
+        if (!file_exists("$this->engineName/postprocess_hook")) {
+            return true;
+        }
+
+        echo "Run Postprocess Hook $this->engineName\n";
+        $result = $this->processHook("postprocess_hook", "Postprocess hook", true);
+        echo "End Postprocess Hook $this->engineName\n";
         return $result;
     }
 
@@ -398,10 +414,8 @@ class Init
     }
 
 
-    private function saveStats(float $startTime): void
+    private function saveStats(): bool
     {
-        $elapsed = microtime(true) - $startTime;
-
         $date = date('ymd_his');
         $folderPath = "../../results/$this->testName/$this->engineName/$date/";
         $fileName = $this->testName . "_" . $this->engineName . "__init";
@@ -410,11 +424,17 @@ class Init
             mkdir($folderPath);
         }
 
+        $elapsedTime = $this->inflateElapsedTime + max(
+            $this->postprocessElapsedTime,
+            0
+        );
+
         file_put_contents(
             $folderPath . $fileName,
             serialize([
                 'stage' => 'init',
-                'elapsedTime' => $elapsed,
+                'elapsedTime' => $elapsedTime,
+                'postprocessElapsedTime' => $this->postprocessElapsedTime,
                 'metrics' => $this->calculateStats(),
                 'engine' => $this->engineName,
                 'test' => $this->testName,
@@ -425,12 +445,13 @@ class Init
             ]));
 
         unlink($this->measurementsLogPath);
+        return true;
     }
 
 
     private function getVersion(): string
     {
-        if (!empty($this->info)){
+		if (!empty($this->info) && is_array($this->info)) {
             return $this->info['version'] ?? '';
         }
         include_once("../../core/engine.php");
@@ -489,11 +510,14 @@ class Init
     }
 
 
-    private function processHook(string $command, string $hookName): bool
+    private function processHook(string $command, string $hookName, bool $measureElapsed = false): bool
     {
         $hookPath
             = "test=$this->testName suffix=$this->suffix $this->engineName/"
             . $command;
+        if ($measureElapsed) {
+            $startTime = microtime(true);
+        }
         $runStatus = $this->runScript($hookPath);
         if ($runStatus['code'] === 10) {
             // If we don't need to rebuild this engine
@@ -505,6 +529,11 @@ class Init
             $this->setFailedIngestion(trim($runStatus['error']));
             exit(98);
         } elseif ($runStatus['code'] === 0) {
+            if ($measureElapsed) {
+                $elapsed = round(microtime(true) - $startTime, 4);
+                $this->postprocessElapsedTime = $elapsed;
+                echo "\t$hookName execution time: {$elapsed} sec\n";
+            }
             return true;
         }
 
@@ -543,6 +572,8 @@ class Init
         file_put_contents("../../".$this->getFailedIngestionPath() . $fileName, $reason);
     }
 }
+
+Init::loadDotEnv(__DIR__ . '/.env');
 
 $arguments = Init::getopt([
     "test:",

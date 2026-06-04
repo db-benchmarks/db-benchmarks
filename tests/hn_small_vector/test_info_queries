@@ -1,0 +1,8 @@
+{
+  "count": {
+    "default": "select count(*) from hn_small_vector"
+  },
+  "doc": {
+    "default": "select * from hn_small_vector limit 1"
+  }
+}

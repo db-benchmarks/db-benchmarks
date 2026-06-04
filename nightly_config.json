@@ -2,6 +2,7 @@
   "init": {
     "taxi": ["manticoresearch:columnar"],
     "hn_small": ["manticoresearch"],
+    "hn_small_vector": ["manticoresearch"],
     "hn": ["manticoresearch:columnar", "manticoresearch:rowwise"],
     "logs10m": ["manticoresearch:columnar", "manticoresearch:rowwise"]
   },
@@ -28,6 +29,13 @@
         "engine": "manticoresearch",
         "memory": 1024,
         "limited": true,
+        "idx_folder": "idx"
+      }
+    ],
+    "hn_small_vector": [
+      {
+        "engine": "manticoresearch",
+        "memory": 110000,
         "idx_folder": "idx"
       }
     ],

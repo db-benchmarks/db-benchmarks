@@ -17,6 +17,8 @@ require_once('core/EsCompatible.php');
 $files = glob(__DIR__ . '/plugins/*.php');
 foreach ($files as $file) require($file);
 
+engine::loadDotEnv(__DIR__ . '/.env');
+
 engine::init($cwd);
 engine::parseCommandLineArguments();
 engine::sanitize();

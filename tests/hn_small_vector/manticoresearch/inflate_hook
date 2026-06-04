@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+echo -en "\tStarting loading at "
+date
+
+dump_sql="data/hn_small_vector_dump.sql"
+if [ ! -s "$dump_sql" ]; then
+  echo -e "\tERROR: missing SQL dump: $dump_sql (run ./prepare_sql/prepare.sh or ./init)"
+  exit 1
+fi
+
+echo -e "\tLoading SQL dump into Manticore: $dump_sql"
+docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 < "$dump_sql"

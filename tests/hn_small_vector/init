@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+trap 'jobs -p | xargs -r kill' EXIT
+
+current_dir=$(basename "$PWD")
+test_dir=$(realpath "$(dirname "$0")")
+cd "$test_dir"
+
+export test="$current_dir"
+
+COLORED='\033[0;33m'
+NC='\033[0m' # No Color
+
+docker compose -f ../../docker-compose.yml --env-file ../../.env down
+docker compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
+
+echo -e "${COLORED}Preparing dump:${NC}"
+./prepare_sql/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done
+if [ $? -ne 0 ]; then
+  echo -e "\tCouldn't prepare dump"
+  exit 1
+fi
+
+../../init --engine=manticoresearch

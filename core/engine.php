@@ -187,6 +187,7 @@ abstract class engine
                 = "create table if not exists init_results (" .
                 "test_name string, " .
                 "init_time float, " .
+                "postprocess_time float, " .
                 "format_version int, " .
                 "engine_name string engine='rowwise', " .
                 "type string engine='rowwise', " .
@@ -209,13 +210,14 @@ abstract class engine
         curl_setopt($curl, CURLOPT_URL, "$protocol://$host:$port/sql?mode=raw");
         curl_setopt($curl, CURLOPT_USERPWD, "$userName:$password");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
-        $curlResult = curl_exec($curl);
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($httpCode != 200) {
-            self::die("ERROR: can't create or verify table to save results: http code: $httpCode",
-                3);
-        }
+
+        self::runSaveQueryWithRetries(
+            $curl,
+            $query,
+            "can't create or verify table to save results",
+            'Verified destination table',
+            true
+        );
 
         if ($stage === 'saveResults') {
             $fields = [
@@ -316,6 +318,7 @@ abstract class engine
                 'id',
                 'test_name',
                 'init_time',
+                'postprocess_time',
                 'format_version',
                 'engine_name',
                 'type',
@@ -335,6 +338,7 @@ abstract class engine
                 $id,
                 "'" . self::mres($results['test']) . "'",
                 $results['elapsedTime'],
+                $results['postprocessElapsedTime'] ?? -1,
                 self::$formatVersion,
                 "'{$results['engine']}'",
                 "'{$results['type']}'",
@@ -357,24 +361,63 @@ abstract class engine
 
     private static function saveRow(string $query, $curl, $id, $hashBase): void
     {
-        curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
-        $curlResult = curl_exec($curl);
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $curlResult = @json_decode($curlResult);
-        if (is_array($curlResult)) {
-            $curlResult = array_shift($curlResult);
-        }
-        $errorMessage
-            = "ERROR: can't save results to db: http code: $httpCode";
-        if (isset($curlResult->error) and $curlResult->error) {
-            $errorMessage .= "; error: " . $curlResult->error;
-        }
-        if ($httpCode != 200 or (isset($curlResult->error)
-                and $curlResult->error)
-        ) {
+        self::runSaveQueryWithRetries(
+            $curl,
+            $query,
+            "can't save results to db",
+            "Saved $id (doc $hashBase)"
+        );
+    }
+
+    private static function runSaveQueryWithRetries(
+        $curl,
+        string $query,
+        string $errorPrefix,
+        ?string $successMessage = null,
+        bool $retryDbErrors = false
+    ): void {
+        $maxAttempts = 5;
+        $retryableHttpCodes = [408, 429, 500, 502, 503, 504];
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, 'query=' . urlencode($query));
+            $rawResult = curl_exec($curl);
+            $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($curl);
+
+            $curlResult = @json_decode($rawResult);
+            if (is_array($curlResult)) {
+                $curlResult = array_shift($curlResult);
+            }
+
+            $hasDbError = isset($curlResult->error) && $curlResult->error;
+            if ($httpCode == 200 && !$hasDbError) {
+                if ($successMessage) {
+                    self::log($successMessage, 3);
+                }
+                return;
+            }
+
+            $errorMessage = "ERROR: $errorPrefix: http code: $httpCode";
+            if ($curlError) {
+                $errorMessage .= "; curl error: $curlError";
+            }
+            if ($hasDbError) {
+                $errorMessage .= "; error: " . $curlResult->error;
+            }
+
+            self::log("$errorMessage (attempt $attempt/$maxAttempts)", 2, 'yellow');
+
+            $shouldRetry = ($rawResult === false || in_array($httpCode, $retryableHttpCodes))
+                || ($retryDbErrors && $hasDbError);
+            if ($shouldRetry && $attempt < $maxAttempts) {
+                $delaySeconds = $attempt * 5;
+                self::log("Retrying in {$delaySeconds}s", 2, 'yellow');
+                sleep($delaySeconds);
+                continue;
+            }
+
             self::die($errorMessage, 3);
-        } else {
-            self::log("Saved $id (doc $hashBase)", 3);
         }
     }
 
