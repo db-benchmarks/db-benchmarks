@@ -41,33 +41,46 @@ export TESTS_EXECUTED=false
 
 # Lock file path
 LOCK_FILE="/tmp/db_benchmarks.lock"
-LOAD_THRESHOLD=0.1  # Low threshold for idle server
+LOAD_THRESHOLD="${LOAD_THRESHOLD:-0.1}"  # Low threshold for idle server
+
+get_current_load() {
+    uptime | awk -F'load averages?:' '{ print $2 }' | awk -F',' '{ print $1 }' | awk '{ print $1 }'
+}
+
+is_high_load() {
+    local load="$1"
+    awk -v load="$load" -v threshold="$LOAD_THRESHOLD" 'BEGIN { exit (load > threshold ? 0 : 1) }'
+}
 
 # Function to check load with 3-minute retry
 check_load() {
     script_log "info" "Checking server load..."
     local wait_count=0
     local max_wait=18  # 3 minutes = 18 * 10 seconds
-    
+
     while [ $wait_count -lt $max_wait ]; do
-        currentLoad=$(uptime | awk -F'load average:' '{ print $2 }' | awk -F',' '{ print $1 }' | tr -d ' ')
-        highLoad=$(echo "$currentLoad > $LOAD_THRESHOLD" | bc)
-        
-        if [ "$highLoad" -eq 0 ]; then
+        currentLoad=$(get_current_load)
+
+        if [ -z "$currentLoad" ]; then
+            script_log "error" "Could not determine server load from uptime output: $(uptime)"
+            exit 1
+        fi
+
+        if ! is_high_load "$currentLoad"; then
             script_log "success" "Server load is acceptable ($currentLoad <= $LOAD_THRESHOLD). Proceeding with tests."
             return 0
         fi
-        
+
         wait_count=$((wait_count + 1))
         script_log "warning" "Server load ($currentLoad) is above threshold ($LOAD_THRESHOLD). Waiting... ($wait_count/$max_wait)"
-        
+
         if [ $wait_count -lt $max_wait ]; then
             sleep 10
         fi
     done
-    
+
     script_log "error" "Server load remained high for 3 minutes. Skipping tests."
-    exit 0
+    exit 2
 }
 
 # Function to wait for server to settle after initial tests
@@ -75,24 +88,28 @@ wait_for_settle() {
     script_log "info" "Waiting for server to settle before starting retest phase..."
     local stable_count=0
     local required_stable=3
-    
+
     while [ $stable_count -lt $required_stable ]; do
-        currentLoad=$(uptime | awk -F'load average:' '{ print $2 }' | awk -F',' '{ print $1 }' | tr -d ' ')
-        highLoad=$(echo "$currentLoad > $LOAD_THRESHOLD" | bc)
-        
-        if [ "$highLoad" -eq 0 ]; then
+        currentLoad=$(get_current_load)
+
+        if [ -z "$currentLoad" ]; then
+            script_log "error" "Could not determine server load from uptime output: $(uptime)"
+            exit 1
+        fi
+
+        if ! is_high_load "$currentLoad"; then
             stable_count=$((stable_count + 1))
             script_log "info" "Load check $stable_count/$required_stable passed (load: $currentLoad)"
         else
             stable_count=0
             script_log "info" "Load still high ($currentLoad > $LOAD_THRESHOLD), resetting counter"
         fi
-        
+
         if [ $stable_count -lt $required_stable ]; then
             sleep 30
         fi
     done
-    
+
     script_log "success" "Server load settled. Starting retest phase..."
 }
 
@@ -102,7 +119,7 @@ if [ -f "$LOCK_FILE" ]; then
     LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
     if [ -n "$LOCK_PID" ] && kill -0 "$LOCK_PID" 2>/dev/null; then
         script_log "warning" "Lock file $LOCK_FILE exists and process $LOCK_PID is running. Another benchmark process may be running. Skipping."
-        exit 0
+        exit 2
     else
         script_log "info" "Removing stale lock file $LOCK_FILE (process $LOCK_PID not running)."
         rm -f "$LOCK_FILE"
@@ -221,7 +238,7 @@ check_manticore_ports_available() {
         if [ -n "$listener" ]; then
             script_log "warning" "Listener: $listener"
         fi
-        exit 0
+        exit 2
     done
 }
 
@@ -251,11 +268,17 @@ fi
 # Get unique tests from JSON config
 unique_tests=($(jq -r '.tests | keys[]' $config_file))
 
-script_log "info" "Pulling dev image..."
-docker pull $MANTICORE_IMAGE
+script_log "info" "Pulling $MANTICORE_IMAGE image..."
+if ! docker pull $MANTICORE_IMAGE; then
+  script_log "error" "Failed to pull $MANTICORE_IMAGE"
+  exit 1
+fi
 
-script_log "info" "Getting Manticoresearch version and hash from dev image..."
-OUTPUT=$(docker run --rm $MANTICORE_IMAGE searchd --version)
+script_log "info" "Getting Manticoresearch version and hash from $MANTICORE_IMAGE image..."
+if ! OUTPUT=$(docker run --rm $MANTICORE_IMAGE searchd --version); then
+  script_log "error" "Failed to get Manticoresearch version from $MANTICORE_IMAGE"
+  exit 1
+fi
 VERSION=$(echo "$OUTPUT" | awk '/Manticore/ {for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\.[0-9]+\.[0-9]+$/) print $i}' | head -1)
 HASH=$(echo "$OUTPUT" | awk '{for(i=1;i<=NF;i++) if($i ~ /@/ && $i !~ /columnar/) {split($i,a,"@"); print a[1]; exit}}')
 if [ -z "$VERSION" ] || [ -z "$HASH" ]; then
@@ -305,7 +328,11 @@ for TEST in "${unique_tests[@]}"; do
   # Step 1: Down all engines (once per test)
   script_log "info" "Shutting down all engines for $TEST..."
   cd "tests/$TEST"
-  suffix="" test=$TEST docker compose down
+  if ! suffix="" test=$TEST docker compose down; then
+    script_log "error" "Docker compose down failed for $TEST"
+    cd ../..
+    exit 1
+  fi
   cd ../..
 
   # Get init engines for this test
@@ -376,7 +403,10 @@ for TEST in "${unique_tests[@]}"; do
     if [[ $limited == "true" ]]; then
       cmd="$cmd --limited"
     fi
-    eval $cmd
+    if ! eval $cmd; then
+      script_log "error" "Initial test command failed for $TEST with engine $engine, memory $memory"
+      exit 1
+    fi
   done <<< "$configs_json"
 done
 
@@ -394,6 +424,7 @@ for TEST in "${unique_tests[@]}"; do
   fi
 
   script_log "success" "Running retests for $TEST."
+  export TESTS_EXECUTED=true
 
   # Step 4: Run retest configurations
   configs_json=$(jq -c ".tests.\"$TEST\"[]" $config_file)
@@ -419,9 +450,19 @@ for TEST in "${unique_tests[@]}"; do
     if [[ $limited == "true" ]]; then
       cmd="$cmd --limited"
     fi
-    eval $cmd
+    if ! eval $cmd; then
+      script_log "error" "Retest command failed for $TEST with engine $engine, memory $memory"
+      exit 1
+    fi
   done <<< "$configs_json"
 done
+
+# If every configured test/retest already had results, finish quietly.
+# This is not an operational error, and should not notify the team.
+if [ "$TESTS_EXECUTED" != true ]; then
+  script_log "success" "No new tests or retests were executed; all configured results already exist."
+  exit 0
+fi
 
 # Saving results
 script_log "info" "Saving Manticoresearch results to DB..."
