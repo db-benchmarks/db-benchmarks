@@ -48,8 +48,8 @@ get_current_load() {
 }
 
 is_high_load() {
-    local load="$1"
-    awk -v load="$load" -v threshold="$LOAD_THRESHOLD" 'BEGIN { exit (load > threshold ? 0 : 1) }'
+    local current_load="$1"
+    awk -v current_load="$current_load" -v threshold="$LOAD_THRESHOLD" 'BEGIN { exit (current_load > threshold ? 0 : 1) }'
 }
 
 # Function to check load with 3-minute retry
