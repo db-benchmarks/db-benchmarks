@@ -40,5 +40,11 @@
   },
   {
     "default": "SELECT id, comment_id, WEIGHT() AS w, knn_dist() AS kd FROM hn_small_vector WHERE MATCH('Google') AND comment_ranking >= 5 AND author_comment_count >= 50 AND knn(comment_embedding, 100, 'Like almost everyone else here, I have no real experience or education in this area but... Have you set yourself a realistic expectation?') ORDER BY w DESC, kd ASC LIMIT 20;"
+  },
+  {
+    "default": "SELECT id, comment_id, WEIGHT() AS w, knn_dist() AS kd FROM hn_small_vector WHERE MATCH('Google') AND knn(comment_embedding, 50, 'Like almost everyone else here, I have no real experience or education in this area but... Have you set yourself a realistic expectation?') ORDER BY w DESC, kd ASC LIMIT 20 OPTION fusion_method='rrf';"
+  },
+  {
+    "default": "SELECT id, comment_id, WEIGHT() AS w, knn_dist() AS kd FROM hn_small_vector WHERE MATCH('Google') AND comment_ranking >= 5 AND author_comment_count >= 50 AND knn(comment_embedding, 100, 'Like almost everyone else here, I have no real experience or education in this area but... Have you set yourself a realistic expectation?') ORDER BY w DESC, kd ASC LIMIT 20 OPTION fusion_method='rrf';"
   }
 ]
