@@ -39,7 +39,7 @@ export TYPESENSE_API_KEY='manticore'
 export TYPESENSE_HOST='http://localhost:8108'
 
 if ! curl -s ${TYPESENSE_HOST}/collections/${test} \
-       -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" 2>&1 | grep "Not Found" > /dev/null; then
+       -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" 2>&1 | grep -E "Not Found|Collection not found" > /dev/null; then
   echo -e "\tNo need to rebuild"
   exit 10
 fi

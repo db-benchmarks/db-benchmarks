@@ -13,5 +13,19 @@ cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
          -v $path/data/:/data/ \
          -v $path/elasticsearch/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
          -v $path/elasticsearch/logstash$suffix/template.json:/template.json \
-         docker.elastic.co/logstash/logstash:8.14.3"
-eval "$cmd"
+         docker.elastic.co/logstash/logstash:9.4.3"
+
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
+
+eval "$cmd" 2>&1 | tee "$log"
+status=${PIPESTATUS[0]}
+
+if [[ $status -ne 0 ]]; then
+  if grep -q "ConcurrentModificationException" "$log"; then
+    echo -e "\tLogstash exited with ConcurrentModificationException after pipeline shutdown; post_hook will verify inserted rows."
+    exit 0
+  fi
+
+  exit "$status"
+fi

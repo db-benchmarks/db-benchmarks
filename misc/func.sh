@@ -30,7 +30,12 @@ init_meilisearch() {
   csv_files=($(ls "$csv_file."*))
 
   for f in "${csv_files[@]}"; do
-    head -1 $f|grep -q $header || sed -i "1i$header" "$f"
+    if ! head -1 "$f" | grep -Fq "$header"; then
+      tmp_file=$(mktemp)
+      printf '%s\n' "$header" > "$tmp_file"
+      cat "$f" >> "$tmp_file"
+      mv "$tmp_file" "$f"
+    fi
   done
 
   echo -en "\tStarting loading into $index at "; date

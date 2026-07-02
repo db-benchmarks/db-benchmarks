@@ -1,6 +1,7 @@
 cluster.name: "docker-cluster"
 network.host: 0.0.0.0
 xpack.security.enabled: false
+cluster.routing.allocation.disk.threshold_enabled: false
 thread_pool:
   force_merge:
     size: 32
