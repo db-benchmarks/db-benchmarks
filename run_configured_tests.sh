@@ -442,6 +442,17 @@ else
 
       init_engines=($(jq -r --arg test_name "$TEST" '.init[$test_name][]' "$CONFIG_FILE"))
       for init_engine in "${init_engines[@]}"; do
+        if [[ $init_engine == "manticoresearch" ]]; then
+          idx_folder="idx"
+        elif [[ $init_engine == *:* ]]; then
+          idx_folder="idx_${init_engine#*:}"
+        else
+          idx_folder="idx"
+        fi
+
+        script_log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
+        rm -rf "manticoresearch/$idx_folder"
+
         script_log "info" "Running init for $TEST with engine $init_engine..."
         if [[ $init_engine == *:* ]]; then
             engine_part=${init_engine%%:*}
@@ -494,12 +505,10 @@ if [ "$SAVE_RESULTS" = true ]; then
   script_log "info" "Saving results to DB..."
 
   result_db_host_var="${RESULT_DB_ENV_PREFIX}_HOST"
-  result_db_port_var="${RESULT_DB_ENV_PREFIX}_PORT"
   result_db_user_var="${RESULT_DB_ENV_PREFIX}_USER"
   result_db_password_var="${RESULT_DB_ENV_PREFIX}_PASSWORD"
 
   RESULT_DB_HOST="${!result_db_host_var:-}"
-  RESULT_DB_PORT="${!result_db_port_var:-443}"
   RESULT_DB_USER="${!result_db_user_var:-}"
   RESULT_DB_PASSWORD="${!result_db_password_var:-}"
 
@@ -517,7 +526,7 @@ if [ "$SAVE_RESULTS" = true ]; then
       return 0
     fi
 
-    save_cmd=(./test --save="$save_path" --host="$RESULT_DB_HOST" --port="$RESULT_DB_PORT" --username="$RESULT_DB_USER" --password="$RESULT_DB_PASSWORD")
+    save_cmd=(./test --save="$save_path" --host="$RESULT_DB_HOST" --port=443 --username="$RESULT_DB_USER" --password="$RESULT_DB_PASSWORD")
     if [ -n "$RESULT_DB_ENGINE" ]; then
       save_cmd+=(--engine="$RESULT_DB_ENGINE")
     fi

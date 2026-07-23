@@ -1004,7 +1004,10 @@ abstract class engine
         exec($exec, $o, $r);
         self::log(implode("\n", $o), 2, 'bright_black');
         if ($r) {
-            $message = "ERROR: couldn't start $engine";
+            $message = "ERROR: couldn't start $engine with command: $exec";
+            if ($o) {
+                $message .= "\n" . implode("\n", $o);
+            }
             throw new RuntimeException($message);
         }
         self::log("Waiting for $engine to come up", 2);
