@@ -183,9 +183,9 @@ The repository includes `run_configured_tests.sh`, a JSON-configured runner used
 
 ### Scripts and configs
 
-- `run_configured_tests.sh`: Runs tests from a JSON config. Use `-c` to choose a config, `-t` to choose the Docker image tag for image-based runs, and `-s` to skip initialization.
-- `nightly_config.json`: Manticoresearch nightly config. It pulls `manticoresearch/manticore:<tag>`, checks the image version with `searchd --version`, prepares data before init, initializes configured Manticore engines, writes nightly output under `results/nightly/`, runs the initial benchmark phase, waits for the server to settle, runs retests, removes duplicate nightly result files for the same version/hash, saves only `results/nightly/`, and then sources the success hook if configured.
-- `regular_config.json`: Regular important test config. It mirrors the previous `important_tests.sh` command list and does not save results by default.
+- `run_configured_tests.sh`: Runs tests from a JSON config. Use `-c` to choose a config, `-t` to choose the Docker image tag for image-based runs, and `-s` to skip initialization for configs that define `init`. The runner checks Manticore ports and server load before starting; occupied ports or sustained high load exit with code 2 so wrappers can classify the run as skipped.
+- `nightly_config.json`: Manticoresearch nightly config. It pulls `manticoresearch/manticore:<tag>`, checks the image version and hash with `searchd --version`, prepares data before init, runs the configured Manticore init hooks, writes nightly output under `results/nightly/`, runs the initial benchmark phase, waits for the server to settle, runs retests, skips suites or retests that already have matching results for the same version/hash, saves only `results/nightly/`, and then sources the success hook if configured. Init hooks may reuse existing indexes and print `No need to rebuild`; use `-s` only to skip the init step entirely.
+- `regular_config.json`: Regular important test config. It mirrors the previous `important_tests.sh` command list, writes to the normal `results/<test>/<engine>` tree, and does not save results by default.
 - `important_tests.sh`: Compatibility wrapper for `./run_configured_tests.sh -c regular_config.json`.
 - `run_nightly.sh`: Runs nightly Manticoresearch tests for both `latest` and `dev` tags and handles dated logs plus failure/skipped hooks.
 
@@ -198,7 +198,7 @@ Examples:
 ./important_tests.sh
 ```
 
-Nightly and regular configs use the same `tests` shape: test names map to arrays of engine/memory entries. Nightly configs add `init` for suite initialization. Nightly runs write and save only `results/nightly/`. Regular configured runs write to the normal `results/<test>/<engine>` tree; if result saving is enabled for a config without `init`, the runner saves everything under `results/` except `results/nightly/`.
+Nightly and regular configs use the same `tests` shape: test names map to arrays of engine/memory entries. Each entry supports `engine`, `memory`, optional `limited`, and optional `query_timeout`. Config `settings` control the image template, quiet mode, result saving, result engine filter, and success hook. Nightly configs add `init` for suite initialization. Nightly runs write and save only `results/nightly/`. Regular configured runs write to the normal `results/<test>/<engine>` tree; if result saving is enabled for a config without `init`, the runner saves everything under `results/` except `results/nightly/`. Nightly saves use `NIGHTLY_DB_HOST`, `NIGHTLY_DB_USER`, and `NIGHTLY_DB_PASSWORD`; regular configured saves use `RESULT_DB_HOST`, `RESULT_DB_USER`, and `RESULT_DB_PASSWORD`. Both save paths use port 443.
 
 ### Setup Cron Job
 
