@@ -442,17 +442,6 @@ else
 
       init_engines=($(jq -r --arg test_name "$TEST" '.init[$test_name][]' "$CONFIG_FILE"))
       for init_engine in "${init_engines[@]}"; do
-        if [[ $init_engine == "manticoresearch" ]]; then
-          idx_folder="idx"
-        elif [[ $init_engine == *:* ]]; then
-          idx_folder="idx_${init_engine#*:}"
-        else
-          idx_folder="idx"
-        fi
-
-        script_log "info" "Removing $idx_folder folder for $TEST engine $init_engine..."
-        rm -rf "manticoresearch/$idx_folder"
-
         script_log "info" "Running init for $TEST with engine $init_engine..."
         if [[ $init_engine == *:* ]]; then
             engine_part=${init_engine%%:*}
