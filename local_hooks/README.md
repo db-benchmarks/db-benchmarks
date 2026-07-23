@@ -12,7 +12,7 @@ They also provide local-only notification hooks for nightly benchmark runs. The 
 
 - `hn_hook.sh`: Hook for the "hn" test suite. Symlinks `manticoresearch/idx$suffix` to `/mnt/ssd/hn_manticore_data_nightly/`
 - `taxi_hook.sh`: Hook for the "taxi" test suite. Symlinks `manticoresearch/idx$suffix` to `/mnt/ssd/taxi_manticore_data_nightly/`
-- `nightly_hook.sh`: Hook sourced by `nightly_manticore.sh` after successful nightly results are saved. Use it for successful result notifications only.
+- `nightly_hook.sh`: Hook sourced by `run_configured_tests.sh` after successful nightly results are saved. Use it for successful result notifications only.
 - `nightly_failure_hook.sh`: Hook sourced by `run_nightly.sh` when a nightly run clearly fails or is skipped for an operational reason. Use it for failed/skipped notifications only.
 
 ## How It Works
@@ -25,7 +25,7 @@ They also provide local-only notification hooks for nightly benchmark runs. The 
 
 ### Nightly notification hooks
 
-1. `nightly_manticore.sh` sources `local_hooks/nightly_hook.sh` only after results are saved successfully.
+1. `run_configured_tests.sh` sources `local_hooks/nightly_hook.sh` only after results are saved successfully.
 2. `run_nightly.sh` sources `local_hooks/nightly_failure_hook.sh` only when a run exits as failed or skipped.
 3. If a notification hook file does not exist, the notification is silently skipped.
 4. Existing-result skips are not treated as failures and should not notify the team.
@@ -49,7 +49,7 @@ Create local notification hook files as needed:
 
 - `NIGHTLY_FAILURE_STATUS`: `failed` or `skipped`
 - `NIGHTLY_FAILURE_TAG`: nightly image tag, e.g. `latest` or `dev`
-- `NIGHTLY_FAILURE_EXIT_CODE`: exit code from `nightly_manticore.sh`
+- `NIGHTLY_FAILURE_EXIT_CODE`: exit code from `run_configured_tests.sh`
 - `NIGHTLY_FAILURE_LOG`: path to the failed/skipped run log
 
 Keep webhook URLs and other credentials inside the local hook files only.

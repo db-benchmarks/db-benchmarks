@@ -417,11 +417,12 @@ class Init
     private function saveStats(): bool
     {
         $date = date('ymd_his');
-        $folderPath = "../../results/$this->testName/$this->engineName/$date/";
+        $resultsRoot = rtrim(getenv('RESULTS_ROOT') ?: '../../results', '/');
+        $folderPath = "$resultsRoot/$this->testName/$this->engineName/$date/";
         $fileName = $this->testName . "_" . $this->engineName . "__init";
 
         if (!file_exists($folderPath)) {
-            mkdir($folderPath);
+            mkdir($folderPath, 0777, true);
         }
 
         $elapsedTime = $this->inflateElapsedTime + max(

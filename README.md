@@ -177,22 +177,36 @@ To install:
 4. Tune JVM limits `ES_JAVA_OPTS` for your tests. Usually it's size of allocated memory for Docker Machine
 
 
-## Nightly Tests
+## Configured and nightly tests
 
-The repository includes automated nightly test scripts for Manticoresearch to ensure continuous benchmarking.
+The repository includes `run_configured_tests.sh`, a JSON-configured runner used by both nightly Manticoresearch benchmarks and the regular important test list.
 
-### Scripts
+### Scripts and configs
 
-- `nightly_manticore.sh`: Main script that runs tests for Manticoresearch using the dev image by default.
-- Supports `-t latest` flag to use the latest stable image instead of dev.
+- `run_configured_tests.sh`: Runs tests from a JSON config. Use `-c` to choose a config, `-t` to choose the Docker image tag for image-based runs, and `-s` to skip initialization.
+- `nightly_config.json`: Manticoresearch nightly config. It pulls `manticoresearch/manticore:<tag>`, checks the image version with `searchd --version`, prepares data before init, initializes configured Manticore engines, writes nightly output under `results/nightly/`, runs the initial benchmark phase, waits for the server to settle, runs retests, removes duplicate nightly result files for the same version/hash, saves only `results/nightly/`, and then sources the success hook if configured.
+- `regular_config.json`: Regular important test config. It mirrors the previous `important_tests.sh` command list and does not save results by default.
+- `important_tests.sh`: Compatibility wrapper for `./run_configured_tests.sh -c regular_config.json`.
+- `run_nightly.sh`: Runs nightly Manticoresearch tests for both `latest` and `dev` tags and handles dated logs plus failure/skipped hooks.
+
+Examples:
+
+```bash
+./run_configured_tests.sh -c nightly_config.json
+./run_configured_tests.sh -c nightly_config.json -t latest
+./run_configured_tests.sh -c regular_config.json
+./important_tests.sh
+```
+
+Nightly and regular configs use the same `tests` shape: test names map to arrays of engine/memory entries. Nightly configs add `init` for suite initialization. Nightly runs write and save only `results/nightly/`. Regular configured runs write to the normal `results/<test>/<engine>` tree; if result saving is enabled for a config without `init`, the runner saves everything under `results/` except `results/nightly/`.
 
 ### Setup Cron Job
 
 To run nightly tests automatically:
 
-1. Ensure scripts are executable: `chmod +x nightly_manticore.sh run_nightly.sh`
+1. Ensure scripts are executable: `chmod +x run_configured_tests.sh run_nightly.sh important_tests.sh`
 2. Add the cron job from `nightly_cron` to your crontab: `crontab -e` and paste the contents, or copy to `/etc/cron.d/` for system-wide setup.
-3. The job runs `run_nightly.sh` at 2 AM daily, which executes both dev and latest versions sequentially.
+3. The job runs `run_nightly.sh` at 2 AM daily, which executes both latest and dev versions sequentially.
 4. Logs are stored in `/var/log/db-benchmarks/` with dated filenames. Successful runs: `nightly_dev_YYYYMMDD.log`, failed runs: `nightly_dev_YYYYMMDD_failed.log` (same for latest).
 
 ### Log Rotation
@@ -395,7 +409,10 @@ We will then:
    |-NOTICE                                  <- Notice file.
    |-README.md                               <- You're reading this file.
    |-docker-compose.yml                      <- Docker Compose configuration for starting and stopping databases and search engines.
-   |-important_tests.sh
+   |-important_tests.sh                       <- Compatibility wrapper for regular_config.json important test runs.
+   |-nightly_config.json                      <- Configured Manticoresearch nightly benchmark suite.
+   |-regular_config.json                      <- Configured regular important benchmark suite.
+   |-run_configured_tests.sh                  <- JSON-configured benchmark runner.
    |-init                                    <- Initialization script. Handles data ingestion and tracks the time taken.
    |-logo.svg                                <- Logo file.
    |-test                                    <- The executable file to run and save test results.

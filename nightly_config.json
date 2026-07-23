@@ -1,68 +1,78 @@
 {
+  "settings": {
+    "image": "manticoresearch/manticore:%s",
+    "quiet": true,
+    "save": true,
+    "result_engine": "manticoresearch",
+    "success_hook": "local_hooks/nightly_hook.sh"
+  },
   "init": {
-    "taxi": ["manticoresearch:columnar"],
-    "hn_small": ["manticoresearch"],
-    "hn_small_vector": ["manticoresearch"],
-    "hn": ["manticoresearch:columnar", "manticoresearch:rowwise"],
-    "logs10m": ["manticoresearch:columnar", "manticoresearch:rowwise"]
+    "taxi": [
+      "manticoresearch:columnar"
+    ],
+    "hn_small": [
+      "manticoresearch"
+    ],
+    "hn_small_vector": [
+      "manticoresearch"
+    ],
+    "hn": [
+      "manticoresearch:columnar",
+      "manticoresearch:rowwise"
+    ],
+    "logs10m": [
+      "manticoresearch:columnar",
+      "manticoresearch:rowwise"
+    ]
   },
   "tests": {
     "taxi": [
       {
         "engine": "manticoresearch:columnar",
-        "memory": 110000,
-        "idx_folder": "idx_columnar"
+        "memory": 110000
       }
     ],
     "hn_small": [
       {
         "engine": "manticoresearch",
-        "memory": 110000,
-        "idx_folder": "idx"
+        "memory": 110000
+      },
+      {
+        "engine": "manticoresearch",
+        "memory": 1024
       },
       {
         "engine": "manticoresearch",
         "memory": 1024,
-        "idx_folder": "idx"
-      },
-      {
-        "engine": "manticoresearch",
-        "memory": 1024,
-        "limited": true,
-        "idx_folder": "idx"
+        "limited": true
       }
     ],
     "hn_small_vector": [
       {
         "engine": "manticoresearch",
-        "memory": 110000,
-        "idx_folder": "idx"
+        "memory": 110000
       }
     ],
     "hn": [
       {
         "engine": "manticoresearch:columnar",
-        "memory": 110000,
-        "idx_folder": "idx_columnar"
+        "memory": 110000
       },
       {
         "engine": "manticoresearch:rowwise",
-        "memory": 110000,
-        "idx_folder": "idx_rowwise"
+        "memory": 110000
       }
     ],
     "logs10m": [
       {
         "engine": "manticoresearch:columnar",
         "memory": 110000,
-        "query_timeout": 600,
-        "idx_folder": "idx_columnar"
+        "query_timeout": 600
       },
       {
         "engine": "manticoresearch:rowwise",
         "memory": 110000,
-        "query_timeout": 600,
-        "idx_folder": "idx_rowwise"
+        "query_timeout": 600
       }
     ]
   }
