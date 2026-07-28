@@ -66,7 +66,7 @@ fi
 export TESTS_EXECUTED=false
 
 LOCK_FILE="/tmp/db_benchmarks.lock"
-LOAD_THRESHOLD="${LOAD_THRESHOLD:-0.1}"
+LOAD_THRESHOLD="${LOAD_THRESHOLD:-0.5}"
 
 if ! command -v jq &> /dev/null; then
   script_log "error" "jq is required but not installed. Please install jq to use this script."

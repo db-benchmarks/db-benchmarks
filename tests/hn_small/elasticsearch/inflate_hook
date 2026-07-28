@@ -17,6 +17,7 @@ cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
 
 log=$(mktemp)
 trap 'rm -f "$log"' EXIT
+logstash_error_pattern='Encountered a retryable error|Request Entity Too Large|No Available connections|Marking url as dead|Elasticsearch Unreachable|Broken pipe|Failed to perform request|Attempted to send a bulk request|abort processing current batch|PHP Fatal error|Allowed memory size|unable to allocate memory|memory exhausted|out of memory|cannot allocate memory'
 
 eval "$cmd" 2>&1 | tee "$log"
 status=${PIPESTATUS[0]}
@@ -28,4 +29,10 @@ if [[ $status -ne 0 ]]; then
   fi
 
   exit "$status"
+fi
+
+if grep -qEi "$logstash_error_pattern" "$log"; then
+  echo -e "\tLogstash reported output errors; failing ingestion before post_hook."
+  grep -Ei "$logstash_error_pattern" "$log" | tail -20 >&2
+  exit 1
 fi

@@ -8,7 +8,7 @@
   },
   "init": {
     "taxi": [
-      "manticoresearch:columnar"
+      "manticoresearch:columnar_tuned"
     ],
     "hn_small": [
       "manticoresearch"
@@ -17,8 +17,8 @@
       "manticoresearch"
     ],
     "hn": [
-      "manticoresearch:columnar",
-      "manticoresearch:rowwise"
+      "manticoresearch:columnar_tuned",
+      "manticoresearch:rowwise_tuned"
     ],
     "logs10m": [
       "manticoresearch:columnar",
@@ -28,7 +28,7 @@
   "tests": {
     "taxi": [
       {
-        "engine": "manticoresearch:columnar",
+        "engine": "manticoresearch:columnar_tuned",
         "memory": 110000
       }
     ],
@@ -55,11 +55,11 @@
     ],
     "hn": [
       {
-        "engine": "manticoresearch:columnar",
+        "engine": "manticoresearch:columnar_tuned",
         "memory": 110000
       },
       {
-        "engine": "manticoresearch:rowwise",
+        "engine": "manticoresearch:rowwise_tuned",
         "memory": 110000
       }
     ],

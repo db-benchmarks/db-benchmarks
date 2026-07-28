@@ -1,2 +1,4 @@
 *.conf
+!logstash/
+!logstash/*.conf
 idx_*

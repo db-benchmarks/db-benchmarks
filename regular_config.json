@@ -17,7 +17,7 @@
         "memory": 110000
       },
       {
-        "engine": "manticoresearch:columnar",
+        "engine": "manticoresearch:columnar_tuned",
         "memory": 110000
       }
     ],
@@ -125,11 +125,11 @@
         "memory": 110000
       },
       {
-        "engine": "manticoresearch:columnar",
+        "engine": "manticoresearch:columnar_tuned",
         "memory": 110000
       },
       {
-        "engine": "manticoresearch:rowwise",
+        "engine": "manticoresearch:rowwise_tuned",
         "memory": 110000
       },
       {
@@ -145,11 +145,11 @@
         "memory": 1024
       },
       {
-        "engine": "manticoresearch:columnar",
+        "engine": "manticoresearch:columnar_tuned",
         "memory": 1024
       },
       {
-        "engine": "manticoresearch:rowwise",
+        "engine": "manticoresearch:rowwise_tuned",
         "memory": 1024
       }
     ],

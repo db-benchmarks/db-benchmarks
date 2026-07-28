@@ -23,8 +23,8 @@ fi
 ../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch --type=tuned
-../../init --engine=manticoresearch --type=rowwise
-../../init --engine=manticoresearch --type=columnar
+../../init --engine=manticoresearch --type=rowwise_tuned
+../../init --engine=manticoresearch --type=columnar_tuned
 ../../init --engine=mysql --type=tuned
 
 #### non-tuned engines ####

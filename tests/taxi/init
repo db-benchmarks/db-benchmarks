@@ -16,4 +16,4 @@ docker compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 ../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch --type=tuned
-../../init --engine=manticoresearch --type=columnar
+../../init --engine=manticoresearch --type=columnar_tuned

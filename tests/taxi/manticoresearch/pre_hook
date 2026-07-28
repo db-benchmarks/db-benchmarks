@@ -16,7 +16,12 @@ fi
 echo "Manticore version: $MANTICORE_REPORTED_VERSION"
 php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
 
-if [ -f manticoresearch/idx$suffix/${test}1.*sph ]; then
+rt_dir="manticoresearch/idx$suffix/$test"
+if [ -d "$rt_dir" ] && (
+  [ -f "$rt_dir/$test.meta" ] ||
+  [ -f "$rt_dir/$test.settings" ] ||
+  ls -1 "$rt_dir/$test".*.sph >/dev/null 2>&1
+); then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
   exit 10
 fi

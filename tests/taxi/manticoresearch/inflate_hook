@@ -1,8 +1,49 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 echo -en "\tStarting loading at "
 date
 
-proc=32
-docker exec -e proc=$proc manticoresearch_engine bash -c \
-'for n in `seq 1 $proc`; do (indexer --noprogress -c /etc/manticoresearch/manticore.conf taxi$n|tee /tmp/taxi$n) & pids[${n}]=$!; done; for pid in ${pids[*]}; do wait $pid; done';
+docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 \
+  < <(php manticoresearch/generate_manticore_schema.php --test="$test" --type="$suffix")
+
+workers=$(nproc)
+path=$(pwd)
+network_name=$(docker compose -f ../../docker-compose.yml --env-file ../../.env config --format=json | jq -r .networks.default.name)
+
+cmd=(
+  docker run
+  -e PIPELINE_BATCH_SIZE=250
+  --env-file ../../.env
+  -e XPACK_MONITORING_ENABLED=false
+  -e PIPELINE_WORKERS="$workers"
+  --network="$network_name"
+  --rm
+  -v "$path/data/:/data/"
+  -v "$path/manticoresearch/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf"
+  docker.elastic.co/logstash/logstash:9.4.3
+)
+
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
+logstash_error_pattern='Encountered a retryable error|Request Entity Too Large|No Available connections|Marking url as dead|Elasticsearch Unreachable|Broken pipe|Failed to perform request|Attempted to send a bulk request|abort processing current batch|PHP Fatal error|Allowed memory size|unable to allocate memory|memory exhausted|out of memory|cannot allocate memory'
+
+set +e
+"${cmd[@]}" 2>&1 | tee "$log"
+status=${PIPESTATUS[0]}
+set -e
+
+if [[ $status -ne 0 ]]; then
+  if grep -q "ConcurrentModificationException" "$log"; then
+    echo -e "\tLogstash exited with ConcurrentModificationException after pipeline shutdown; post_hook will verify inserted rows."
+    exit 0
+  fi
+
+  exit "$status"
+fi
+
+if grep -qEi "$logstash_error_pattern" "$log"; then
+  echo -e "\tLogstash reported output errors; failing ingestion before post_hook."
+  grep -Ei "$logstash_error_pattern" "$log" | tail -20 >&2
+  exit 1
+fi
