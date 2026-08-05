@@ -7,4 +7,17 @@ date
 docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 \
   < <(php manticoresearch/generate_manticore_schema.php --test="$test" --type="$suffix")
 
-python3 manticoresearch/load_csv.py
+path=$(pwd)
+fluent_bit_dir="$path/fluent-bit"
+if [[ ! -f "$fluent_bit_dir/fluent-bit.conf" ]]; then
+  fluent_bit_dir="$path/manticoresearch/fluent-bit"
+fi
+
+normalize_function=""
+id_key=""
+if [[ "$test" == "taxi" ]]; then
+  normalize_function="parse_taxi_manticore"
+  id_key="id"
+fi
+
+../misc/fluent-bit/run.sh manticoresearch 9308 "$fluent_bit_dir" - "$normalize_function" "$id_key"

@@ -11,6 +11,7 @@ $engine = strstr($type, 'columnar') ? " engine='columnar'" : '';
 echo "DROP TABLE IF EXISTS $test;
 ";
 echo "CREATE TABLE $test (" .
+    "`@timestamp` string, " .
     "story_id int, " .
     "story_text text, " .
     "story_author text indexed attribute, " .

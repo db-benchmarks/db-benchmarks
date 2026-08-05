@@ -8,6 +8,9 @@
     },
     "mappings": {
       "properties": {
+        "@timestamp": {
+          "type": "keyword"
+        },
         "vendor_id": {
           "type": "keyword"
         },
@@ -174,4 +177,3 @@
     }
   }
 }
-

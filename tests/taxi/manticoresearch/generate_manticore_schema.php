@@ -11,6 +11,7 @@ $shards = 32;
 
 echo "DROP TABLE IF EXISTS $test;\n";
 echo "CREATE TABLE $test (" .
+    "`@timestamp` string, " .
     "vendor_id string, " .
     "pickup_datetime timestamp, " .
     "dropoff_datetime timestamp, " .

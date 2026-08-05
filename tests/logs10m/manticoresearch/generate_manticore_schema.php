@@ -11,6 +11,7 @@ $engine = strstr($type, 'columnar') ? " engine='columnar'" : '';
 echo "DROP TABLE IF EXISTS $test;
 ";
 echo "CREATE TABLE $test (" .
+    "`@timestamp` string, " .
     "remote_addr text, " .
     "remote_user text, " .
     "runtime int, " .

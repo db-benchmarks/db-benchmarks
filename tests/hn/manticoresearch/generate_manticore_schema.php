@@ -11,6 +11,7 @@ $shards = 32;
 
 echo "DROP TABLE IF EXISTS $test;\n";
 echo "CREATE TABLE $test (" .
+    "`@timestamp` string, " .
     "story_id int, " .
     "story_text text, " .
     "story_author text indexed attribute, " .

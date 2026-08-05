@@ -6,6 +6,9 @@
     },
     "mappings": {
       "properties": {
+        "@timestamp": {
+          "type": "keyword"
+        },
         "remote_addr": {
           "type": "text"
         },
@@ -48,5 +51,3 @@
     }
   }
 }
-
-

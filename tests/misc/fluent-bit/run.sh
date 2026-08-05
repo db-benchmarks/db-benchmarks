@@ -67,52 +67,10 @@ if [[ "$template_dir" != "-" ]]; then
     --data-binary @- >/dev/null <<'JSON'
 {
   "processors": [
-    {"remove": {"field": "@timestamp", "ignore_missing": true}},
     {"remove": {"field": "id", "ignore_missing": true}}
   ]
 }
 JSON
-fi
-
-manticore_table_type() {
-  docker exec manticoresearch_engine mysql -h127.0.0.1 -P9306 -N -B \
-    -e "SHOW TABLES" 2>/dev/null | awk -v table="$test" '($1 == table) { print $2; exit } ($2 == table) { print $4; exit }'
-}
-
-alter_manticore_column() {
-  local table="$1"
-  local action="$2"
-
-  if [[ "$action" == "ADD" ]]; then
-    docker exec manticoresearch_engine mysql -h127.0.0.1 -P9306 \
-      -e "ALTER TABLE $table ADD COLUMN \`@timestamp\` string" >/dev/null 2>&1 || true
-  else
-    docker exec manticoresearch_engine mysql -h127.0.0.1 -P9306 \
-      -e "ALTER TABLE $table DROP COLUMN \`@timestamp\`" >/dev/null 2>&1 || true
-  fi
-}
-
-for_manticore_tables() {
-  local action="$1"
-  local table_type
-
-  table_type=$(manticore_table_type)
-  if [[ "$table_type" == "shard" ]]; then
-    for i in $(seq 0 1023); do
-      if ! docker exec manticoresearch_engine mysql -h127.0.0.1 -P9306 \
-        -e "DESC system.${test}_s$i" >/dev/null 2>&1; then
-        break
-      fi
-
-      alter_manticore_column "system.${test}_s$i" "$action"
-    done
-  else
-    alter_manticore_column "$test" "$action"
-  fi
-}
-
-if [[ "$host" == "manticoresearch" ]]; then
-  for_manticore_tables ADD
 fi
 
 # We use docker compose here because it usually has the newer JSON-capable version.
@@ -141,10 +99,6 @@ set +e
 "${cmd[@]}" 2>&1 | tee "$log"
 status=${PIPESTATUS[0]}
 set -e
-
-if [[ "$host" == "manticoresearch" ]]; then
-  for_manticore_tables DROP
-fi
 
 if [[ $status -ne 0 ]]; then
   exit "$status"
