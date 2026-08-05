@@ -1,5 +1,5 @@
 {
-  "index_patterns": "hn_small",
+  "index_patterns": "hn",
   "template": {
     "settings": {
       "index.queries.cache.enabled": false
@@ -47,4 +47,3 @@
     }
   }
 }
-

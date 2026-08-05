@@ -1,7 +1,9 @@
 {
-  "index_patterns": "hn_small",
+  "index_patterns": "hn",
   "template": {
     "settings": {
+      "number_of_replicas": 0,
+      "number_of_shards": 32,
       "index.queries.cache.enabled": false
     },
     "mappings": {
@@ -47,4 +49,3 @@
     }
   }
 }
-

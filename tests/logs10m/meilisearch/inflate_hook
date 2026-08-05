@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-. "../../misc/func.sh"
-
 echo -en "\tStarting loading at "
 date
 
-header="id:number,remote_addr,remote_user,runtime:number,time_local:number,request_type,request_path,request_protocol,status:number,size:number,referer,usearagent"
+jsonl_file=./data/data.jsonl
+chunk_size=50000
 
 echo -e "Creating an index"
 curl -s \
@@ -42,4 +41,58 @@ curl -s \
 sleep 5
 echo -e "Index settings:"
 curl -s "http://localhost:7700/indexes/$test/settings" | jq .
-init_meilisearch "$test" "$header"  || exit 1
+
+count=$(curl -s -X GET "http://localhost:7700/indexes/$test/stats" \
+  | jq | grep numberOfDocuments | head -n 1 | cut -d':' -f2 | tr -d ' ,')
+echo "Found ${count:-0} documents in Meilisearch"
+
+if (( count > 0 )); then
+  echo -e "\tNo need to rebuild"
+  exit 1
+fi
+
+if [ ! -f "$jsonl_file" ]; then
+  echo -e "\tMissing $jsonl_file; run ./prepare_jsonl/prepare.sh first"
+  exit 1
+fi
+
+rm -f "$jsonl_file".?????
+split -a 5 -l "$chunk_size" "$jsonl_file" "$jsonl_file."
+jsonl_files=("$jsonl_file".?????)
+task_ids=()
+
+echo -en "\tStarting loading into $test at "; date
+
+for f in "${jsonl_files[@]}"; do
+  printf "\tFile: %s. " "$f"
+  response=$(curl -s \
+    -X POST "http://localhost:7700/indexes/$test/documents?primaryKey=id" \
+    -H 'Content-Type: application/x-ndjson' \
+    --data-binary @"$f")
+  task_id=$(printf '%s' "$response" | jq -r '.taskUid // empty')
+  if [[ -z "$task_id" ]]; then
+    echo
+    echo -e "\tFailed to enqueue $f"
+    printf '%s\n' "$response"
+    exit 1
+  fi
+  task_ids+=("$task_id")
+  printf "Task: %s\n" "$task_id"
+  rm "$f"
+done
+
+while true; do
+  if [ "$(curl -s -X GET "http://localhost:7700/tasks/?limit=10000&statuses=enqueued,processing" | jq '.results|length')" -eq 0 ]; then break; fi
+  sleep 1
+done
+
+for task_id in "${task_ids[@]}"; do
+  status=$(curl -s -X GET "http://localhost:7700/tasks/$task_id" | jq -r '.status')
+  if [[ "$status" != "succeeded" ]]; then
+    echo -e "\tMeilisearch task $task_id failed with status: $status"
+    curl -s -X GET "http://localhost:7700/tasks/$task_id" | jq .
+    exit 1
+  fi
+done
+
+echo -en "\tFinished loading at "; date

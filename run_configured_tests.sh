@@ -429,6 +429,13 @@ else
           cd ../..
           exit 1
         fi
+      elif [ -f "./prepare_jsonl/prepare.sh" ]; then
+        ./prepare_jsonl/prepare.sh
+        if [ $? -ne 0 ]; then
+          script_log "error" "Couldn't prepare JSONL for $TEST"
+          cd ../..
+          exit 1
+        fi
       elif [ -f "./prepare_csv/prepare.sh" ]; then
         ./prepare_csv/prepare.sh
         if [ $? -ne 0 ]; then

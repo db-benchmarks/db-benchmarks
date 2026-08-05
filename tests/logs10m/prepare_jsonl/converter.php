@@ -3,15 +3,16 @@
 
 class Converter
 {
-    private const CSV_RESULT_FILE = '../data/data.csv';
+    private const JSONL_RESULT_FILE = '../data/data.jsonl';
     private const BATCH_SIZE = 500;
+    private const EXCLUDED_IDS = [2222903, 2537971, 4831596];
     private $batch;
     private $counter = 0;
 
     public function __construct()
     {
-        if (file_exists(self::CSV_RESULT_FILE)) {
-            unlink(self::CSV_RESULT_FILE);
+        if (file_exists(self::JSONL_RESULT_FILE)) {
+            unlink(self::JSONL_RESULT_FILE);
         }
     }
 
@@ -70,8 +71,8 @@ class Converter
 
     public function save(): bool
     {
-        if (file_exists(self::CSV_RESULT_FILE)) {
-            echo "CSV results exists. Skip conversion";
+        if (file_exists(self::JSONL_RESULT_FILE)) {
+            echo "JSONL results exists. Skip conversion";
 
             return false;
         }
@@ -82,7 +83,7 @@ class Converter
             while (($buffer = fgets($handle, 16384)) !== false) {
                 $i++;
                 $data = $this->parseLine($i, $buffer);
-                if ($data !== false) {
+                if ($data !== false && !in_array($data['id'], self::EXCLUDED_IDS, true)) {
                     $this->stackToBatch($data);
                 }
 
@@ -93,7 +94,7 @@ class Converter
             fclose($handle);
         }
 
-        $this->saveToCsv();
+        $this->saveToJsonl();
 
         return true;
     }
@@ -101,46 +102,48 @@ class Converter
     private function stackToBatch($line): void
     {
         $this->batch[] = $line;
-        if ((count($this->batch) >= self::BATCH_SIZE) && $this->saveToCsv()) {
+        if ((count($this->batch) >= self::BATCH_SIZE) && $this->saveToJsonl()) {
             echo 'Converted ' . $this->counter . " records\n";
         }
     }
 
-    private function saveToCsv(): bool
+    private function saveToJsonl(): bool
     {
 
         if (count($this->batch) === 0) {
             return false;
         }
 
-        $csv = fopen(self::CSV_RESULT_FILE, 'ab');
-        $mem = fopen('php://temp/maxmemory:1048576', 'w');
+        $jsonl = fopen(self::JSONL_RESULT_FILE, 'ab');
         foreach ($this->batch as $fields) {
             foreach ($fields as $k=>$v) {
-                $v = str_replace(array(
-                    // control characters
-                   chr(0), chr(1), chr(2), chr(3), chr(4), chr(5), chr(6), chr(7), chr(8),
-                   chr(11), chr(12), chr(14), chr(15), chr(16), chr(17), chr(18), chr(19), chr(20),
-                   chr(21), chr(22), chr(23), chr(24), chr(25), chr(26), chr(27), chr(28), chr(29), chr(30),
-                   chr(31),
-                   // non-printing characters
-                   chr(127)
-                ), '', $v);
-                $v = '"'.str_replace('"','""',$v).'"';
-                $fields[$k] = $v;
+                $fields[$k] = $this->sanitizeValue($v);
             }
-            fputcsv($mem, $fields, ',', "\0", '\\');
-            rewind($mem);
-            fwrite($csv, str_replace(chr(0), '', stream_get_contents($mem)));
-            ftruncate($mem, 0);
+            fwrite($jsonl, json_encode($fields)."\n");
         }
-        fclose($csv);
-        fclose($mem);
+        fclose($jsonl);
 
         $this->counter += count($this->batch);
         $this->batch   = [];
 
         return true;
+    }
+
+    private function sanitizeValue($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        return str_replace(array(
+            // control characters
+           chr(0), chr(1), chr(2), chr(3), chr(4), chr(5), chr(6), chr(7), chr(8),
+           chr(11), chr(12), chr(14), chr(15), chr(16), chr(17), chr(18), chr(19), chr(20),
+           chr(21), chr(22), chr(23), chr(24), chr(25), chr(26), chr(27), chr(28), chr(29), chr(30),
+           chr(31),
+           // non-printing characters
+           chr(127)
+        ), '', $value);
     }
 }
 

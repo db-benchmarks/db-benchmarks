@@ -18,7 +18,7 @@ curl -s \
 
 sleep 5
 
-# maxTotalHits is overrided since otherwise a query like "select count(*) from hn_small where comment_ranking > 300 and comment_ranking < 500" returns 1000 at max
+# maxTotalHits is overrided since otherwise a query like "select count(*) from $test where comment_ranking > 300 and comment_ranking < 500" returns 1000 at max
 echo -e "Patching the index"
 curl -s \
   -X PATCH "http://localhost:7700/indexes/$test/settings" \

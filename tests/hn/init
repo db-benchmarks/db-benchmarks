@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")
@@ -52,6 +53,10 @@ fi
 if [[ -d mysql_percona ]]; then
   ../../init --engine=mysql_percona
 fi
+
+# data.jsonl is a derived ingestion helper; keep canonical data.csv, but drop
+# the raw download cache after preparation to avoid retaining extra large files.
+rm -f data/data.jsonl data/downloaded.csv
 
 # Meilisearch never finishes ingesting the data, hence commented out
 # Meilisearch

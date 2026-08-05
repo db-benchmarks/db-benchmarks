@@ -355,15 +355,16 @@ We will then:
   |  |  |  |  |-jvm.options
   |  |  |  |  |-log4j2.properties
   |  |  |  |-config_tuned                   <- Elasticsearch configuration directory for the "tuned" type.
-  |  |  |  |-logstash                       <- Logstash configuration directory.
-  |  |  |  |  |-logstash.conf
+  |  |  |  |-fluent-bit                     <- Elasticsearch index template used by Fluent Bit ingestion.
   |  |  |  |  |-template.json
-  |  |  |  |-logstash_tuned                 <- Logstash configuration directory for the "tuned" type.
-  |  |  |  |  |-logstash.conf
+  |  |  |  |-fluent-bit_tuned               <- Tuned Elasticsearch index template used by Fluent Bit ingestion.
   |  |  |  |  |-template.json
   |  |  |  |-inflate_hook                   <- Engine initialization script for data ingestion.
   |  |  |  |-post_hook                      <- Verifies document count and data consistency.
   |  |  |  |-pre_hook                       <- Pre-check script for table rebuilding and engine initialization.
+  |  |  |-fluent-bit                         <- Shared Fluent Bit ingestion config for Elasticsearch and Manticore Search.
+  |  |  |  |-fluent-bit.conf                 <- Fluent Bit config with placeholders for host, port, and worker count.
+  |  |  |  |-fluent-bit-parsers.conf         <- Fluent Bit parser config when the suite ingests JSONL.
   |  |  |-manticoresearch                   <- Directory for testing Manticore Search in the Hackernews test suite.
   |  |  |  |-generate_manticore_config.php  <- Script for dynamically generating Manticore Search configuration.
   |  |  |  |-inflate_hook                   <- Data ingestion script.

@@ -28,11 +28,22 @@ fi
 
 mkdir -p manticoresearch/idx$suffix/data/binlog
 chmod 777 manticoresearch/idx$suffix/data/binlog
-suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
+compose_output=$(suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch 2>&1)
+compose_status=$?
+printf '%s\n' "$compose_output"
+if [[ $compose_status -ne 0 ]]; then
+  echo -e '\tManticore failed to start. Full docker compose output is shown above.'
+  exit 1
+fi
 
 if timeout 120 grep -qm1 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
   echo -e '\tAccepting connections';
 else
   echo -e '\tManticore failed to start properly in 60 seconds';
+  exit 1
+fi
+
+if [ ! -f data/data.jsonl ]; then
+  echo -e "\tMissing data/data.jsonl; run ./prepare_jsonl/prepare.sh first"
   exit 1
 fi

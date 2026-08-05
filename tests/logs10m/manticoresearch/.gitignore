@@ -1,4 +1,4 @@
 *.conf
-!logstash/
-!logstash/*.conf
+!fluent-bit/
+!fluent-bit/*.conf
 idx_*
