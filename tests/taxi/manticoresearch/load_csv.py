@@ -3,6 +3,8 @@ import csv
 import glob
 import http.client
 import json
+import os
+from pathlib import Path
 import sys
 
 COLUMNS = [
@@ -31,10 +33,29 @@ FLOAT_COLUMNS = {
     'snowfall', 'wind',
 }
 
-BATCH_SIZE = 1000
-MANTICORE_HOST = 'localhost'
-MANTICORE_PORT = 9308
 INDEX_NAME = 'taxi'
+
+
+def env_value(name, default):
+    value = os.getenv(name)
+    if value is not None:
+        return value
+
+    env_path = Path(__file__).resolve().parents[3] / '.env'
+    if not env_path.exists():
+        return default
+
+    for line in env_path.read_text().splitlines():
+        key, separator, value = line.partition('=')
+        if separator and key == name:
+            return value.strip().strip('"\'')
+
+    return default
+
+
+BATCH_SIZE = 1000
+MANTICORE_HOST = env_value('MANTICORE_HTTP_HOST', 'localhost')
+MANTICORE_PORT = int(env_value('MANTICORE_HTTP_PORT', '9308'))
 
 
 def convert_value(key, value):
@@ -51,12 +72,17 @@ def post_batch(batch):
     if not batch:
         return
 
-    conn = http.client.HTTPConnection(MANTICORE_HOST, MANTICORE_PORT, timeout=600)
     body = ''.join(batch).encode()
-    conn.request('POST', '/_bulk?filter_path=errors,took', body, {'Content-Type': 'application/x-ndjson'})
-    response = conn.getresponse()
-    payload = response.read()
-    conn.close()
+
+    try:
+        conn = http.client.HTTPConnection(MANTICORE_HOST, MANTICORE_PORT, timeout=600)
+        conn.request('POST', '/_bulk?filter_path=errors,took', body, {'Content-Type': 'application/x-ndjson'})
+        response = conn.getresponse()
+        payload = response.read()
+        conn.close()
+    except OSError as e:
+        print(f'Failed to connect to Manticore HTTP at {MANTICORE_HOST}:{MANTICORE_PORT}: {e}', file=sys.stderr)
+        raise SystemExit(1)
 
     if response.status >= 400:
         print(f'Manticore bulk HTTP {response.status}: {payload[:4000].decode(errors="replace")}', file=sys.stderr)
