@@ -15,17 +15,27 @@ if [ -z "$MANTICORE_REPORTED_VERSION" ]; then
 fi
 echo "Manticore version: $MANTICORE_REPORTED_VERSION"
 
-php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
+shards=$(../misc/manticore_shards_from_cpuset.sh ../../.env)
+if [ -z "$shards" ]; then
+  echo -e "\tCouldn't determine shard count from cpuset"
+  exit 1
+fi
+echo -e "\tManticore shards from cpuset: $shards"
 
-rt_dir="manticoresearch/idx$suffix/$test"
-if [ -d "$rt_dir" ] && (
-  [ -f "$rt_dir/$test.meta" ] ||
-  [ -f "$rt_dir/$test.settings" ] ||
-  ls -1 "$rt_dir/$test".*.sph >/dev/null 2>&1
-); then
+php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix --shards=$shards > manticoresearch/manticore$suffix.conf
+
+if [ -f manticoresearch/idx$suffix/${test}1.*sph ]; then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
   exit 10
 fi
+
+if [ ! -f data/data.jsonl ]; then
+  echo -e "\tConvert CSV to JSONL"
+  php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
+fi
+
+php manticoresearch/split_jsonl_shards.php --input=data/data.jsonl --output-dir=data/manticoresearch_shards --shards=$shards
+echo "$shards" > data/manticoresearch_shards/.shards
 
 # Source local hook if it exists
 if [ -f ../../local_hooks/hn_hook.sh ]; then
@@ -35,22 +45,11 @@ fi
 
 mkdir -p manticoresearch/idx$suffix/data/binlog
 chmod 777 manticoresearch/idx$suffix/data/binlog
-compose_output=$(suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch 2>&1)
-compose_status=$?
-printf '%s\n' "$compose_output"
-if [[ $compose_status -ne 0 ]]; then
-  echo -e '\tManticore failed to start. Full docker compose output is shown above.'
-  exit 1
-fi
+suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
 
 if timeout 120 grep -qm1 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
   echo -e '\tAccepting connections';
 else
   echo -e '\tManticore failed to start properly in 60 seconds';
   exit 1
-fi
-
-if [ ! -f data/data.jsonl ]; then
-  echo -e "\tConvert CSV to JSONL"
-  php ./typesense/csv_jsonl.php ./data/data.csv ./data/data.jsonl
 fi

@@ -1,9 +1,16 @@
 #!/bin/bash
 
-# Load environment variables from .env file if it exists
+# Load simple KEY=VALUE entries from .env if it exists. Keep this parser
+# conservative: skip comments/blank lines and ignore malformed variable names.
 if [ -f .env ]; then
-  while IFS= read -r line; do
-    if [[ $line =~ ^[[:space:]]*([^=]+)=(.*)$ ]]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    [[ $line =~ ^[[:space:]]*$ ]] && continue
+    [[ $line =~ ^[[:space:]]*# ]] && continue
+    if [[ $line =~ ^[[:space:]]*export[[:space:]]+(.+)$ ]]; then
+      line="${BASH_REMATCH[1]}"
+    fi
+    if [[ $line =~ ^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
       export "${BASH_REMATCH[1]}"="${BASH_REMATCH[2]}"
     fi
   done < .env
@@ -96,7 +103,6 @@ setting_value() {
 SAVE_RESULTS=$(setting_bool "save" true)
 QUIET_TESTS=$(setting_bool "quiet" true)
 IMAGE_TEMPLATE=$(setting_value "image" "manticoresearch/manticore:%s")
-DEDUPE_ENGINE_GLOB="manticoresearch*"
 RESULT_DB_ENGINE=$(setting_value "result_engine" "manticoresearch")
 SUCCESS_HOOK=$(setting_value "success_hook" "local_hooks/nightly_hook.sh")
 HAS_INIT=false
@@ -327,22 +333,50 @@ get_result_dir() {
 
 results_exist() {
   local test_name="$1"
-  local retest_only="$2"
-  local results_root="$3"
+  local config_json="$2"
+  local retest_only="$3"
+  local include_type_suffix="$4"
+  local dir
+  local file
 
   if [ -z "$VERSION" ] || [ -z "$SHORT_HASH" ]; then
     return 1
   fi
 
-  if [ ! -d "./$results_root/$test_name" ]; then
+  dir=$(get_result_dir "$test_name" "$config_json" "$include_type_suffix")
+  if [ ! -d "./$dir" ]; then
     return 1
   fi
 
-  if [ "$retest_only" = true ]; then
-    find "./$results_root/$test_name" -path "*/$DEDUPE_ENGINE_GLOB" -name "*_retest*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null
-  else
-    find "./$results_root/$test_name" -path "*/$DEDUPE_ENGINE_GLOB" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null
-  fi
+  while IFS= read -r file; do
+    if grep -q "$VERSION" "$file" && grep -q "$SHORT_HASH" "$file"; then
+      return 0
+    fi
+  done < <(
+    if [ "$retest_only" = true ]; then
+      find "./$dir" -name "*_retest*" -type f
+    else
+      find "./$dir" ! -name "*_retest*" -type f
+    fi
+  )
+
+  return 1
+}
+
+test_has_missing_results() {
+  local test_name="$1"
+  local retest_only="$2"
+  local configs_json
+  local config_json
+
+  configs_json=$(jq -c --arg test_name "$test_name" '.tests[$test_name][]' "$CONFIG_FILE")
+  while IFS= read -r config_json; do
+    if ! results_exist "$test_name" "$config_json" "$retest_only" true; then
+      return 0
+    fi
+  done <<< "$configs_json"
+
+  return 1
 }
 
 run_test_config() {
@@ -399,13 +433,12 @@ if [ "$HAS_INIT" != true ]; then
   done
 else
   for TEST in "${unique_tests[@]}"; do
-  if results_exist "$TEST" false "results/nightly"; then
-    script_log "warning" "Results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
+  if ! test_has_missing_results "$TEST" false; then
+    script_log "warning" "Initial results for all $TEST configs with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
     continue
   fi
 
   script_log "success" "Running configured tests for $TEST."
-  export TESTS_EXECUTED=true
 
   script_log "info" "Shutting down all engines for $TEST..."
   cd "tests/$TEST"
@@ -469,6 +502,11 @@ else
 
   configs_json=$(jq -c --arg test_name "$TEST" '.tests[$test_name][]' "$CONFIG_FILE")
   while IFS= read -r config_json; do
+    if results_exist "$TEST" "$config_json" false true; then
+      script_log "warning" "Initial result for $TEST config $config_json with version $VERSION and hash $SHORT_HASH already exists. Skipping."
+      continue
+    fi
+    export TESTS_EXECUTED=true
     run_test_config "$TEST" "$config_json" "--no-retest" true
   done <<< "$configs_json"
   done
@@ -477,16 +515,20 @@ else
 
   script_log "info" "Starting retest phase for all tests..."
   for TEST in "${unique_tests[@]}"; do
-    if results_exist "$TEST" true "results/nightly"; then
-      script_log "warning" "Retest results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping retests for $TEST."
+    if ! test_has_missing_results "$TEST" true; then
+      script_log "warning" "Retest results for all $TEST configs with version $VERSION and hash $SHORT_HASH already exist. Skipping retests for $TEST."
       continue
     fi
 
     script_log "success" "Running retests for $TEST."
-    export TESTS_EXECUTED=true
 
     configs_json=$(jq -c --arg test_name "$TEST" '.tests[$test_name][]' "$CONFIG_FILE")
     while IFS= read -r config_json; do
+      if results_exist "$TEST" "$config_json" true true; then
+        script_log "warning" "Retest result for $TEST config $config_json with version $VERSION and hash $SHORT_HASH already exists. Skipping."
+        continue
+      fi
+      export TESTS_EXECUTED=true
       run_test_config "$TEST" "$config_json" "--retest-only" true
     done <<< "$configs_json"
   done
