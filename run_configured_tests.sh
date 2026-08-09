@@ -379,6 +379,12 @@ test_has_missing_results() {
   return 1
 }
 
+test_has_missing_run_results() {
+  local test_name="$1"
+
+  test_has_missing_results "$test_name" false || test_has_missing_results "$test_name" true
+}
+
 run_test_config() {
   local test_name="$1"
   local config_json="$2"
@@ -433,8 +439,8 @@ if [ "$HAS_INIT" != true ]; then
   done
 else
   for TEST in "${unique_tests[@]}"; do
-  if ! test_has_missing_results "$TEST" false; then
-    script_log "warning" "Initial results for all $TEST configs with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
+  if ! test_has_missing_run_results "$TEST"; then
+    script_log "warning" "First-run and retest results for all $TEST configs with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
     continue
   fi
 
