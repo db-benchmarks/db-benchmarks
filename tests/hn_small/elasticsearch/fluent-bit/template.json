@@ -6,9 +6,6 @@
     },
     "mappings": {
       "properties": {
-        "@timestamp": {
-          "type": "keyword"
-        },
         "story_id": {
           "type": "integer"
         },

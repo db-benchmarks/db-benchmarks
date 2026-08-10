@@ -67,7 +67,8 @@ if [[ "$template_dir" != "-" ]]; then
     --data-binary @- >/dev/null <<'JSON'
 {
   "processors": [
-    {"remove": {"field": "id", "ignore_missing": true}}
+    {"remove": {"field": "id", "ignore_missing": true}},
+    {"remove": {"field": "@timestamp", "ignore_missing": true}}
   ]
 }
 JSON

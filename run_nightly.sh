@@ -40,9 +40,9 @@ run_test() {
 
     echo "$(date): Starting ${tag} tests" >> "$temp_log"
     if [ "$tag" = "dev" ]; then
-        ./run_configured_tests.sh -c nightly_config.json >> "$temp_log" 2>&1
+        ./run_configured_tests.sh -c configs/nightly.json >> "$temp_log" 2>&1
     else
-        ./run_configured_tests.sh -c nightly_config.json -t "$tag" >> "$temp_log" 2>&1
+        ./run_configured_tests.sh -c configs/nightly.json -t "$tag" >> "$temp_log" 2>&1
     fi
     local exit_code=$?
 

@@ -183,18 +183,18 @@ The repository includes `run_configured_tests.sh`, a JSON-configured runner used
 
 ### Scripts and configs
 
-- `run_configured_tests.sh`: Runs tests from a JSON config. Use `-c` to choose a config, `-t` to choose the Docker image tag for configs with an image template, and `-s` to skip initialization for configs that define `init`. The runner checks Manticore ports and server load before starting; occupied ports or sustained high load exit with code 2 so wrappers can classify the run as skipped.
-- `nightly_config.json`: Manticoresearch nightly config. It pulls `manticoresearch/manticore:<tag>`, checks the image version and hash with `searchd --version`, prepares data before init, runs the configured Manticore init hooks, writes nightly output under `results/nightly/`, runs the initial benchmark phase, waits for the server to settle, runs retests, skips config entries that already have matching results for the same version/hash, saves only `results/nightly/`, and then sources the success hook if configured. Init hooks may reuse existing indexes and print `No need to rebuild`; use `-s` only to skip the init step entirely.
-- `regular_config.json`: Regular important test config. It mirrors the previous `important_tests.sh` command list except that HN and taxi Manticore entries intentionally use `manticoresearch:columnar_tuned` and `manticoresearch:rowwise_tuned`. It writes to the normal `results/<test>/<engine>` tree and does not save results by default.
-- `important_tests.sh`: Compatibility wrapper for `./run_configured_tests.sh -c regular_config.json`.
+- `run_configured_tests.sh`: Runs tests from a JSON config. Use `-c` to choose a config, `-t` to choose the Docker image tag for configs with an image template, and `-s` to skip initialization for configs that define `init`. Configs with `init` check Manticore ports and server load before starting; occupied ports or sustained high load exit with code 2 so wrappers can classify the run as skipped.
+- `configs/nightly.json`: Manticoresearch nightly config. It pulls `manticoresearch/manticore:<tag>`, checks the image version and hash with `searchd --version`, prepares data before init, runs the configured Manticore init hooks, writes nightly output under `results/nightly/`, runs the initial benchmark phase, waits for the server to settle, runs retests, skips config entries that already have matching results for the same version/hash, saves only `results/nightly/`, and then sources the success hook if configured. Init hooks may reuse existing indexes and print `No need to rebuild`; use `-s` only to skip the init step entirely.
+- `configs/regular.json`: Regular important test config. It mirrors the previous `important_tests.sh` command list except that HN and taxi Manticore entries intentionally use `manticoresearch:columnar_tuned` and `manticoresearch:rowwise_tuned`. It writes to the normal `results/<test>/<engine>` tree and does not save results by default.
+- `important_tests.sh`: Compatibility wrapper for `./run_configured_tests.sh -c configs/regular.json`.
 - `run_nightly.sh`: Runs nightly Manticoresearch tests for both `latest` and `dev` tags and handles dated logs plus failure/skipped hooks.
 
 Examples:
 
 ```bash
-./run_configured_tests.sh -c nightly_config.json
-./run_configured_tests.sh -c nightly_config.json -t latest
-./run_configured_tests.sh -c regular_config.json
+./run_configured_tests.sh -c configs/nightly.json
+./run_configured_tests.sh -c configs/nightly.json -t latest
+./run_configured_tests.sh -c configs/regular.json
 ./important_tests.sh
 ```
 
@@ -350,13 +350,7 @@ We will then:
   |  |  |  |-pre_hook                       <- Engine pre-check script. Determines if tables need to be rebuilt, starts the engine, and ensures availability.
   |  |  |-data                              <- Prepared data collection for the tests.
   |  |  |-elasticsearch                     <- Directory for "Hackernews test -> Elasticsearch".
-  |  |  |  |-config                         <- Elasticsearch configuration directory. 
-  |  |  |  |  |-elasticsearch.yml
-  |  |  |  |  |-jvm.options
-  |  |  |  |  |-log4j2.properties
   |  |  |  |-config_tuned                   <- Elasticsearch configuration directory for the "tuned" type.
-  |  |  |  |-fluent-bit                     <- Elasticsearch index template used by Fluent Bit ingestion.
-  |  |  |  |  |-template.json
   |  |  |  |-fluent-bit_tuned               <- Tuned Elasticsearch index template used by Fluent Bit ingestion.
   |  |  |  |  |-template.json
   |  |  |  |-inflate_hook                   <- Engine initialization script for data ingestion.
@@ -409,9 +403,10 @@ We will then:
    |-NOTICE                                  <- Notice file.
    |-README.md                               <- You're reading this file.
    |-docker-compose.yml                      <- Docker Compose configuration for starting and stopping databases and search engines.
-   |-important_tests.sh                       <- Compatibility wrapper for regular_config.json important test runs.
-   |-nightly_config.json                      <- Configured Manticoresearch nightly benchmark suite.
-   |-regular_config.json                      <- Configured regular important benchmark suite.
+   |-configs                                  <- JSON benchmark-runner configurations.
+   |  |-nightly.json                           <- Configured Manticoresearch nightly benchmark suite.
+   |  |-regular.json                           <- Configured regular important benchmark suite.
+   |-important_tests.sh                       <- Compatibility wrapper for configs/regular.json important test runs.
    |-run_configured_tests.sh                  <- JSON-configured benchmark runner.
    |-init                                    <- Initialization script. Handles data ingestion and tracks the time taken.
    |-logo.svg                                <- Logo file.

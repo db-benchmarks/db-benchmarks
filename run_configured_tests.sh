@@ -18,11 +18,11 @@ fi
 
 TAG="dev"
 SKIP_INIT=false
-CONFIG_FILE="nightly_config.json"
+CONFIG_FILE="configs/nightly.json"
 
 usage() {
-  echo "Usage: $0 [-c config.json] [-t tag] [-s]" >&2
-  echo "  -c config.json: test run config (defaults to nightly_config.json)" >&2
+  echo "Usage: $0 [-c configs/config.json] [-t tag] [-s]" >&2
+  echo "  -c configs/config.json: test run config (defaults to configs/nightly.json)" >&2
   echo "  -t tag: Docker tag for configured image templates (dev by default)" >&2
   echo "  -s: skip initialization (reuse existing indexes/data)" >&2
 }
@@ -73,7 +73,8 @@ fi
 export TESTS_EXECUTED=false
 
 LOCK_FILE="/tmp/db_benchmarks.lock"
-LOAD_THRESHOLD="${LOAD_THRESHOLD:-0.5}"
+LOAD_THRESHOLD="${LOAD_THRESHOLD:-0.1}"
+LOAD_WAIT_STEPS="${LOAD_WAIT_STEPS:-60}"
 
 if ! command -v jq &> /dev/null; then
   script_log "error" "jq is required but not installed. Please install jq to use this script."
@@ -126,7 +127,7 @@ is_high_load() {
 check_load() {
     script_log "info" "Checking server load..."
     local wait_count=0
-    local max_wait=18
+    local max_wait="$LOAD_WAIT_STEPS"
 
     while [ $wait_count -lt $max_wait ]; do
         currentLoad=$(get_current_load)
@@ -149,7 +150,7 @@ check_load() {
         fi
     done
 
-    script_log "error" "Server load remained high for 3 minutes. Skipping tests."
+    script_log "error" "Server load remained high for $max_wait checks. Skipping tests."
     exit 2
 }
 
@@ -278,8 +279,10 @@ check_manticore_ports_available() {
     done
 }
 
-check_manticore_ports_available
-check_load
+if [ "$HAS_INIT" = true ]; then
+  check_manticore_ports_available
+  check_load
+fi
 
 VERSION=""
 SHORT_HASH=""
