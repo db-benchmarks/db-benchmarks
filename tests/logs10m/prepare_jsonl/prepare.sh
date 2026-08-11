@@ -2,9 +2,8 @@
 test_dir=$(realpath "$(dirname "$0")")
 cd "$test_dir"
 
-if [ -f ../data/data.jsonl ]; then
-  rm -f ../data/data.csv
-  echo "JSONL results exists. Skip conversion"
+if [ -f ../data/data.jsonl ] && [ -f ../data/data.csv ]; then
+  echo "JSONL and CSV results exist. Skip conversion"
   exit 0
 fi
 
@@ -20,5 +19,4 @@ if [ ! -f access.log ]; then
 fi
 
 ./converter.php
-rm -f ../data/data.csv
 rm ./access.log

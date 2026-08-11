@@ -4,6 +4,7 @@
 class Converter
 {
     private const JSONL_RESULT_FILE = '../data/data.jsonl';
+    private const CSV_RESULT_FILE = '../data/data.csv';
     private const BATCH_SIZE = 500;
     private const EXCLUDED_IDS = [2222903, 2537971, 4831596];
     private $batch;
@@ -13,6 +14,10 @@ class Converter
     {
         if (file_exists(self::JSONL_RESULT_FILE)) {
             unlink(self::JSONL_RESULT_FILE);
+        }
+
+        if (file_exists(self::CSV_RESULT_FILE)) {
+            unlink(self::CSV_RESULT_FILE);
         }
     }
 
@@ -71,8 +76,8 @@ class Converter
 
     public function save(): bool
     {
-        if (file_exists(self::JSONL_RESULT_FILE)) {
-            echo "JSONL results exists. Skip conversion";
+        if (file_exists(self::JSONL_RESULT_FILE) && file_exists(self::CSV_RESULT_FILE)) {
+            echo "JSONL and CSV results exist. Skip conversion";
 
             return false;
         }
@@ -94,7 +99,7 @@ class Converter
             fclose($handle);
         }
 
-        $this->saveToJsonl();
+        $this->saveToFiles();
 
         return true;
     }
@@ -102,12 +107,12 @@ class Converter
     private function stackToBatch($line): void
     {
         $this->batch[] = $line;
-        if ((count($this->batch) >= self::BATCH_SIZE) && $this->saveToJsonl()) {
+        if ((count($this->batch) >= self::BATCH_SIZE) && $this->saveToFiles()) {
             echo 'Converted ' . $this->counter . " records\n";
         }
     }
 
-    private function saveToJsonl(): bool
+    private function saveToFiles(): bool
     {
 
         if (count($this->batch) === 0) {
@@ -115,13 +120,25 @@ class Converter
         }
 
         $jsonl = fopen(self::JSONL_RESULT_FILE, 'ab');
+        $csv = fopen(self::CSV_RESULT_FILE, 'ab');
+        $mem = fopen('php://temp/maxmemory:1048576', 'w');
         foreach ($this->batch as $fields) {
             foreach ($fields as $k=>$v) {
                 $fields[$k] = $this->sanitizeValue($v);
             }
             fwrite($jsonl, json_encode($fields)."\n");
+
+            foreach ($fields as $k => $v) {
+                $fields[$k] = '"' . str_replace('"', '""', $v) . '"';
+            }
+            fputcsv($mem, $fields, ',', "\0", '\\');
+            rewind($mem);
+            fwrite($csv, str_replace(chr(0), '', stream_get_contents($mem)));
+            ftruncate($mem, 0);
         }
         fclose($jsonl);
+        fclose($csv);
+        fclose($mem);
 
         $this->counter += count($this->batch);
         $this->batch   = [];
