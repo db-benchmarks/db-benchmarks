@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to run nightly Manticoresearch tests for both dev and latest versions
+# Script to run nightly Manticoresearch configured tests for both dev and latest versions
 
 DATE=$(date +%Y%m%d)
 LOG_DIR="${LOG_DIR:-/var/log/db-benchmarks}"
@@ -33,20 +33,16 @@ run_nightly_failure_hook() {
 # Function to run test and handle logging
 run_test() {
     local tag="$1"
-    local nightly_flags_string="${NIGHTLY_MANTICORE_FLAGS:--k}"
-    local nightly_flags=()
     local temp_log="$LOG_DIR/nightly_${tag}_${DATE}_temp.log"
     local final_log="$LOG_DIR/nightly_${tag}_${DATE}.log"
     local failed_log="$LOG_DIR/nightly_${tag}_${DATE}_failed.log"
     local skipped_log="$LOG_DIR/nightly_${tag}_${DATE}_skipped.log"
 
-    read -r -a nightly_flags <<< "$nightly_flags_string"
-
     echo "$(date): Starting ${tag} tests" >> "$temp_log"
     if [ "$tag" = "dev" ]; then
-        ./nightly_manticore.sh "${nightly_flags[@]}" >> "$temp_log" 2>&1
+        ./run_configured_tests.sh -c configs/nightly.json >> "$temp_log" 2>&1
     else
-        ./nightly_manticore.sh -t "$tag" "${nightly_flags[@]}" >> "$temp_log" 2>&1
+        ./run_configured_tests.sh -c configs/nightly.json -t "$tag" >> "$temp_log" 2>&1
     fi
     local exit_code=$?
 

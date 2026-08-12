@@ -26,10 +26,10 @@ curl -s -XPOST "${HOST}/api/v1/indexes" \
   --header "content-type: application/yaml" \
   --data-binary @./quickwit/index-config.yaml
 
+rm -f ./data/data_splitted.*
 if [ ! -f data/data.jsonl ]; then
-    echo -e "\tConvert CSV to JSONL. The current operation might take time. You can check progress by 'cat ./data/data.jsonl | wc -l'"
-    php ./quickwit/csv_jsonl.php ./data/data.csv ./data/data.jsonl
-    echo -e "\tEnd converting"
+    echo -e "\tMissing data/data.jsonl; run ./prepare_data/prepare.sh first"
+    exit 1
 fi
 
 split -l 10000 -a 5 ./data/data.jsonl ./data/data_splitted.

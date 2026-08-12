@@ -15,5 +15,3 @@ if ((count > 0)); then
   echo -e "\tNo need to rebuild"
   exit 10
 fi
-
-docker exec meilisearch_engine apk add coreutils > /dev/null

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")
@@ -12,10 +14,10 @@ NC='\033[0m' # No Color
 docker compose -f ../../docker-compose.yml --env-file ../../.env down
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 
-echo -e "${COLORED}Preparing CSV:${NC}"
-./prepare_csv/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done
+echo -e "${COLORED}Preparing CSV and JSONL:${NC}"
+./prepare_data/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done
 if [ $? -ne 0 ]; then
-  echo -e "\tCouldn't prepare CSV"
+  echo -e "\tCouldn't prepare CSV and JSONL"
   exit 1
 fi
 

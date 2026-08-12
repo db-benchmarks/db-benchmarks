@@ -3,6 +3,6 @@
 echo -en "\tStarting loading at "
 date
 
-proc=32
+proc=$(cat manticoresearch/idx$suffix/.shards)
 docker exec -e proc=$proc manticoresearch_engine bash -c \
-'for n in `seq 1 $proc`; do (indexer --noprogress -c /etc/manticoresearch/manticore.conf taxi$n|tee /tmp/taxi$n) & pids[${n}]=$!; done; for pid in ${pids[*]}; do wait $pid; done';
+'for n in `seq 1 $proc`; do (indexer --noprogress -c /etc/manticoresearch/manticore.conf taxi$n | tee /tmp/taxi$n) & pids[${n}]=$!; done; for pid in ${pids[*]}; do wait $pid; done';

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")
@@ -23,14 +24,9 @@ fi
 ../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch --type=tuned
-../../init --engine=manticoresearch --type=rowwise
-../../init --engine=manticoresearch --type=columnar
+../../init --engine=manticoresearch --type=rowwise_tuned
+../../init --engine=manticoresearch --type=columnar_tuned
 ../../init --engine=mysql --type=tuned
-
-#### non-tuned engines ####
-#../../init --engine=elasticsearch
-#../../init --engine=mysql
-###########################
 
 # Can't process dataset this size
 # ../../init --engine=typesense

@@ -1,0 +1,189 @@
+{
+  "settings": {
+    "image": "",
+    "quiet": false,
+    "save": false,
+    "result_engine": "",
+    "success_hook": ""
+  },
+  "tests": {
+    "taxi": [
+      {
+        "engine": "elasticsearch:tuned",
+        "memory": 110000
+      },
+      {
+        "engine": "clickhouse",
+        "memory": 110000
+      },
+      {
+        "engine": "manticoresearch:columnar_tuned",
+        "memory": 110000
+      }
+    ],
+    "hn_small": [
+      {
+        "engine": "elasticsearch",
+        "memory": 110000
+      },
+      {
+        "engine": "clickhouse",
+        "memory": 110000
+      },
+      {
+        "engine": "manticoresearch",
+        "memory": 110000
+      },
+      {
+        "engine": "mysql",
+        "memory": 110000
+      },
+      {
+        "engine": "mysql_percona",
+        "memory": 110000
+      },
+      {
+        "engine": "meilisearch",
+        "memory": 110000
+      },
+      {
+        "engine": "elasticsearch",
+        "memory": 1024
+      },
+      {
+        "engine": "clickhouse",
+        "memory": 1024
+      },
+      {
+        "engine": "manticoresearch",
+        "memory": 1024
+      },
+      {
+        "engine": "mysql",
+        "memory": 1024
+      },
+      {
+        "engine": "mysql_percona",
+        "memory": 1024
+      },
+      {
+        "engine": "meilisearch",
+        "memory": 1024
+      },
+      {
+        "engine": "elasticsearch",
+        "memory": 1024,
+        "limited": true
+      },
+      {
+        "engine": "clickhouse",
+        "memory": 1024,
+        "limited": true
+      },
+      {
+        "engine": "manticoresearch",
+        "memory": 1024,
+        "limited": true
+      },
+      {
+        "engine": "mysql",
+        "memory": 1024,
+        "limited": true
+      },
+      {
+        "engine": "mysql_percona",
+        "memory": 1024,
+        "limited": true
+      },
+      {
+        "engine": "meilisearch",
+        "memory": 1024,
+        "limited": true
+      },
+      {
+        "engine": "postgres",
+        "memory": 1024,
+        "limited": true
+      },
+      {
+        "engine": "typesense",
+        "memory": 1024,
+        "limited": true
+      }
+    ],
+    "hn": [
+      {
+        "engine": "mysql:tuned",
+        "memory": 110000
+      },
+      {
+        "engine": "elasticsearch:tuned",
+        "memory": 110000
+      },
+      {
+        "engine": "clickhouse",
+        "memory": 110000
+      },
+      {
+        "engine": "manticoresearch:columnar_tuned",
+        "memory": 110000
+      },
+      {
+        "engine": "manticoresearch:rowwise_tuned",
+        "memory": 110000
+      },
+      {
+        "engine": "mysql:tuned",
+        "memory": 1024
+      },
+      {
+        "engine": "elasticsearch:tuned",
+        "memory": 1024
+      },
+      {
+        "engine": "clickhouse",
+        "memory": 1024
+      },
+      {
+        "engine": "manticoresearch:columnar_tuned",
+        "memory": 1024
+      },
+      {
+        "engine": "manticoresearch:rowwise_tuned",
+        "memory": 1024
+      }
+    ],
+    "logs10m": [
+      {
+        "engine": "elasticsearch",
+        "memory": 110000,
+        "query_timeout": 600
+      },
+      {
+        "engine": "elasticsearch:tuned",
+        "memory": 110000,
+        "query_timeout": 600
+      },
+      {
+        "engine": "clickhouse",
+        "memory": 110000,
+        "query_timeout": 600
+      },
+      {
+        "engine": "manticoresearch:columnar",
+        "memory": 110000,
+        "query_timeout": 600
+      },
+      {
+        "engine": "manticoresearch:rowwise",
+        "memory": 110000,
+        "query_timeout": 600
+      },
+      {
+        "engine": "meilisearch",
+        "memory": 110000,
+        "query_timeout": 600
+      }
+    ]
+  }
+}
