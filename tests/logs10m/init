@@ -15,7 +15,7 @@ docker compose -f ../../docker-compose.yml --env-file ../../.env down
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 
 echo -e "${COLORED}Preparing CSV and JSONL:${NC}"
-./prepare_jsonl/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done
+./prepare_data/prepare.sh | while IFS= read -r line; do echo -e "\t$line"; done
 if [ $? -ne 0 ]; then
   echo -e "\tCouldn't prepare CSV and JSONL"
   exit 1

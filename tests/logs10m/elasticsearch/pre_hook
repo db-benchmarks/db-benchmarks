@@ -13,7 +13,7 @@ chmod -R 777 elasticsearch/idx$suffix # otherwise elasticsearch in docker won't 
 chmod -R 777 elasticsearch/config$suffix/logs elasticsearch/config$suffix/data
 chmod -R 777 data          # otherwise Fluent Bit may not be able to read the files
 if [ ! -f data/data.jsonl ]; then
-  echo -e "\tMissing data/data.jsonl; run ./prepare_jsonl/prepare.sh first"
+  echo -e "\tMissing data/data.jsonl; run ./prepare_data/prepare.sh first"
   exit 1
 fi
 

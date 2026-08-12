@@ -28,7 +28,7 @@ curl -s -XPOST "${HOST}/api/v1/indexes" \
 
 rm -f ./data/data_splitted.*
 if [ ! -f data/data.jsonl ]; then
-    echo -e "\tMissing data/data.jsonl; run ./prepare_jsonl/prepare.sh first"
+    echo -e "\tMissing data/data.jsonl; run ./prepare_data/prepare.sh first"
     exit 1
 fi
 

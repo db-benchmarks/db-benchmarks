@@ -485,6 +485,13 @@ else
           cd ../..
           exit 1
         fi
+      elif [ -f "./prepare_data/prepare.sh" ]; then
+        ./prepare_data/prepare.sh
+        if [ $? -ne 0 ]; then
+          script_log "error" "Couldn't prepare data for $TEST"
+          cd ../..
+          exit 1
+        fi
       elif [ -f "./prepare_jsonl/prepare.sh" ]; then
         ./prepare_jsonl/prepare.sh
         if [ $? -ne 0 ]; then
