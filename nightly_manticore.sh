@@ -292,10 +292,19 @@ script_log "success" "Version: $VERSION, Hash: $SHORT_HASH"
 
 script_log "success" "Proceeding with tests."
 
+source ./core/nightly_results.sh
+
 # Process each test
 for TEST in "${unique_tests[@]}"; do
   script_log "info" "Checking for existing results for $TEST with version $VERSION and hash $SHORT_HASH..."
-  if find ./results/$TEST -path "*/manticoresearch*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null; then
+  all_present=true
+  while IFS= read -r config_json; do
+    if ! has_config_result "$TEST" "$config_json" initial; then
+      all_present=false
+      break
+    fi
+  done < <(jq -c ".tests.\"$TEST\"[]" "$config_file")
+  if [[ $all_present == true ]]; then
     script_log "warning" "Results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping $TEST."
     continue
   fi
@@ -382,6 +391,10 @@ for TEST in "${unique_tests[@]}"; do
   # Step 4: Run test configurations
   configs_json=$(jq -c ".tests.\"$TEST\"[]" $config_file)
   while IFS= read -r config_json; do
+    if has_config_result "$TEST" "$config_json" initial; then
+      script_log "info" "Initial result already exists for $TEST: $(jq -r '.engine' <<< "$config_json"). Skipping configuration."
+      continue
+    fi
     engine=$(jq -r '.engine' <<< "$config_json")
     memory=$(jq -r '.memory' <<< "$config_json")
     query_timeout=$(jq -r '.query_timeout // 30' <<< "$config_json")
@@ -418,7 +431,14 @@ script_log "info" "Starting retest phase for all tests..."
 
 for TEST in "${unique_tests[@]}"; do
   script_log "info" "Checking for existing retest results for $TEST with version $VERSION and hash $SHORT_HASH..."
-  if find ./results/$TEST -path "*/manticoresearch*" -name "*_retest*" -type f -exec grep -l "$VERSION" {} \; | xargs grep -l "$SHORT_HASH" | head -1 | grep -q . 2>/dev/null; then
+  all_present=true
+  while IFS= read -r config_json; do
+    if ! has_config_result "$TEST" "$config_json" retest; then
+      all_present=false
+      break
+    fi
+  done < <(jq -c ".tests.\"$TEST\"[]" "$config_file")
+  if [[ $all_present == true ]]; then
     script_log "warning" "Retest results for $TEST with version $VERSION and hash $SHORT_HASH already exist. Skipping retests for $TEST."
     continue
   fi
@@ -429,6 +449,10 @@ for TEST in "${unique_tests[@]}"; do
   # Step 4: Run retest configurations
   configs_json=$(jq -c ".tests.\"$TEST\"[]" $config_file)
   while IFS= read -r config_json; do
+    if has_config_result "$TEST" "$config_json" retest; then
+      script_log "info" "Retest result already exists for $TEST: $(jq -r '.engine' <<< "$config_json"). Skipping configuration."
+      continue
+    fi
     engine=$(jq -r '.engine' <<< "$config_json")
     memory=$(jq -r '.memory' <<< "$config_json")
     query_timeout=$(jq -r '.query_timeout // 30' <<< "$config_json")
