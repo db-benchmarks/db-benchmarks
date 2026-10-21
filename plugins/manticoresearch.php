@@ -42,14 +42,22 @@ class manticoresearch extends engine {
         }
         $row = $res->fetch_row();
         if (preg_match('/(\d+\.\d+\.\d+) (\w+)@(\d+) .*?\(columnar ([0-9.\-]+) (.*?)@(.*?)\)/', $row[1], $match)) {
-            $version = $match[1];
+            $reportedVersion = $match[1];
             $commit = substr($match[2], 0, 5)."_".substr($match[5], 0, 5);
             $date = max($match[3], $match[6]);
         } else return false;
         $date = date_parse_from_format('ymd', $date);
         $time = mktime($date['hour'], $date['minute'], $date['second'], $date['month'], $date['day'], $date['year']);
 
-        return ['version' => $version, 'manticoreVersion' => $version, 'manticoreCommit' => $commit, 'manticoreCommitTime' => $time];
+        // For custom images, identify results by the image tag and the
+        // running server's commit/date instead of its often-0.0.0 version.
+        $resultVersion = $reportedVersion;
+        if ($image = getenv('MANTICORE_CUSTOM_IMAGE')) {
+            $tag = strrchr($image, ':');
+            $tag = preg_replace('/[^a-zA-Z0-9_.-]/', '_', substr($tag, 1));
+            $resultVersion = $tag . '-' . $match[3] . '-' . $match[2];
+        }
+        return ['version' => $resultVersion, 'manticoreVersion' => $reportedVersion, 'manticoreCommit' => $commit, 'manticoreCommitTime' => $time];
     }
 
     protected function appendType($info) {
@@ -166,7 +174,7 @@ class manticoresearch extends engine {
             $this->reportedVersion = null;
             return null;
         }
-        $this->reportedVersion = $info['version'];
+        $this->reportedVersion = getenv('MANTICORE_REPORTED_VERSION') ?: $info['manticoreVersion'];
         return $this->reportedVersion;
     }
 }

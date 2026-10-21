@@ -6,6 +6,9 @@
     "result_engine": "manticoresearch",
     "success_hook": "local_hooks/nightly_hook.sh"
   },
+  "custom_images": [
+    "ghcr.io/manticoresoftware/manticoresearch:test-kit-light-perf_improvements"
+  ],
   "init": {
     "taxi": [
       "manticoresearch:columnar_tuned"
