@@ -17,7 +17,8 @@
       "manticoresearch"
     ],
     "hn_small_vector": [
-      "manticoresearch"
+      "manticoresearch:rowwise",
+      "manticoresearch:columnar"
     ],
     "hn": [
       "manticoresearch:columnar_tuned",
@@ -52,7 +53,11 @@
     ],
     "hn_small_vector": [
       {
-        "engine": "manticoresearch",
+        "engine": "manticoresearch:rowwise",
+        "memory": 110000
+      },
+      {
+        "engine": "manticoresearch:columnar",
         "memory": 110000
       }
     ],

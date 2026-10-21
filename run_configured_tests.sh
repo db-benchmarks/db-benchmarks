@@ -345,6 +345,7 @@ if [ -n "$IMAGE_TEMPLATE" ] || [ -n "$CUSTOM_IMAGE" ]; then
 fi
 
 unique_tests=($(jq -r '.tests | keys_unsorted[]' "$CONFIG_FILE"))
+source "$(dirname "$0")/core/nightly_results.sh"
 
 get_result_dir() {
   local test_name="$1"
@@ -372,30 +373,20 @@ results_exist() {
   local config_json="$2"
   local retest_only="$3"
   local include_type_suffix="$4"
-  local dir
-  local memory
-  local limited
-  local engine_name
-  local expected_type
+  local phase=initial
   local query_count
 
   if [ -z "$VERSION" ] || [ -z "$SHORT_HASH" ]; then
     return 1
   fi
-
-  memory=$(jq -r '.memory' <<< "$config_json")
-  limited=$(jq -r '.limited // false' <<< "$config_json")
-  dir=$(get_result_dir "$test_name" "$config_json" "$include_type_suffix")
-  if [ ! -d "./$dir" ]; then
+  if [ "$include_type_suffix" != true ]; then
     return 1
   fi
-
-  engine_name=$(jq -r '.engine' <<< "$config_json")
-  expected_type="${engine_name#*:}"
-  if [ "$expected_type" = "$engine_name" ]; then expected_type=""; fi
+  if [ "$retest_only" = true ]; then
+    phase=retest
+  fi
   query_count=$(jq -r 'length' "tests/$test_name/test_queries") || return 1
-  php ./scripts/nightly_result_exists.php "./$dir" "$test_name" "${engine_name%%:*}" \
-    "$expected_type" "$memory" "$limited" "$retest_only" "$VERSION" "$SHORT_HASH" "$query_count"
+  has_config_result "$test_name" "$config_json" "$phase" "$query_count"
 }
 
 test_has_missing_results() {
