@@ -312,6 +312,7 @@ if [ -n "$IMAGE_TEMPLATE" ]; then
 fi
 
 unique_tests=($(jq -r '.tests | keys_unsorted[]' "$CONFIG_FILE"))
+source "$(dirname "$0")/core/nightly_results.sh"
 
 get_result_dir() {
   local test_name="$1"
@@ -339,45 +340,18 @@ results_exist() {
   local config_json="$2"
   local retest_only="$3"
   local include_type_suffix="$4"
-  local dir
-  local file
-  local memory
-  local limited
-  local result_name_pattern
+  local phase=initial
 
   if [ -z "$VERSION" ] || [ -z "$SHORT_HASH" ]; then
     return 1
   fi
-
-  memory=$(jq -r '.memory' <<< "$config_json")
-  limited=$(jq -r '.limited // false' <<< "$config_json")
-  if [ "$limited" = true ]; then
-    result_name_pattern="_${memory}_limited(_retest)?$"
-  else
-    result_name_pattern="_${memory}(_retest)?$"
-  fi
-
-  dir=$(get_result_dir "$test_name" "$config_json" "$include_type_suffix")
-  if [ ! -d "./$dir" ]; then
+  if [ "$include_type_suffix" != true ]; then
     return 1
   fi
-
-  while IFS= read -r file; do
-    if [[ ! $(basename "$file") =~ $result_name_pattern ]]; then
-      continue
-    fi
-    if grep -q "$VERSION" "$file" && grep -q "$SHORT_HASH" "$file"; then
-      return 0
-    fi
-  done < <(
-    if [ "$retest_only" = true ]; then
-      find "./$dir" -name "*_retest*" -type f
-    else
-      find "./$dir" ! -name "*_retest*" -type f
-    fi
-  )
-
-  return 1
+  if [ "$retest_only" = true ]; then
+    phase=retest
+  fi
+  has_config_result "$test_name" "$config_json" "$phase"
 }
 
 test_has_missing_results() {

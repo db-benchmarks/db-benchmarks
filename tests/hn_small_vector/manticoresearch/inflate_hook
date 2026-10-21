@@ -13,4 +13,9 @@ if [ ! -s "$dump_sql" ]; then
 fi
 
 echo -e "\tLoading SQL dump into Manticore: $dump_sql"
-docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 < "$dump_sql"
+if [[ "${suffix:-}" == "_rowwise" || "${suffix:-}" == "_columnar" ]]; then
+  php manticoresearch/storage_dump.php "$dump_sql" "${suffix#_}" |
+    docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306
+else
+  docker exec -i manticoresearch_engine mysql -h127.0.0.1 -P9306 < "$dump_sql"
+fi
