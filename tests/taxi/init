@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")
@@ -7,7 +8,7 @@ cd "$test_dir"
 
 export test="$current_dir"
 
-COLORED='\033[0;33m'``
+COLORED='\033[0;33m'
 NC='\033[0m' # No Color
 
 docker compose -f ../../docker-compose.yml --env-file ../../.env down
@@ -16,4 +17,4 @@ docker compose -f ../../docker-compose.yml --env-file ../../.env rm -fs
 ../../init --engine=quickwit
 ../../init --engine=clickhouse
 ../../init --engine=elasticsearch --type=tuned
-../../init --engine=manticoresearch --type=columnar
+../../init --engine=manticoresearch --type=columnar_tuned

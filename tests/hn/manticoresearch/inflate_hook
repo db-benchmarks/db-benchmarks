@@ -2,4 +2,7 @@
 
 echo -en "\tStarting loading at "
 date
-docker exec manticoresearch_engine indexer --all
+
+proc=$(cat data/manticoresearch_shards/.shards)
+docker exec -e proc=$proc -e test=$test manticoresearch_engine bash -c \
+'set -o pipefail; failed=0; for n in `seq 1 $proc`; do (indexer --noprogress -c /etc/manticoresearch/manticore.conf $test$n | tee /tmp/$test$n) & pids[$n]=$!; done; for n in `seq 1 $proc`; do if ! wait ${pids[$n]}; then echo "Indexer failed for $test$n" >&2; failed=1; fi; done; exit $failed'

@@ -48,20 +48,20 @@ make_result() {
 }
 
 expect miss 'no result' "$row"
-make_result results/hn_small_vector/manticoresearch_rowwise hn_small_vector rowwise 110000 false initial
-expect hit 'typed rowwise result' "$row"
+make_result results/nightly/hn_small_vector/manticoresearch_rowwise hn_small_vector rowwise 110000 false initial
+expect hit 'current nightly rowwise result' "$row"
 expect miss 'rowwise cannot satisfy columnar' "$col"
 expect miss 'initial cannot satisfy retest' "$row" retest
 expect miss 'memory is part of identity' "$small"
 expect miss 'limited is part of identity' "$limited"
 expect miss 'untyped is distinct from typed' "$default"
 expect miss 'test suite is part of identity' "$row" initial hn
-make_result results/hn_small_vector/manticoresearch_rowwise hn_small_vector rowwise 110000 false retest
+make_result results/nightly/hn_small_vector/manticoresearch_rowwise hn_small_vector rowwise 110000 false retest
 expect hit 'retest result' "$row" retest
 make_result results/hn_small_vector/manticoresearch hn_small_vector columnar 110000 false initial
 expect hit 'legacy common directory' "$col"
-make_result results/hn_small_vector/manticoresearch_columnar hn_small_vector columnar 110000 false retest
-expect hit 'typed columnar retest directory' "$col" retest
+make_result results/nightly/hn_small_vector/manticoresearch_columnar hn_small_vector columnar 110000 false retest
+expect hit 'current nightly columnar retest directory' "$col" retest
 make_result results/hn_small_vector/manticoresearch hn_small_vector '' 110000 false initial
 expect hit 'untyped result' "$default"
 make_result results/hn_small_vector/manticoresearch_rowwise hn_small_vector rowwise 1024 false initial
@@ -73,19 +73,19 @@ all_configured() {
   local phase=$1 config
   while IFS= read -r config; do
     has_config_result hn_small_vector "$config" "$phase" || return 1
-  done < <(jq -c '.tests.hn_small_vector[]' "$repo/nightly_config.json")
+  done < <(jq -c '.tests.hn_small_vector[]' "$repo/configs/nightly.json")
 }
 all_configured initial
 all_configured retest
 printf 'PASS: every configured vector variant is present for both phases\n'
-rm results/hn_small_vector/manticoresearch_columnar/260101_000000/hn_small_vector_manticoresearch_columnar_110000_retest
+rm results/nightly/hn_small_vector/manticoresearch_columnar/260101_000000/hn_small_vector_manticoresearch_columnar_110000_retest
 if all_configured retest; then
   printf 'FAIL: missing columnar retest incorrectly completes suite\n' >&2
   exit 1
 fi
 printf 'PASS: missing columnar retest prevents suite-wide skip\n'
-make_result results/hn_small_vector/manticoresearch_columnar hn_small_vector columnar 110000 false retest
-rm results/hn_small_vector/manticoresearch_rowwise/260101_000000/hn_small_vector_manticoresearch_rowwise_110000
+make_result results/nightly/hn_small_vector/manticoresearch_columnar hn_small_vector columnar 110000 false retest
+rm results/nightly/hn_small_vector/manticoresearch_rowwise/260101_000000/hn_small_vector_manticoresearch_rowwise_110000
 if all_configured initial; then
   printf 'FAIL: missing rowwise initial incorrectly completes suite\n' >&2
   exit 1
@@ -131,12 +131,14 @@ expect hit 'later valid candidate' "$col" initial recovery
 
 # The test's fixture shape is also checked against an actual saved result.
 cd "$repo"
-if [[ -f results/hn/manticoresearch/260711_083950/hn_manticoresearch_rowwise_110000_retest ]]; then
-  expect hit 'real saved legacy rowwise initial artifact' "$row" initial hn
-  expect hit 'real saved legacy retest artifact' "$row" retest hn
-  expect hit 'real saved legacy columnar initial artifact' "$col" initial hn
-  expect hit 'real saved legacy columnar retest artifact' "$col" retest hn
+if [[ -f results/hn/manticoresearch/260811_115131/hn_manticoresearch_rowwise_tuned_110000_retest ]]; then
+  tuned_row='{"engine":"manticoresearch:rowwise_tuned","memory":110000}'
+  tuned_col='{"engine":"manticoresearch:columnar_tuned","memory":110000}'
+  expect hit 'real saved legacy rowwise initial artifact' "$tuned_row" initial hn
+  expect hit 'real saved legacy retest artifact' "$tuned_row" retest hn
+  expect hit 'real saved legacy columnar initial artifact' "$tuned_col" initial hn
+  expect hit 'real saved legacy columnar retest artifact' "$tuned_col" retest hn
   SHORT_HASH=00000
-  expect miss 'real saved artifact with wrong image hash' "$row" initial hn
+  expect miss 'real saved artifact with wrong image hash' "$tuned_row" initial hn
 fi
 printf 'All nightly result lookup checks passed.\n'

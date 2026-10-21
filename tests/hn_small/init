@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 trap 'jobs -p | xargs -r kill' EXIT
 
 current_dir=$(basename "$PWD")

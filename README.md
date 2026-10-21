@@ -177,22 +177,36 @@ To install:
 4. Tune JVM limits `ES_JAVA_OPTS` for your tests. Usually it's size of allocated memory for Docker Machine
 
 
-## Nightly Tests
+## Configured and nightly tests
 
-The repository includes automated nightly test scripts for Manticoresearch to ensure continuous benchmarking.
+The repository includes `run_configured_tests.sh`, a JSON-configured runner used by both nightly Manticoresearch benchmarks and the regular important test list.
 
-### Scripts
+### Scripts and configs
 
-- `nightly_manticore.sh`: Main script that runs tests for Manticoresearch using the dev image by default.
-- Supports `-t latest` flag to use the latest stable image instead of dev.
+- `run_configured_tests.sh`: Runs tests from a JSON config. Use `-c` to choose a config, `-t` to choose the Docker image tag for configs with an image template, and `-s` to skip initialization for configs that define `init`. Configs with `init` check Manticore ports and server load before starting; occupied ports or sustained high load exit with code 2 so wrappers can classify the run as skipped.
+- `configs/nightly.json`: Manticoresearch nightly config. It pulls `manticoresearch/manticore:<tag>`, checks the image version and hash with `searchd --version`, prepares data before init, runs the configured Manticore init hooks, writes nightly output under `results/nightly/`, runs the initial benchmark phase, waits for the server to settle, runs retests, skips config entries that already have matching results for the same version/hash, saves only `results/nightly/`, and then sources the success hook if configured. Init hooks may reuse existing indexes and print `No need to rebuild`; use `-s` only to skip the init step entirely.
+- `configs/regular.json`: Regular important test config. It mirrors the previous `important_tests.sh` command list except that HN and taxi Manticore entries intentionally use `manticoresearch:columnar_tuned` and `manticoresearch:rowwise_tuned`. It writes to the normal `results/<test>/<engine>` tree and does not save results by default.
+- `important_tests.sh`: Compatibility wrapper for `./run_configured_tests.sh -c configs/regular.json`.
+- `run_nightly.sh`: Runs nightly Manticoresearch tests for both `latest` and `dev` tags and handles dated logs plus failure/skipped hooks.
+
+Examples:
+
+```bash
+./run_configured_tests.sh -c configs/nightly.json
+./run_configured_tests.sh -c configs/nightly.json -t latest
+./run_configured_tests.sh -c configs/regular.json
+./important_tests.sh
+```
+
+Nightly and regular configs use the same `tests` shape: test names map to arrays of engine/memory entries. Each entry supports `engine`, `memory`, optional `limited`, and optional `query_timeout`. Config `settings` control the image template, quiet mode, result saving, result engine filter, and success hook. Nightly configs add `init` for suite initialization. Nightly runs write and save only `results/nightly/`. Regular configured runs write to the normal `results/<test>/<engine>` tree; if result saving is enabled for a config without `init`, the runner saves everything under `results/` except `results/nightly/`. Nightly saves use `NIGHTLY_DB_HOST`, `NIGHTLY_DB_USER`, and `NIGHTLY_DB_PASSWORD`; regular configured saves use `RESULT_DB_HOST`, `RESULT_DB_USER`, and `RESULT_DB_PASSWORD`. Both save paths use port 443.
 
 ### Setup Cron Job
 
 To run nightly tests automatically:
 
-1. Ensure scripts are executable: `chmod +x nightly_manticore.sh run_nightly.sh`
+1. Ensure scripts are executable: `chmod +x run_configured_tests.sh run_nightly.sh important_tests.sh`
 2. Add the cron job from `nightly_cron` to your crontab: `crontab -e` and paste the contents, or copy to `/etc/cron.d/` for system-wide setup.
-3. The job runs `run_nightly.sh` at 2 AM daily, which executes both dev and latest versions sequentially.
+3. The job runs `run_nightly.sh` at 2 AM daily, which executes both latest and dev versions sequentially.
 4. Logs are stored in `/var/log/db-benchmarks/` with dated filenames. Successful runs: `nightly_dev_YYYYMMDD.log`, failed runs: `nightly_dev_YYYYMMDD_failed.log` (same for latest).
 
 ### Log Rotation
@@ -336,20 +350,14 @@ We will then:
   |  |  |  |-pre_hook                       <- Engine pre-check script. Determines if tables need to be rebuilt, starts the engine, and ensures availability.
   |  |  |-data                              <- Prepared data collection for the tests.
   |  |  |-elasticsearch                     <- Directory for "Hackernews test -> Elasticsearch".
-  |  |  |  |-config                         <- Elasticsearch configuration directory. 
-  |  |  |  |  |-elasticsearch.yml
-  |  |  |  |  |-jvm.options
-  |  |  |  |  |-log4j2.properties
   |  |  |  |-config_tuned                   <- Elasticsearch configuration directory for the "tuned" type.
-  |  |  |  |-logstash                       <- Logstash configuration directory.
-  |  |  |  |  |-logstash.conf
-  |  |  |  |  |-template.json
-  |  |  |  |-logstash_tuned                 <- Logstash configuration directory for the "tuned" type.
-  |  |  |  |  |-logstash.conf
+  |  |  |  |-fluent-bit_tuned               <- Tuned Elasticsearch index template used by Fluent Bit ingestion.
   |  |  |  |  |-template.json
   |  |  |  |-inflate_hook                   <- Engine initialization script for data ingestion.
   |  |  |  |-post_hook                      <- Verifies document count and data consistency.
   |  |  |  |-pre_hook                       <- Pre-check script for table rebuilding and engine initialization.
+  |  |  |-fluent-bit                         <- Shared Fluent Bit ingestion config.
+  |  |  |  |-fluent-bit.conf                 <- Fluent Bit config with placeholders for host, port, and worker count.
   |  |  |-manticoresearch                   <- Directory for testing Manticore Search in the Hackernews test suite.
   |  |  |  |-generate_manticore_config.php  <- Script for dynamically generating Manticore Search configuration.
   |  |  |  |-inflate_hook                   <- Data ingestion script.
@@ -395,7 +403,11 @@ We will then:
    |-NOTICE                                  <- Notice file.
    |-README.md                               <- You're reading this file.
    |-docker-compose.yml                      <- Docker Compose configuration for starting and stopping databases and search engines.
-   |-important_tests.sh
+   |-configs                                  <- JSON benchmark-runner configurations.
+   |  |-nightly.json                           <- Configured Manticoresearch nightly benchmark suite.
+   |  |-regular.json                           <- Configured regular important benchmark suite.
+   |-important_tests.sh                       <- Compatibility wrapper for configs/regular.json important test runs.
+   |-run_configured_tests.sh                  <- JSON-configured benchmark runner.
    |-init                                    <- Initialization script. Handles data ingestion and tracks the time taken.
    |-logo.svg                                <- Logo file.
    |-test                                    <- The executable file to run and save test results.

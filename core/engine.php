@@ -1004,7 +1004,10 @@ abstract class engine
         exec($exec, $o, $r);
         self::log(implode("\n", $o), 2, 'bright_black');
         if ($r) {
-            $message = "ERROR: couldn't start $engine";
+            $message = "ERROR: couldn't start $engine with command: $exec";
+            if ($o) {
+                $message .= "\n" . implode("\n", $o);
+            }
             throw new RuntimeException($message);
         }
         self::log("Waiting for $engine to come up", 2);
@@ -1322,7 +1325,8 @@ Environment vairables:
             . " docker compose down > /dev/null 2>&1");
         system("test=" . self::$commandLineArguments['test']
             . " docker compose rm > /dev/null 2>&1");
-        system("docker stop $(docker ps -aq) > /dev/null 2>&1");
+        // Containers labeled db-benchmarks.keep=true (e.g. host monitoring agents) keep running.
+        system("docker stop $(docker ps -aq | grep -vxF \"$(docker ps -aq --filter label=db-benchmarks.keep=true)\") > /dev/null 2>&1");
         system("docker ps -a|grep _engine|awk '{print $1}'|xargs docker rm > /dev/null 2>&1");
     }
 

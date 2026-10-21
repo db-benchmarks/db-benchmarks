@@ -1,31 +1,25 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-workers=$(nproc)
 path=$(pwd)
-# We use here docker compose cause it usually has higher version (we need it for JSON formatting)
-network_name=$(docker compose -f ../../docker-compose.yml --env-file ../../.env config --format=json | jq .networks.default.name)
-
-cmd="docker run -e PIPELINE_BATCH_SIZE=10000 \
-         --env-file ../../.env \
-         -e XPACK_MONITORING_ENABLED=false \
-         -e PIPELINE_WORKERS=\"$workers\" \
-         --network=\"$network_name\" --rm \
-         -v $path/data/:/data/ \
-         -v $path/elasticsearch/logstash$suffix/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
-         -v $path/elasticsearch/logstash$suffix/template.json:/template.json \
-         docker.elastic.co/logstash/logstash:9.4.3"
-
-log=$(mktemp)
-trap 'rm -f "$log"' EXIT
-
-eval "$cmd" 2>&1 | tee "$log"
-status=${PIPESTATUS[0]}
-
-if [[ $status -ne 0 ]]; then
-  if grep -q "ConcurrentModificationException" "$log"; then
-    echo -e "\tLogstash exited with ConcurrentModificationException after pipeline shutdown; post_hook will verify inserted rows."
-    exit 0
-  fi
-
-  exit "$status"
+fluent_bit_dir="$path/fluent-bit"
+if [[ ! -f "$fluent_bit_dir/fluent-bit.conf" ]]; then
+  fluent_bit_dir="$path/elasticsearch/fluent-bit$suffix"
 fi
+if [[ ! -f "$fluent_bit_dir/fluent-bit.conf" ]]; then
+  fluent_bit_dir="$path/elasticsearch/fluent-bit"
+fi
+
+template_dir="$path/elasticsearch/fluent-bit$suffix"
+if [[ ! -f "$template_dir/template.json" ]]; then
+  template_dir="$path/elasticsearch/fluent-bit"
+fi
+
+normalize_function=""
+id_key=""
+if [[ "$test" == "taxi" ]]; then
+  normalize_function="parse_taxi"
+  id_key="trip_id"
+fi
+
+../misc/fluent-bit/run.sh elasticsearch 9200 "$fluent_bit_dir" "$template_dir" "$normalize_function" "$id_key"

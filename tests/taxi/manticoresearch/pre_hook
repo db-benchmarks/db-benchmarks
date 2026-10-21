@@ -14,7 +14,15 @@ if [ -z "$MANTICORE_REPORTED_VERSION" ]; then
   export MANTICORE_REPORTED_VERSION
 fi
 echo "Manticore version: $MANTICORE_REPORTED_VERSION"
-php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix > manticoresearch/manticore$suffix.conf
+
+shards=$(../misc/manticore_shards_from_cpuset.sh ../../.env)
+if [ -z "$shards" ]; then
+  echo -e "\tCouldn't determine shard count from cpuset"
+  exit 1
+fi
+echo -e "\tManticore shards from cpuset: $shards"
+
+php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix --shards=$shards > manticoresearch/manticore$suffix.conf
 
 if [ -f manticoresearch/idx$suffix/${test}1.*sph ]; then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
@@ -28,6 +36,7 @@ fi
 
 mkdir -p manticoresearch/idx$suffix/data/binlog
 chmod 777 manticoresearch/idx$suffix/data/binlog
+echo "$shards" > manticoresearch/idx$suffix/.shards
 suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
 
 if timeout 120 grep -qm1 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then
