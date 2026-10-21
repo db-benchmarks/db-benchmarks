@@ -1,10 +1,20 @@
 #!/bin/bash
 
-# Script to run nightly Manticoresearch configured tests for both dev and latest versions
+# Script to run nightly Manticoresearch configured tests for release, dev and custom images
 
 DATE=$(date +%Y%m%d)
 LOG_DIR="${LOG_DIR:-/var/log/db-benchmarks}"
 OVERALL_EXIT=0
+CONFIG_FILE="configs/nightly.json"
+
+if ! jq -e '(.custom_images // []) | if type == "array" then all(.[]; type == "string" and length > 0) else false end' "$CONFIG_FILE" > /dev/null; then
+    echo "Invalid custom_images in $CONFIG_FILE (expected an array of image references)" >&2
+    exit 1
+fi
+NIGHTLY_IMAGES=()
+while IFS= read -r image; do
+    NIGHTLY_IMAGES+=("$image")
+done < <(jq -r '.custom_images // [] | .[]' "$CONFIG_FILE")
 
 # Ensure logs directory exists
 if [ ! -d "$LOG_DIR" ]; then
@@ -33,13 +43,18 @@ run_nightly_failure_hook() {
 # Function to run test and handle logging
 run_test() {
     local tag="$1"
-    local temp_log="$LOG_DIR/nightly_${tag}_${DATE}_temp.log"
-    local final_log="$LOG_DIR/nightly_${tag}_${DATE}.log"
-    local failed_log="$LOG_DIR/nightly_${tag}_${DATE}_failed.log"
-    local skipped_log="$LOG_DIR/nightly_${tag}_${DATE}_skipped.log"
+    local image="${2:-}"
+    local log_tag="${image:-$tag}"
+    log_tag="${log_tag//[^a-zA-Z0-9_.-]/_}"
+    local temp_log="$LOG_DIR/nightly_${log_tag}_${DATE}_temp.log"
+    local final_log="$LOG_DIR/nightly_${log_tag}_${DATE}.log"
+    local failed_log="$LOG_DIR/nightly_${log_tag}_${DATE}_failed.log"
+    local skipped_log="$LOG_DIR/nightly_${log_tag}_${DATE}_skipped.log"
 
     echo "$(date): Starting ${tag} tests" >> "$temp_log"
-    if [ "$tag" = "dev" ]; then
+    if [ -n "$image" ]; then
+        ./run_configured_tests.sh -c configs/nightly.json -i "$image" >> "$temp_log" 2>&1
+    elif [ "$tag" = "dev" ]; then
         ./run_configured_tests.sh -c configs/nightly.json >> "$temp_log" 2>&1
     else
         ./run_configured_tests.sh -c configs/nightly.json -t "$tag" >> "$temp_log" 2>&1
@@ -78,6 +93,11 @@ run_test() {
 IFS=',' read -r -a NIGHTLY_TAGS <<< "${RUN_NIGHTLY_TAGS:-latest,dev}"
 for nightly_tag in "${NIGHTLY_TAGS[@]}"; do
     run_test "$nightly_tag"
+done
+
+# Full image references from configs/nightly.json, after latest and dev.
+for nightly_image in "${NIGHTLY_IMAGES[@]}"; do
+    run_test "${nightly_image##*:}" "$nightly_image"
 done
 
 exit "$OVERALL_EXIT"

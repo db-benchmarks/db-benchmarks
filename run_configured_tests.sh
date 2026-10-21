@@ -17,20 +17,23 @@ if [ -f .env ]; then
 fi
 
 TAG="dev"
+CUSTOM_IMAGE=""
 SKIP_INIT=false
 CONFIG_FILE="configs/nightly.json"
 
 usage() {
-  echo "Usage: $0 [-c configs/config.json] [-t tag] [-s]" >&2
+  echo "Usage: $0 [-c configs/config.json] [-t tag | -i image] [-s]" >&2
   echo "  -c configs/config.json: test run config (defaults to configs/nightly.json)" >&2
   echo "  -t tag: Docker tag for configured image templates (dev by default)" >&2
+  echo "  -i image: full Docker image reference (overrides the image template)" >&2
   echo "  -s: skip initialization (reuse existing indexes/data)" >&2
 }
 
-while getopts "c:t:s" opt; do
+while getopts "c:t:i:s" opt; do
   case $opt in
     c) CONFIG_FILE="$OPTARG" ;;
     t) TAG="$OPTARG" ;;
+    i) CUSTOM_IMAGE="$OPTARG" ;;
     s) SKIP_INIT=true ;;
     *) usage; exit 1 ;;
   esac
@@ -70,6 +73,10 @@ if [[ -z "$TAG" ]]; then
   script_log "error" "Invalid tag: tag cannot be empty."
   exit 1
 fi
+if [[ -n "$CUSTOM_IMAGE" && "$CUSTOM_IMAGE" != *:* && "$CUSTOM_IMAGE" != *@sha256:* ]]; then
+  script_log "error" "Custom image must include a tag or digest."
+  exit 1
+fi
 export TESTS_EXECUTED=false
 
 LOCK_FILE="/tmp/db_benchmarks.lock"
@@ -106,6 +113,10 @@ QUIET_TESTS=$(setting_bool "quiet" true)
 IMAGE_TEMPLATE=$(setting_value "image" "manticoresearch/manticore:%s")
 RESULT_DB_ENGINE=$(setting_value "result_engine" "manticoresearch")
 SUCCESS_HOOK=$(setting_value "success_hook" "local_hooks/nightly_hook.sh")
+if [ -n "$CUSTOM_IMAGE" ]; then
+  # The release-vs-dev comparison hook is not meaningful for a branch build.
+  SUCCESS_HOOK=""
+fi
 HAS_INIT=false
 if jq -e '.init // empty' "$CONFIG_FILE" > /dev/null; then
   HAS_INIT=true
@@ -286,8 +297,8 @@ fi
 
 VERSION=""
 SHORT_HASH=""
-if [ -n "$IMAGE_TEMPLATE" ]; then
-  MANTICORE_IMAGE="${IMAGE_TEMPLATE//%s/$TAG}"
+if [ -n "$IMAGE_TEMPLATE" ] || [ -n "$CUSTOM_IMAGE" ]; then
+  MANTICORE_IMAGE="${CUSTOM_IMAGE:-${IMAGE_TEMPLATE//%s/$TAG}}"
   export MANTICORE_IMAGE
 
   script_log "info" "Pulling $MANTICORE_IMAGE image..."
@@ -308,6 +319,28 @@ if [ -n "$IMAGE_TEMPLATE" ]; then
     exit 1
   fi
   SHORT_HASH="${HASH:0:5}"
+  REPORTED_VERSION="$VERSION"
+  unset MANTICORE_CUSTOM_IMAGE
+  if [ -n "$CUSTOM_IMAGE" ]; then
+    # Testkit reports 0.0.0. Use the searchd commit and build timestamp
+    # alongside the image tag as the benchmark's visible version.
+    if [[ ! "$OUTPUT" =~ Manticore[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+[[:space:]]+([a-f0-9]+)@([0-9]{8}) ]]; then
+      script_log "error" "Cannot identify commit and build date in $MANTICORE_IMAGE"
+      exit 1
+    fi
+    IMAGE_COMMIT_SHORT="${BASH_REMATCH[1]}"
+    IMAGE_COMMIT_DATE="${BASH_REMATCH[2]}"
+    IMAGE_TAG="${CUSTOM_IMAGE##*:}"
+    IMAGE_TAG="${IMAGE_TAG//[^a-zA-Z0-9_.-]/_}"
+    VERSION="${IMAGE_TAG}-${IMAGE_COMMIT_DATE}-${IMAGE_COMMIT_SHORT}"
+    export MANTICORE_CUSTOM_IMAGE="$CUSTOM_IMAGE"
+    if [ "$REPORTED_VERSION" = "0.0.0" ] && [[ "$IMAGE_TAG" == test-kit-* ]]; then
+      # Testkit's 0.0.0 is not an old server: its config and DROP CACHE
+      # support the >=17 feature path. This is a capability floor, not the
+      # result version (which remains the exact image identity above).
+      export MANTICORE_REPORTED_VERSION=17.0.0
+    fi
+  fi
   script_log "success" "Version: $VERSION, Hash: $SHORT_HASH"
 fi
 
@@ -341,6 +374,7 @@ results_exist() {
   local retest_only="$3"
   local include_type_suffix="$4"
   local phase=initial
+  local query_count
 
   if [ -z "$VERSION" ] || [ -z "$SHORT_HASH" ]; then
     return 1
@@ -351,7 +385,8 @@ results_exist() {
   if [ "$retest_only" = true ]; then
     phase=retest
   fi
-  has_config_result "$test_name" "$config_json" "$phase"
+  query_count=$(jq -r 'length' "tests/$test_name/test_queries") || return 1
+  has_config_result "$test_name" "$config_json" "$phase" "$query_count"
 }
 
 test_has_missing_results() {
