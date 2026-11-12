@@ -557,7 +557,9 @@ abstract class engine
                         $engine->beforeQuery();
                         $result = $engine->testOnce($preparedQuery);
                         if ($result['error']){
-                            self::die("ERROR: ".$result['message'], 3);
+                            self::die("ERROR: informational $type query for {$engineOptions['engine']}"
+                                . ($engineOptions['type'] ? ":{$engineOptions['type']}" : "")
+                                . " failed: " . ($result['message'] ?? 'unknown query error'), 3);
                         }
                         $outs[$type] = $engine->parseResult($result['response']);
                     }
@@ -689,6 +691,9 @@ abstract class engine
                             $warmupTime = $engine->start($mem, $limited);
                         } catch (Exception $exception) {
                             $startError = $exception->getMessage();
+                            if ($engine instanceof manticoresearch) {
+                                self::die($startError, 2);
+                            }
                             self::log($startError, 2, 'red');
                         }
 
@@ -1009,6 +1014,30 @@ abstract class engine
                 $message .= "\n" . implode("\n", $o);
             }
             throw new RuntimeException($message);
+        }
+        if ($this instanceof manticoresearch) {
+            // Compose returning success only means the container was started.
+            // Poll startup logs as well as SQL readiness: a table can be
+            // NOT SERVING even when the server never accepts connections.
+            $t = microtime(true);
+            while (true) {
+                $startupError = $this->startupError();
+                if ($startupError) {
+                    throw new RuntimeException("ERROR: $startupError");
+                }
+                if ($this->canConnect()) {
+                    break;
+                }
+                if (microtime(true) - $t > self::$commandLineArguments['probe_timeout']) {
+                    throw new RuntimeException("ERROR: $engine did not accept SQL connections within "
+                        . self::$commandLineArguments['probe_timeout'] . " seconds");
+                }
+                usleep(250000);
+            }
+            $startupError = $this->startupError();
+            if ($startupError) {
+                throw new RuntimeException("ERROR: $startupError");
+            }
         }
         self::log("Waiting for $engine to come up", 2);
         $t = microtime(true);
@@ -1411,7 +1440,7 @@ Environment vairables:
         return false;
     }
 
-    protected function parseMysqlError($mysqlErrno, $timeoutErrorCode): bool|array
+    protected function parseMysqlError($mysqlErrno, $timeoutErrorCode, $mysqlError = ''): bool|array
     {
         if ($mysqlErrno) {
             $out = [
@@ -1423,6 +1452,8 @@ Environment vairables:
                 $out['message'] = 'Operation timed out after ' .
                     self::$commandLineArguments['query_timeout'] .
                     ' seconds with 0 bytes received';
+            } else {
+                $out['message'] = "MySQL error $mysqlErrno: $mysqlError";
             }
             return $out;
         }

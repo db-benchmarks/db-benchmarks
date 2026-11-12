@@ -76,7 +76,7 @@ class mysql extends engine {
     {
         try {
             $res = $this->mysql->query($query);
-            $errorResult = $this->parseMysqlError($this->mysql->errno, 2006);
+            $errorResult = $this->parseMysqlError($this->mysql->errno, 2006, $this->mysql->error);
             if ($errorResult) {
                 return $errorResult;
             }

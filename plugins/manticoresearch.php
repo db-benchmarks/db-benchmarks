@@ -82,6 +82,30 @@ class manticoresearch extends engine {
         return false;
     }
 
+    public static function findNotServingError(array $lines): ?string {
+        foreach ($lines as $line) {
+            if (strpos($line, 'NOT SERVING') !== false) {
+                return trim($line);
+            }
+        }
+        return null;
+    }
+
+    protected function startupError(): ?string {
+        $startedAt = [];
+        exec("docker inspect manticoresearch_engine --format='{{.State.StartedAt}}' 2>&1", $startedAt, $status);
+        if ($status || empty($startedAt[0])) {
+            return 'Cannot inspect Manticore container startup time';
+        }
+        $logs = [];
+        exec('docker logs --since ' . escapeshellarg(trim($startedAt[0]))
+            . ' manticoresearch_engine 2>&1', $logs, $status);
+        if ($status) {
+            return 'Cannot read Manticore container startup logs';
+        }
+        return self::findNotServingError($logs);
+    }
+
     protected function beforeQuery() {
         $this->mysql = new mysqli();
         mysqli_report(MYSQLI_REPORT_OFF);
@@ -96,7 +120,7 @@ class manticoresearch extends engine {
     protected function testOnce($query):array {
         $res = $this->mysql->query($query);
 
-        $errorResult = $this->parseMysqlError($this->mysql->errno, 2006);
+        $errorResult = $this->parseMysqlError($this->mysql->errno, 2006, $this->mysql->error);
         if ($errorResult){
             return $errorResult;
         }
