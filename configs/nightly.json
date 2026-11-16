@@ -7,7 +7,10 @@
     "success_hook": "local_hooks/nightly_hook.sh"
   },
   "custom_images": [
-    "ghcr.io/manticoresoftware/manticoresearch:test-kit-light-perf_improvements"
+    {
+      "image": "ghcr.io/manticoresoftware/manticoresearch:test-kit-index_format",
+      "tests": ["hn_small", "hn"]
+    }
   ],
   "init": {
     "taxi": [

@@ -19,21 +19,24 @@ fi
 TAG="dev"
 CUSTOM_IMAGE=""
 SKIP_INIT=false
+TEST_FILTER=""
 CONFIG_FILE="configs/nightly.json"
 
 usage() {
-  echo "Usage: $0 [-c configs/config.json] [-t tag | -i image] [-s]" >&2
+  echo "Usage: $0 [-c configs/config.json] [-t tag | -i image] [-T suite1,suite2] [-s]" >&2
   echo "  -c configs/config.json: test run config (defaults to configs/nightly.json)" >&2
   echo "  -t tag: Docker tag for configured image templates (dev by default)" >&2
   echo "  -i image: full Docker image reference (overrides the image template)" >&2
+  echo "  -T suites: run only these comma-separated test suites from the config" >&2
   echo "  -s: skip initialization (reuse existing indexes/data)" >&2
 }
 
-while getopts "c:t:i:s" opt; do
+while getopts "c:t:i:sT:" opt; do
   case $opt in
     c) CONFIG_FILE="$OPTARG" ;;
     t) TAG="$OPTARG" ;;
     i) CUSTOM_IMAGE="$OPTARG" ;;
+    T) TEST_FILTER="$OPTARG" ;;
     s) SKIP_INIT=true ;;
     *) usage; exit 1 ;;
   esac
@@ -93,6 +96,14 @@ if [[ ! -f $CONFIG_FILE ]]; then
   exit 1
 fi
 CONFIG_FILE="$(cd "$(dirname "$CONFIG_FILE")" && pwd)/$(basename "$CONFIG_FILE")"
+if [ -n "$TEST_FILTER" ] && ! jq -e --arg names "$TEST_FILTER" '
+  . as $config | ($names | split(",")) as $selected |
+  ($selected | unique | length) == ($selected | length)
+  and all($selected[]; . as $name | test("^[A-Za-z0-9_]+$") and ($config.tests[$name] | type) == "array")
+' "$CONFIG_FILE" >/dev/null; then
+  script_log "error" "Invalid test suite selection: $TEST_FILTER"
+  exit 1
+fi
 
 setting_bool() {
   local name="$1"
@@ -320,7 +331,7 @@ if [ -n "$IMAGE_TEMPLATE" ] || [ -n "$CUSTOM_IMAGE" ]; then
   fi
   SHORT_HASH="${HASH:0:5}"
   REPORTED_VERSION="$VERSION"
-  unset MANTICORE_CUSTOM_IMAGE
+  unset MANTICORE_CUSTOM_IMAGE MANTICORE_CUSTOM_IMAGE_SUFFIX
   if [ -n "$CUSTOM_IMAGE" ]; then
     # Testkit reports 0.0.0. Use the searchd commit and build timestamp
     # alongside the image tag as the benchmark's visible version.
@@ -332,6 +343,9 @@ if [ -n "$IMAGE_TEMPLATE" ] || [ -n "$CUSTOM_IMAGE" ]; then
     IMAGE_COMMIT_DATE="${BASH_REMATCH[2]}"
     IMAGE_TAG="${CUSTOM_IMAGE##*:}"
     IMAGE_TAG="${IMAGE_TAG//[^a-zA-Z0-9_.-]/_}"
+    # Give this custom image its own index and config files.
+    MANTICORE_CUSTOM_IMAGE_SUFFIX="_custom_${IMAGE_TAG}"
+    export MANTICORE_CUSTOM_IMAGE_SUFFIX
     VERSION="${IMAGE_TAG}-${IMAGE_COMMIT_DATE}-${IMAGE_COMMIT_SHORT}"
     export MANTICORE_CUSTOM_IMAGE="$CUSTOM_IMAGE"
     if [ "$REPORTED_VERSION" = "0.0.0" ] && [[ "$IMAGE_TAG" == test-kit-* ]]; then
@@ -344,7 +358,11 @@ if [ -n "$IMAGE_TEMPLATE" ] || [ -n "$CUSTOM_IMAGE" ]; then
   script_log "success" "Version: $VERSION, Hash: $SHORT_HASH"
 fi
 
-unique_tests=($(jq -r '.tests | keys_unsorted[]' "$CONFIG_FILE"))
+if [ -n "$TEST_FILTER" ]; then
+  unique_tests=($(jq -r --arg names "$TEST_FILTER" '.tests | keys_unsorted[] | select(. as $suite | $names | split(",") | index($suite))' "$CONFIG_FILE"))
+else
+  unique_tests=($(jq -r '.tests | keys_unsorted[]' "$CONFIG_FILE"))
+fi
 source "$(dirname "$0")/core/nightly_results.sh"
 
 get_result_dir() {
@@ -521,7 +539,7 @@ else
 
       init_engines=($(jq -r --arg test_name "$TEST" '.init[$test_name][]' "$CONFIG_FILE"))
       for init_engine in "${init_engines[@]}"; do
-        script_log "info" "Running init for $TEST with engine $init_engine..."
+        script_log "info" "Running init for $TEST with engine $init_engine using $MANTICORE_IMAGE..."
         if [[ $init_engine == *:* ]]; then
             engine_part=${init_engine%%:*}
             type_part=${init_engine#*:}

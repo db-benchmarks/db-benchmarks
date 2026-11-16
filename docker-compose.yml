@@ -137,9 +137,9 @@ services:
     environment:
       - EXTRA=1
     volumes:
-      - ./tests/${test}/manticoresearch/idx${suffix}:/var/lib/manticore
+      - ./tests/${test}/manticoresearch/idx${suffix}${MANTICORE_CUSTOM_IMAGE_SUFFIX:-}:/var/lib/manticore
       - ./tests/${test}/data:/input
-      - ./tests/${test}/manticoresearch/manticore${suffix}.conf:/etc/manticoresearch/manticore.conf
+      - ./tests/${test}/manticoresearch/manticore${suffix}${MANTICORE_CUSTOM_IMAGE_SUFFIX:-}.conf:/etc/manticoresearch/manticore.conf
 
   postgres:
     image: postgres:18.4
