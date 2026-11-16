@@ -17,20 +17,26 @@ if [ -f .env ]; then
 fi
 
 TAG="dev"
+CUSTOM_IMAGE=""
 SKIP_INIT=false
+TEST_FILTER=""
 CONFIG_FILE="configs/nightly.json"
 
 usage() {
-  echo "Usage: $0 [-c configs/config.json] [-t tag] [-s]" >&2
+  echo "Usage: $0 [-c configs/config.json] [-t tag | -i image] [-T suite1,suite2] [-s]" >&2
   echo "  -c configs/config.json: test run config (defaults to configs/nightly.json)" >&2
   echo "  -t tag: Docker tag for configured image templates (dev by default)" >&2
+  echo "  -i image: full Docker image reference (overrides the image template)" >&2
+  echo "  -T suites: run only these comma-separated test suites from the config" >&2
   echo "  -s: skip initialization (reuse existing indexes/data)" >&2
 }
 
-while getopts "c:t:s" opt; do
+while getopts "c:t:i:sT:" opt; do
   case $opt in
     c) CONFIG_FILE="$OPTARG" ;;
     t) TAG="$OPTARG" ;;
+    i) CUSTOM_IMAGE="$OPTARG" ;;
+    T) TEST_FILTER="$OPTARG" ;;
     s) SKIP_INIT=true ;;
     *) usage; exit 1 ;;
   esac
@@ -70,6 +76,10 @@ if [[ -z "$TAG" ]]; then
   script_log "error" "Invalid tag: tag cannot be empty."
   exit 1
 fi
+if [[ -n "$CUSTOM_IMAGE" && "$CUSTOM_IMAGE" != *:* && "$CUSTOM_IMAGE" != *@sha256:* ]]; then
+  script_log "error" "Custom image must include a tag or digest."
+  exit 1
+fi
 export TESTS_EXECUTED=false
 
 LOCK_FILE="/tmp/db_benchmarks.lock"
@@ -86,6 +96,14 @@ if [[ ! -f $CONFIG_FILE ]]; then
   exit 1
 fi
 CONFIG_FILE="$(cd "$(dirname "$CONFIG_FILE")" && pwd)/$(basename "$CONFIG_FILE")"
+if [ -n "$TEST_FILTER" ] && ! jq -e --arg names "$TEST_FILTER" '
+  . as $config | ($names | split(",")) as $selected |
+  ($selected | unique | length) == ($selected | length)
+  and all($selected[]; . as $name | test("^[A-Za-z0-9_]+$") and ($config.tests[$name] | type) == "array")
+' "$CONFIG_FILE" >/dev/null; then
+  script_log "error" "Invalid test suite selection: $TEST_FILTER"
+  exit 1
+fi
 
 setting_bool() {
   local name="$1"
@@ -106,6 +124,10 @@ QUIET_TESTS=$(setting_bool "quiet" true)
 IMAGE_TEMPLATE=$(setting_value "image" "manticoresearch/manticore:%s")
 RESULT_DB_ENGINE=$(setting_value "result_engine" "manticoresearch")
 SUCCESS_HOOK=$(setting_value "success_hook" "local_hooks/nightly_hook.sh")
+if [ -n "$CUSTOM_IMAGE" ]; then
+  # The release-vs-dev comparison hook is not meaningful for a branch build.
+  SUCCESS_HOOK=""
+fi
 HAS_INIT=false
 if jq -e '.init // empty' "$CONFIG_FILE" > /dev/null; then
   HAS_INIT=true
@@ -286,8 +308,8 @@ fi
 
 VERSION=""
 SHORT_HASH=""
-if [ -n "$IMAGE_TEMPLATE" ]; then
-  MANTICORE_IMAGE="${IMAGE_TEMPLATE//%s/$TAG}"
+if [ -n "$IMAGE_TEMPLATE" ] || [ -n "$CUSTOM_IMAGE" ]; then
+  MANTICORE_IMAGE="${CUSTOM_IMAGE:-${IMAGE_TEMPLATE//%s/$TAG}}"
   export MANTICORE_IMAGE
 
   script_log "info" "Pulling $MANTICORE_IMAGE image..."
@@ -308,10 +330,39 @@ if [ -n "$IMAGE_TEMPLATE" ]; then
     exit 1
   fi
   SHORT_HASH="${HASH:0:5}"
+  REPORTED_VERSION="$VERSION"
+  unset MANTICORE_CUSTOM_IMAGE MANTICORE_CUSTOM_IMAGE_SUFFIX
+  if [ -n "$CUSTOM_IMAGE" ]; then
+    # Testkit reports 0.0.0. Use the searchd commit and build timestamp
+    # alongside the image tag as the benchmark's visible version.
+    if [[ ! "$OUTPUT" =~ Manticore[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+[[:space:]]+([a-f0-9]+)@([0-9]{8}) ]]; then
+      script_log "error" "Cannot identify commit and build date in $MANTICORE_IMAGE"
+      exit 1
+    fi
+    IMAGE_COMMIT_SHORT="${BASH_REMATCH[1]}"
+    IMAGE_COMMIT_DATE="${BASH_REMATCH[2]}"
+    IMAGE_TAG="${CUSTOM_IMAGE##*:}"
+    IMAGE_TAG="${IMAGE_TAG//[^a-zA-Z0-9_.-]/_}"
+    # Give this custom image its own index and config files.
+    MANTICORE_CUSTOM_IMAGE_SUFFIX="_custom_${IMAGE_TAG}"
+    export MANTICORE_CUSTOM_IMAGE_SUFFIX
+    VERSION="${IMAGE_TAG}-${IMAGE_COMMIT_DATE}-${IMAGE_COMMIT_SHORT}"
+    export MANTICORE_CUSTOM_IMAGE="$CUSTOM_IMAGE"
+    if [ "$REPORTED_VERSION" = "0.0.0" ] && [[ "$IMAGE_TAG" == test-kit-* ]]; then
+      # Testkit's 0.0.0 is not an old server: its config and DROP CACHE
+      # support the >=17 feature path. This is a capability floor, not the
+      # result version (which remains the exact image identity above).
+      export MANTICORE_REPORTED_VERSION=17.0.0
+    fi
+  fi
   script_log "success" "Version: $VERSION, Hash: $SHORT_HASH"
 fi
 
-unique_tests=($(jq -r '.tests | keys_unsorted[]' "$CONFIG_FILE"))
+if [ -n "$TEST_FILTER" ]; then
+  unique_tests=($(jq -r --arg names "$TEST_FILTER" '.tests | keys_unsorted[] | select(. as $suite | $names | split(",") | index($suite))' "$CONFIG_FILE"))
+else
+  unique_tests=($(jq -r '.tests | keys_unsorted[]' "$CONFIG_FILE"))
+fi
 source "$(dirname "$0")/core/nightly_results.sh"
 
 get_result_dir() {
@@ -341,6 +392,7 @@ results_exist() {
   local retest_only="$3"
   local include_type_suffix="$4"
   local phase=initial
+  local query_count
 
   if [ -z "$VERSION" ] || [ -z "$SHORT_HASH" ]; then
     return 1
@@ -351,7 +403,8 @@ results_exist() {
   if [ "$retest_only" = true ]; then
     phase=retest
   fi
-  has_config_result "$test_name" "$config_json" "$phase"
+  query_count=$(jq -r 'length' "tests/$test_name/test_queries") || return 1
+  has_config_result "$test_name" "$config_json" "$phase" "$query_count"
 }
 
 test_has_missing_results() {
@@ -486,7 +539,7 @@ else
 
       init_engines=($(jq -r --arg test_name "$TEST" '.init[$test_name][]' "$CONFIG_FILE"))
       for init_engine in "${init_engines[@]}"; do
-        script_log "info" "Running init for $TEST with engine $init_engine..."
+        script_log "info" "Running init for $TEST with engine $init_engine using $MANTICORE_IMAGE..."
         if [[ $init_engine == *:* ]]; then
             engine_part=${init_engine%%:*}
             type_part=${init_engine#*:}

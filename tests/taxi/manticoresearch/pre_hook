@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
 echo -e "Manticore Search (type $suffix):"
+index_suffix="${suffix}${MANTICORE_CUSTOM_IMAGE_SUFFIX:-}"
 
 docker compose -f ../../docker-compose.yml --env-file ../../.env stop manticoresearch
 docker compose -f ../../docker-compose.yml --env-file ../../.env rm -f manticoresearch
 
 if [ -z "$MANTICORE_REPORTED_VERSION" ]; then
-  echo "" > manticoresearch/manticore$suffix.conf
+  echo "" > manticoresearch/manticore$index_suffix.conf
   MANTICORE_REPORTED_VERSION=$(
-    docker compose -f ../../docker-compose.yml --env-file ../../.env \
+    suffix="$suffix" docker compose -f ../../docker-compose.yml --env-file ../../.env \
       run --rm --no-deps manticoresearch searchd --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1
   )
   export MANTICORE_REPORTED_VERSION
@@ -22,9 +23,9 @@ if [ -z "$shards" ]; then
 fi
 echo -e "\tManticore shards from cpuset: $shards"
 
-php manticoresearch/generate_manticore_config.php --test=$test --type=$suffix --shards=$shards > manticoresearch/manticore$suffix.conf
+php manticoresearch/generate_manticore_config.php --test="$test" --type="$suffix" --shards="$shards" > manticoresearch/manticore$index_suffix.conf
 
-if [ -f manticoresearch/idx$suffix/${test}1.*sph ]; then
+if [ -f manticoresearch/idx$index_suffix/${test}1.*sph ]; then
   echo -e "${COLORED}\tNo need to rebuild${NC}"
   exit 10
 fi
@@ -34,9 +35,9 @@ if [ -f ../../local_hooks/taxi_hook.sh ]; then
   source ../../local_hooks/taxi_hook.sh
 fi
 
-mkdir -p manticoresearch/idx$suffix/data/binlog
-chmod 777 manticoresearch/idx$suffix/data/binlog
-echo "$shards" > manticoresearch/idx$suffix/.shards
+mkdir -p manticoresearch/idx$index_suffix/data/binlog
+chmod 777 manticoresearch/idx$index_suffix/data/binlog
+echo "$shards" > manticoresearch/idx$index_suffix/.shards
 suffix=$suffix docker compose -f ../../docker-compose.yml --env-file ../../.env up -d manticoresearch
 
 if timeout 120 grep -qm1 '\[BUDDY\] started' <(docker logs -f manticoresearch_engine); then

@@ -4,7 +4,7 @@ NIGHTLY_RESULT_MATCHER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/nightly_re
 
 # Expects VERSION and SHORT_HASH from the image selected by run_configured_tests.sh.
 has_config_result() {
-  local test_name="$1" config="$2" phase="$3"
+  local test_name="$1" config="$2" phase="$3" query_count="${4:-}"
   local engine memory limited type="" suffix="" filename file
   engine=$(jq -r '.engine' <<< "$config")
   memory=$(jq -r '.memory' <<< "$config")
@@ -22,7 +22,7 @@ has_config_result() {
               "results/$test_name/manticoresearch$suffix"/*/"$filename" \
               "results/$test_name/manticoresearch"/*/"$filename"; do
     if [[ -f $file ]] && php "$NIGHTLY_RESULT_MATCHER" "$file" "$test_name" "$type" \
-      "$memory" "$limited" "$VERSION" "$SHORT_HASH" "$phase"; then
+      "$memory" "$limited" "$VERSION" "$SHORT_HASH" "$phase" "$query_count"; then
       return 0
     fi
   done

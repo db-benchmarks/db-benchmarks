@@ -42,14 +42,22 @@ class manticoresearch extends engine {
         }
         $row = $res->fetch_row();
         if (preg_match('/(\d+\.\d+\.\d+) (\w+)@(\d+) .*?\(columnar ([0-9.\-]+) (.*?)@(.*?)\)/', $row[1], $match)) {
-            $version = $match[1];
+            $reportedVersion = $match[1];
             $commit = substr($match[2], 0, 5)."_".substr($match[5], 0, 5);
             $date = max($match[3], $match[6]);
         } else return false;
         $date = date_parse_from_format('ymd', $date);
         $time = mktime($date['hour'], $date['minute'], $date['second'], $date['month'], $date['day'], $date['year']);
 
-        return ['version' => $version, 'manticoreVersion' => $version, 'manticoreCommit' => $commit, 'manticoreCommitTime' => $time];
+        // For custom images, identify results by the image tag and the
+        // running server's commit/date instead of its often-0.0.0 version.
+        $resultVersion = $reportedVersion;
+        if ($image = getenv('MANTICORE_CUSTOM_IMAGE')) {
+            $tag = strrchr($image, ':');
+            $tag = preg_replace('/[^a-zA-Z0-9_.-]/', '_', substr($tag, 1));
+            $resultVersion = $tag . '-' . $match[3] . '-' . $match[2];
+        }
+        return ['version' => $resultVersion, 'manticoreVersion' => $reportedVersion, 'manticoreCommit' => $commit, 'manticoreCommitTime' => $time];
     }
 
     protected function appendType($info) {
@@ -74,6 +82,30 @@ class manticoresearch extends engine {
         return false;
     }
 
+    public static function findNotServingError(array $lines): ?string {
+        foreach ($lines as $line) {
+            if (strpos($line, 'NOT SERVING') !== false) {
+                return trim($line);
+            }
+        }
+        return null;
+    }
+
+    protected function startupError(): ?string {
+        $startedAt = [];
+        exec("docker inspect manticoresearch_engine --format='{{.State.StartedAt}}' 2>&1", $startedAt, $status);
+        if ($status || empty($startedAt[0])) {
+            return 'Cannot inspect Manticore container startup time';
+        }
+        $logs = [];
+        exec('docker logs --since ' . escapeshellarg(trim($startedAt[0]))
+            . ' manticoresearch_engine 2>&1', $logs, $status);
+        if ($status) {
+            return 'Cannot read Manticore container startup logs';
+        }
+        return self::findNotServingError($logs);
+    }
+
     protected function beforeQuery() {
         $this->mysql = new mysqli();
         mysqli_report(MYSQLI_REPORT_OFF);
@@ -88,7 +120,7 @@ class manticoresearch extends engine {
     protected function testOnce($query):array {
         $res = $this->mysql->query($query);
 
-        $errorResult = $this->parseMysqlError($this->mysql->errno, 2006);
+        $errorResult = $this->parseMysqlError($this->mysql->errno, 2006, $this->mysql->error);
         if ($errorResult){
             return $errorResult;
         }
@@ -166,7 +198,7 @@ class manticoresearch extends engine {
             $this->reportedVersion = null;
             return null;
         }
-        $this->reportedVersion = $info['version'];
+        $this->reportedVersion = getenv('MANTICORE_REPORTED_VERSION') ?: $info['manticoreVersion'];
         return $this->reportedVersion;
     }
 }

@@ -6,6 +6,12 @@
     "result_engine": "manticoresearch",
     "success_hook": "local_hooks/nightly_hook.sh"
   },
+  "custom_images": [
+    {
+      "image": "ghcr.io/manticoresoftware/manticoresearch:test-kit-light-index_format",
+      "tests": ["hn_small", "hn"]
+    }
+  ],
   "init": {
     "taxi": [
       "manticoresearch:columnar_tuned"

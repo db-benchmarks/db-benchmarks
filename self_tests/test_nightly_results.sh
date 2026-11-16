@@ -50,6 +50,21 @@ make_result() {
 expect miss 'no result' "$row"
 make_result results/nightly/hn_small_vector/manticoresearch_rowwise hn_small_vector rowwise 110000 false initial
 expect hit 'current nightly rowwise result' "$row"
+if ! has_config_result hn_small_vector "$row" initial 1; then
+  printf 'FAIL: complete result was not found with the expected query count\n' >&2
+  exit 1
+fi
+if has_config_result hn_small_vector "$row" initial 2; then
+  printf 'FAIL: partial result was accepted for a two-query workload\n' >&2
+  exit 1
+fi
+printf 'PASS: query count is part of completion check\n'
+VERSION=test-kit-light-perf_improvements-26102015-5ba603a55
+SHORT_HASH=5ba60
+make_result results/nightly/branch/manticoresearch branch '' 110000 false initial "$VERSION" "$SHORT_HASH"
+expect hit 'custom image result identity' "$default" initial branch
+VERSION=27.1.5
+SHORT_HASH=5a1cf
 expect miss 'rowwise cannot satisfy columnar' "$col"
 expect miss 'initial cannot satisfy retest' "$row" retest
 expect miss 'memory is part of identity' "$small"

@@ -2,11 +2,11 @@
 
 // A benchmark result is PHP-serialized; matching arbitrary text in it can
 // mistake query text or server metadata for the tested engine version.
-if ($argc !== 9 || !is_file($argv[1])) {
+if ($argc !== 10 || !is_file($argv[1])) {
     exit(1);
 }
 
-[, $file, $test, $type, $memory, $limited, $version, $hash, $phase] = $argv;
+[, $file, $test, $type, $memory, $limited, $version, $hash, $phase, $queryCount] = $argv;
 if (!in_array($phase, ['initial', 'retest'], true)) {
     exit(1);
 }
@@ -18,7 +18,7 @@ if (!is_array($result) || !isset($result['info']) || !is_array($result['info']))
 
 $queries = $result['queries'] ?? null;
 $expectedRetest = $phase === 'retest';
-if (!is_array($queries) || !$queries) {
+if (!is_array($queries) || !$queries || ($queryCount !== '' && count($queries) !== (int) $queryCount)) {
     exit(1);
 }
 foreach ($queries as $query) {
