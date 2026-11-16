@@ -5,7 +5,7 @@ Custom images and their suites are configured in `configs/nightly.json`:
 ```json
 "custom_images": [
   {
-    "image": "ghcr.io/manticoresoftware/manticoresearch:test-kit-index_format",
+    "image": "ghcr.io/manticoresoftware/manticoresearch:test-kit-light-index_format",
     "tests": ["hn_small", "hn"]
   }
 ]
@@ -14,7 +14,7 @@ Custom images and their suites are configured in `configs/nightly.json`:
 `run_nightly.sh` passes each custom image and its selected suites to `run_configured_tests.sh`. The same nightly config supplies their `init` entries, benchmark cases, and shared settings. No second config or inheritance is needed. To run just this image and its selected suites:
 
 ```bash
-./run_configured_tests.sh -c configs/nightly.json -i ghcr.io/manticoresoftware/manticoresearch:test-kit-index_format -T hn_small,hn
+./run_configured_tests.sh -c configs/nightly.json -i ghcr.io/manticoresoftware/manticoresearch:test-kit-light-index_format -T hn_small,hn
 ```
 
 For one-off data preparation of the configured custom images:

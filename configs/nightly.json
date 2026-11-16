@@ -8,7 +8,7 @@
   },
   "custom_images": [
     {
-      "image": "ghcr.io/manticoresoftware/manticoresearch:test-kit-index_format",
+      "image": "ghcr.io/manticoresoftware/manticoresearch:test-kit-light-index_format",
       "tests": ["hn_small", "hn"]
     }
   ],
